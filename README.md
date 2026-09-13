@@ -1,26 +1,21 @@
 # 🩸 Rota Solidária
----
-## Sobre o Projeto
 
+## Sobre o Projeto
 O **Rota Solidária** é uma plataforma web voltada para a **divulgação de excursões para doação de sangue**.
 A plataforma tem como objetivo conectar pessoas interessadas em realizar doações de sangue às **excursões disponíveis**, facilitando o acesso às informações sobre as viagens, campanhas, datas, locais e demais detalhes necessários para a participação.
 Este repositório contém a **implementação web do projeto**, desenvolvida com base no protótipo do Rota Solidária.
 
 ## Objetivo
-
 O projeto busca facilitar a participação da população em ações de doação de sangue por meio da **divulgação e organização de excursões destinadas aos locais de coleta**.
 A plataforma permite centralizar informações sobre as excursões, tornando mais fácil para os interessados encontrar uma oportunidade de doação e participar de uma viagem organizada para esse propósito.
 
 ## Como funciona?
-
 A proposta do Rota Solidária é:
 1. **Divulgar excursões** destinadas à doação de sangue;
 2. Apresentar **datas e horários** das excursões;
 3. Informar o **local de destino para a doação**;
 4. Disponibilizar informações sobre a **viagem e transporte**;
 5. Facilitar o acesso das pessoas interessadas às excursões disponíveis;
-
----
 
 ## Tecnologias Utilizadas
 * Java 21
@@ -33,23 +28,17 @@ A proposta do Rota Solidária é:
 * HTML
 * CSS
 
----
-
 ## Principais Dependências
-
-### Spring Web
+### - Spring Web
 Utilizado para o desenvolvimento da aplicação web, criação de **controllers e rotas**.
-### FreeMarker
+### - FreeMarker
 Utilizado como mecanismo de templates para a construção das páginas da aplicação por meio dos arquivos `.ftlh`.
-### Spring Boot DevTools
+### - Spring Boot DevTools
 Auxilia durante o desenvolvimento permitindo o **recarregamento automático da aplicação** após alterações no código.
-### Spring Boot Test
+### - Spring Boot Test
 Utilizado para a realização de **testes automatizados** na aplicação.
 
----
-
 ## 📁 Estrutura do Projeto
-
 ```text
 4Semestre_ProjetoWeb/
 │
@@ -73,24 +62,16 @@ Utilizado para a realização de **testes automatizados** na aplicação.
 └── README.md
 ```
 
----
-
 ## Requisitos
-
 Para executar o projeto, é necessário possuir:
 * Java JDK 21
 * Maven
 * Git
 * IDE de desenvolvimento Java, como IntelliJ IDEA, Eclipse ou Visual Studio Code.
 
----
-
 ## Projeto Relacionado
-
 O desenvolvimento deste projeto foi baseado no protótipo do Rota Solidária: **4Semestre_Prototipo**
 O protótipo apresenta a estrutura visual e a proposta inicial da plataforma, enquanto este repositório contém a **implementação web utilizando Java e Spring Boot**.
-
----
 
 ## Autores
 <table>
@@ -102,5 +83,3 @@ O protótipo apresenta a estrutura visual e a proposta inicial da plataforma, en
     <td align="center"><a href="https://github.com/Ramos902"><img src="https://github.com/Ramos902.png" width="80" height="80" style="border-radius:50%"/><br><sub>Ramos</sub></a></td>
   </tr>
 </table>
-### ❤️ Rota Solidária
-**Conectando pessoas às excursões para doação de sangue.**
