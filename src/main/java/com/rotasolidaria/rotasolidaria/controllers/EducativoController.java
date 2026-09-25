@@ -1,5 +1,5 @@
 // EducativoController.java
-package com.rotasolidaria.rotasolidaria.Educativo;
+package com.rotasolidaria.rotasolidaria.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,5 +1,5 @@
 // InscricaoController.java
-package com.rotasolidaria.rotasolidaria.Inscricao;
+package com.rotasolidaria.rotasolidaria.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

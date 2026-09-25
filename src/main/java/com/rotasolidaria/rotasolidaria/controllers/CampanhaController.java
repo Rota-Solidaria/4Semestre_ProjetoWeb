@@ -1,5 +1,5 @@
 // CampanhaController.java
-package com.rotasolidaria.rotasolidaria.Campanha;
+package com.rotasolidaria.rotasolidaria.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,4 +1,4 @@
-package com.rotasolidaria.rotasolidaria.Campanha;
+package com.rotasolidaria.rotasolidaria.repositories;
 
 /**
  * CampanhaRepository
