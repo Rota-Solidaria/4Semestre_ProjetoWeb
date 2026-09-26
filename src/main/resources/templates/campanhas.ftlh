@@ -8,8 +8,11 @@
   <link rel="icon" href="assets/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet">
   <link rel="stylesheet" href="/css/campanhas.css">
 </head>
 
@@ -26,7 +29,8 @@
         <a href="/educativo">Saiba Mais</a>
       </nav>
       <div class="header-actions">
-        <a class="icon-btn" href="#acessibilidade" aria-label="Acessibilidade"><span class="icon">accessibility_new</span></a>
+        <a class="icon-btn" href="#acessibilidade" aria-label="Acessibilidade"><span
+            class="icon">accessibility_new</span></a>
         <a class="profile-chip" href="/login"><span class="avatar">RS</span>Perfil</a>
       </div>
     </div>
@@ -56,39 +60,42 @@
       </div>
 
       <div class="list">
-        <a class="list-row" href="/campanhas/1">
-          <img src="assets/doacaodesangue.jpeg" alt="">
-          <div>
-            <div class="row-top">
-              <span class="badge badge-open"><span class="dot"></span>Inscrições abertas</span>
-              <span class="row-vagas">12 vagas</span>
-            </div>
-            <h3>Campanha Mês Amarelo</h3>
-            <div class="row-meta">
-              <span><span class="icon">schedule</span>11 de Maio · Saída 05:00h</span>
-              <span><span class="icon">place</span>Colsan — Posto de Coleta Sorocaba</span>
-              <span><span class="icon">directions_bus</span>Transporte gratuito</span>
-            </div>
-          </div>
-          <span class="row-cta cta-primary" style="background:var(--brand);color:#fff">Ver campanha</span>
-        </a>
-
-        <div class="list-row is-closed">
-          <img src="assets/doacaodesangue.jpeg" alt="">
-          <div>
-            <div class="row-top">
-              <span class="badge badge-closed"><span class="dot"></span>Finalizada</span>
-              <span class="row-vagas">0 vagas</span>
-            </div>
-            <h3>Mutirão Solidário de Abril</h3>
-            <div class="row-meta">
-              <span><span class="icon">schedule</span>03 de Abril · Saída 05:00h</span>
-              <span><span class="icon">place</span>Colsan — Posto de Coleta Sorocaba</span>
-              <span><span class="icon">directions_bus</span>Transporte gratuito</span>
-            </div>
-          </div>
-          <span class="row-cta" style="background:var(--surface2);color:var(--text3)">Encerrada</span>
-        </div>
+        <#if campanhas?? && campanhas?size gt 0>
+          <#list campanhas as c>
+            <a class="list-row" href="/campanhas/${c.
+  id}">
+              <img src="/css/assets/doacaodesangue.  
+  jpeg" alt="${c.title}">
+              <div>
+                <div class="row-top">
+                  <span class="badge badge-          
+  open"><span class="dot"></span>${c.status}</span>
+                  <span class="row-vagas">${c.
+                    slots!0} vagas</span>
+                </div>
+                <h3>${c.title}</h3>
+                <div class="row-meta">
+                  <#if c.eventDate??>
+                    <span><span class="icon">schedule</span>${c.eventDate} <#if c. donationTime??>· ${c.donationTime}h
+                      </#if></span>
+                  </#if>
+                  <#if c.donationLocation??>
+                    <span><span class="icon">place</span>${c.donationLocation.name} —
+                      ${c.donationLocation.city}</span>
+                  </#if>
+                  <span><span class="icon">directions_bus</span>Transporte
+                    gratuito</span>
+                </div>
+              </div>
+              <span class="row-cta cta-primary" style="background:var(--brand);color:#fff">Ver
+                campanha</span>
+            </a>
+          </#list>
+          <#else>
+            <p style="padding: 2rem; text-align: center;
+  color: var(--text3);">Nenhuma campanha aberta no
+              momento.</p>
+        </#if>
       </div>
 
       <div class="pagination">
