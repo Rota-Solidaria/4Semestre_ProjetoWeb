@@ -1,7 +1,8 @@
-package com.rotasolidaria.rotasolidaria.models;
+package com.rotasolidaria.models;
+
+import com.rotasolidaria.models.enums.ContentType;
 
 import jakarta.persistence.*;
-import com.rotasolidaria.rotasolidaria.models.enums.ContentType;
 
 @Entity
 @Table(name = "educational_contents")

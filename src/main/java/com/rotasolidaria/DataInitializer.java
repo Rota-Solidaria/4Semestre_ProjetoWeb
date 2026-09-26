@@ -1,30 +1,43 @@
 package com.rotasolidaria;
 
-import com.rotasolidaria.rotasolidaria.models.*;
-import com.rotasolidaria.rotasolidaria.models.enums.*;
-import com.rotasolidaria.rotasolidaria.repositories.*;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import com.rotasolidaria.models.Campaign;
+import com.rotasolidaria.models.EducationalContent;
+import com.rotasolidaria.models.Location;
+import com.rotasolidaria.models.Organizer;
+import com.rotasolidaria.models.enums.CampaignStatus;
+import com.rotasolidaria.models.enums.ContentType;
+import com.rotasolidaria.repositories.CampanhaRepository;
+import com.rotasolidaria.repositories.ConteudoEducativoRepository;
+import com.rotasolidaria.repositories.LocalizacaoRepository;
+import com.rotasolidaria.repositories.UserRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     private final CampanhaRepository campanhaRepository;
     private final LocalizacaoRepository localizacaoRepository;
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
     private final ConteudoEducativoRepository conteudoEducativoRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(CampanhaRepository campanhaRepository,
             LocalizacaoRepository localizacaoRepository,
-            UsuarioRepository usuarioRepository,
-            ConteudoEducativoRepository conteudoEducativoRepository) {
+            UserRepository usuarioRepository,
+
+            ConteudoEducativoRepository conteudoEducativoRepository,
+            PasswordEncoder passwordEncoder) {
         this.campanhaRepository = campanhaRepository;
         this.localizacaoRepository = localizacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.conteudoEducativoRepository = conteudoEducativoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -36,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
             Organizer organizador = new Organizer();
             organizador.setName("Hemocentro Regional");
             organizador.setEmail("contato@hemocentro.org.br");
-            organizador.setPasswordHash("123456");
+            organizador.setPasswordHash(passwordEncoder.encode("123456"));
             organizador.setPhone("11999998888");
             organizador.setInstitution("Fundação Pró-Sangue");
             usuarioRepository.save(organizador);

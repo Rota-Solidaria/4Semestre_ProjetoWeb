@@ -1,4 +1,4 @@
-package com.rotasolidaria.rotasolidaria.models.enums;
+package com.rotasolidaria.models.enums;
 
 public enum CampaignStatus {
     OPEN,

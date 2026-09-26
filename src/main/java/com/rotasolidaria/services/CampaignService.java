@@ -1,7 +1,8 @@
 package com.rotasolidaria.services;
 
-import com.rotasolidaria.rotasolidaria.models.Campaign;
-import com.rotasolidaria.rotasolidaria.repositories.CampanhaRepository;
+import com.rotasolidaria.models.Campaign;
+import com.rotasolidaria.repositories.CampanhaRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;

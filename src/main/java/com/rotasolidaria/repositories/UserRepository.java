@@ -1,14 +1,16 @@
-package com.rotasolidaria.rotasolidaria.repositories;
+package com.rotasolidaria.repositories;
 
-import com.rotasolidaria.rotasolidaria.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.rotasolidaria.models.User;
 
 import java.util.Optional;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
+    
 }

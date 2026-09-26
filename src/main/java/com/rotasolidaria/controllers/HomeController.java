@@ -1,5 +1,5 @@
 // HomeController.java
-package com.rotasolidaria.rotasolidaria.controllers;
+package com.rotasolidaria.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

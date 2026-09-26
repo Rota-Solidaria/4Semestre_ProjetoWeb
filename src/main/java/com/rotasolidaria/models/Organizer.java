@@ -1,4 +1,4 @@
-package com.rotasolidaria.rotasolidaria.models;
+package com.rotasolidaria.models;
 
 import jakarta.persistence.*;
 

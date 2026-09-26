@@ -1,8 +1,10 @@
-package com.rotasolidaria.rotasolidaria.models;
+package com.rotasolidaria.models;
 
 import java.time.LocalDate;
 import org.springframework.context.annotation.Primary;
-import com.rotasolidaria.rotasolidaria.models.enums.BloodType;
+
+import com.rotasolidaria.models.enums.BloodType;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
 

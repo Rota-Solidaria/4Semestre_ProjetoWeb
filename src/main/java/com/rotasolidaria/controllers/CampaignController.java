@@ -1,5 +1,5 @@
 // CampanhaController.java
-package com.rotasolidaria.rotasolidaria.controllers;
+package com.rotasolidaria.controllers;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.rotasolidaria.rotasolidaria.models.Campaign;
+import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.services.CampaignService;
 
 @Controller

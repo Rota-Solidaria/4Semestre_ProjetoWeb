@@ -1,10 +1,11 @@
-package com.rotasolidaria.rotasolidaria.repositories;
+package com.rotasolidaria.repositories;
 
-import com.rotasolidaria.rotasolidaria.models.Campaign;
-import com.rotasolidaria.rotasolidaria.models.Donor;
-import com.rotasolidaria.rotasolidaria.models.Registration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.rotasolidaria.models.Campaign;
+import com.rotasolidaria.models.Donor;
+import com.rotasolidaria.models.Registration;
 
 import java.util.List;
 

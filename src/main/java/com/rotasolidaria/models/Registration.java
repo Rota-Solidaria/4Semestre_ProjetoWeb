@@ -1,9 +1,10 @@
-package com.rotasolidaria.rotasolidaria.models;
+package com.rotasolidaria.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import com.rotasolidaria.rotasolidaria.models.enums.RegistrationStatus;
-import com.rotasolidaria.rotasolidaria.models.Campaign;
+
+import com.rotasolidaria.models.Campaign;
+import com.rotasolidaria.models.enums.RegistrationStatus;
 
 @Entity
 @Table(

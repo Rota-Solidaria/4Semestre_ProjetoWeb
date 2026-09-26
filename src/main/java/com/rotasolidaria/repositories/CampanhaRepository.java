@@ -1,9 +1,10 @@
-package com.rotasolidaria.rotasolidaria.repositories;
+package com.rotasolidaria.repositories;
 
-import com.rotasolidaria.rotasolidaria.models.Campaign;
-import com.rotasolidaria.rotasolidaria.models.enums.CampaignStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.rotasolidaria.models.Campaign;
+import com.rotasolidaria.models.enums.CampaignStatus;
 
 import java.util.List;
 
