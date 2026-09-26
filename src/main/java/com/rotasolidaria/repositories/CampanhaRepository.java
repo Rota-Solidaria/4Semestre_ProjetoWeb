@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface CampanhaRepository extends JpaRepository<Campaign, Long> { 
     List<Campaign> findByStatus(CampaignStatus status);
+    List<Campaign> findTop6ByStatus(CampaignStatus status);
 }

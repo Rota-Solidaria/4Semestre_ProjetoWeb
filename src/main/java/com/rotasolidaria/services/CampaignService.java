@@ -21,6 +21,10 @@ public class CampaignService {
         return campanhaRepository.findAll();
     }
 
+    public List<Campaign> listarAbertas() {
+        return campanhaRepository.findTop6ByStatus(com.rotasolidaria.models.enums.CampaignStatus.OPEN);
+    }
+
     public Optional<Campaign> buscarPorId(Long id) {
         return campanhaRepository.findById(id);
     }

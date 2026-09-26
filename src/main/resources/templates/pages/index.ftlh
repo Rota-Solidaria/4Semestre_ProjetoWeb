@@ -30,32 +30,51 @@
         </div>
 
         <div class="grid">
-          <a class="card" href="/campanhas/1">
-            <div class="card-img"><img src="/images/doacaodesangue.jpeg" alt=""></div>
-            <div class="card-body">
-              <span class="badge badge-open"><span class="dot"></span>Inscrições abertas</span>
-              <h3>Campanha Mês Amarelo</h3>
-              <div class="meta">
-                <span><span class="icon">schedule</span>11 de Maio · Saída 05:00h</span>
-                <span><span class="icon">place</span>Colsan — Posto de Coleta Sorocaba</span>
-                <span><span class="icon">directions_bus</span>Transporte gratuito</span>
-              </div>
-              <span class="card-cta cta-primary">Inscrever-se</span>
-            </div>
-          </a>
-          <div class="card is-closed">
-            <div class="card-img"><img src="/images/doacaodesangue.jpeg" alt=""></div>
-            <div class="card-body">
-              <span class="badge badge-closed"><span class="dot"></span>Finalizada</span>
-              <h3>Mutirão Solidário de Abril</h3>
-              <div class="meta">
-                <span><span class="icon">schedule</span>03 de Abril · Saída 05:00h</span>
-                <span><span class="icon">place</span>Colsan — Posto de Coleta Sorocaba</span>
-                <span><span class="icon">directions_bus</span>Transporte gratuito</span>
-              </div>
-              <span class="card-cta cta-disabled">Encerrada</span>
-            </div>
-          </div>
+          <#if campanhas?? && campanhas?size gt 0>
+            <#list campanhas as c>
+              <#if c?index lt 6>
+                <#if c.status == "OPEN">
+                  <a class="card" href="/campanhas/${c.id}">
+                    <div class="card-img"><img src="${c.imageUrl!'/images/doacaodesangue.jpeg'}" alt="${c.title}"></div>
+                    <div class="card-body">
+                      <span class="badge badge-open"><span class="dot"></span>Inscrições abertas</span>
+                      <h3>${c.title}</h3>
+                      <div class="meta">
+                        <#if c.eventDate??>
+                          <span><span class="icon">schedule</span>${c.eventDate}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTime}h</#if></span>
+                        </#if>
+                        <#if c.donationLocation??>
+                          <span><span class="icon">place</span>${c.donationLocation.name}<#if c.donationLocation.city??> — ${c.donationLocation.city}</#if></span>
+                        </#if>
+                        <span><span class="icon">directions_bus</span>Transporte gratuito</span>
+                      </div>
+                      <span class="card-cta cta-primary">Inscrever-se</span>
+                    </div>
+                  </a>
+                <#else>
+                  <div class="card is-closed">
+                    <div class="card-img"><img src="${c.imageUrl!'/images/doacaodesangue.jpeg'}" alt="${c.title}"></div>
+                    <div class="card-body">
+                      <span class="badge badge-closed"><span class="dot"></span>Finalizada</span>
+                      <h3>${c.title}</h3>
+                      <div class="meta">
+                        <#if c.eventDate??>
+                          <span><span class="icon">schedule</span>${c.eventDate}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTime}h</#if></span>
+                        </#if>
+                        <#if c.donationLocation??>
+                          <span><span class="icon">place</span>${c.donationLocation.name}<#if c.donationLocation.city??> — ${c.donationLocation.city}</#if></span>
+                        </#if>
+                        <span><span class="icon">directions_bus</span>Transporte gratuito</span>
+                      </div>
+                      <span class="card-cta cta-disabled">Encerrada</span>
+                    </div>
+                  </div>
+                </#if>
+              </#if>
+            </#list>
+          <#else>
+            <p style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--text3);">Nenhuma campanha aberta no momento.</p>
+          </#if>
         </div>
       </div>
     </section>
