@@ -18,6 +18,12 @@ import com.rotasolidaria.repositories.ConteudoEducativoRepository;
 import com.rotasolidaria.repositories.LocalizacaoRepository;
 import com.rotasolidaria.repositories.UserRepository;
 
+import com.rotasolidaria.models.Donor;
+import com.rotasolidaria.models.Registration;
+import com.rotasolidaria.models.enums.BloodType;
+import com.rotasolidaria.models.enums.RegistrationStatus;
+import com.rotasolidaria.repositories.InscricaoRepository;
+
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -25,18 +31,20 @@ public class DataInitializer implements CommandLineRunner {
     private final LocalizacaoRepository localizacaoRepository;
     private final UserRepository usuarioRepository;
     private final ConteudoEducativoRepository conteudoEducativoRepository;
+    private final InscricaoRepository inscricaoRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(CampanhaRepository campanhaRepository,
             LocalizacaoRepository localizacaoRepository,
             UserRepository usuarioRepository,
-
             ConteudoEducativoRepository conteudoEducativoRepository,
+            InscricaoRepository inscricaoRepository,
             PasswordEncoder passwordEncoder) {
         this.campanhaRepository = campanhaRepository;
         this.localizacaoRepository = localizacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.conteudoEducativoRepository = conteudoEducativoRepository;
+        this.inscricaoRepository = inscricaoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -93,7 +101,47 @@ public class DataInitializer implements CommandLineRunner {
             mito1.setDisplayOrder(2);
             conteudoEducativoRepository.save(mito1);
 
+            // 5. Criar Doador Padrão de Teste
+            if (!usuarioRepository.existsByEmail("joao@email.com")) {
+                Donor doador = new Donor();
+                doador.setName("João da Silva");
+                doador.setEmail("joao@email.com");
+                doador.setPasswordHash(passwordEncoder.encode("123456"));
+                doador.setPhone("(15) 99999-0000");
+                doador.setBloodType(BloodType.O_POSITIVE);
+                doador.setBirthDate(LocalDate.of(1995, 5, 15));
+                doador.setWeight(72.5);
+                usuarioRepository.save(doador);
+
+                Registration inscricao = new Registration();
+                inscricao.setCampaign(c1);
+                inscricao.setDonor(doador);
+                inscricao.setStatus(RegistrationStatus.CONFIRMED);
+                inscricao.setNotes("Embarque Praça Matriz.");
+                inscricaoRepository.save(inscricao);
+            }
+
             System.out.println(">>> [DataInitializer] Dados de teste carregados com sucesso no MySQL!");
+        } else if (!usuarioRepository.existsByEmail("joao@email.com")) {
+            Donor doador = new Donor();
+            doador.setName("João da Silva");
+            doador.setEmail("joao@email.com");
+            doador.setPasswordHash(passwordEncoder.encode("123456"));
+            doador.setPhone("(15) 99999-0000");
+            doador.setBloodType(BloodType.O_POSITIVE);
+            doador.setBirthDate(LocalDate.of(1995, 5, 15));
+            doador.setWeight(72.5);
+            usuarioRepository.save(doador);
+
+            var campanhas = campanhaRepository.findAll();
+            if (!campanhas.isEmpty()) {
+                Registration inscricao = new Registration();
+                inscricao.setCampaign(campanhas.get(0));
+                inscricao.setDonor(doador);
+                inscricao.setStatus(RegistrationStatus.CONFIRMED);
+                inscricao.setNotes("Embarque Praça Matriz.");
+                inscricaoRepository.save(inscricao);
+            }
         }
     }
 }

@@ -14,6 +14,7 @@
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0"
     rel="stylesheet">
+  <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="${css}">
 </head>
 
