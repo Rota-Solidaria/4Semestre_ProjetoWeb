@@ -49,5 +49,101 @@ public class Campaign {
     @JoinColumn(name = "organizer_id", nullable = false)
     private Organizer organizer;
 
-    // Getters e Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDate getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public LocalTime getDonationTime() {
+        return donationTime;
+    }
+
+    public void setDonationTime(LocalTime donationTime) {
+        this.donationTime = donationTime;
+    }
+
+    public LocalTime getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(LocalTime departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    public Integer getSlots() {
+        return slots;
+    }
+
+    public void setSlots(Integer slots) {
+        this.slots = slots;
+    }
+
+    public CampaignStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CampaignStatus status) {
+        this.status = status;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Location getDonationLocation() {
+        return donationLocation;
+    }
+
+    public void setDonationLocation(Location donationLocation) {
+        this.donationLocation = donationLocation;
+    }
+
+    public Location getDepartureLocation() {
+        return departureLocation;
+    }
+
+    public void setDepartureLocation(Location departureLocation) {
+        this.departureLocation = departureLocation;
+    }
+
+    public Organizer getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(Organizer organizer) {
+        this.organizer = organizer;
+    }
+
+    
 }

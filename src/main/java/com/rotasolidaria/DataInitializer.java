@@ -1,0 +1,86 @@
+package com.rotasolidaria;
+
+import com.rotasolidaria.rotasolidaria.models.*;
+import com.rotasolidaria.rotasolidaria.models.enums.*;
+import com.rotasolidaria.rotasolidaria.repositories.*;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Component
+public class DataInitializer implements CommandLineRunner {
+
+    private final CampanhaRepository campanhaRepository;
+    private final LocalizacaoRepository localizacaoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final ConteudoEducativoRepository conteudoEducativoRepository;
+
+    public DataInitializer(CampanhaRepository campanhaRepository,
+            LocalizacaoRepository localizacaoRepository,
+            UsuarioRepository usuarioRepository,
+            ConteudoEducativoRepository conteudoEducativoRepository) {
+        this.campanhaRepository = campanhaRepository;
+        this.localizacaoRepository = localizacaoRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.conteudoEducativoRepository = conteudoEducativoRepository;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        // Só popula se ainda não houver campanhas cadastradas
+        if (campanhaRepository.count() == 0) {
+
+            // 1. Criar um Organizador
+            Organizer organizador = new Organizer();
+            organizador.setName("Hemocentro Regional");
+            organizador.setEmail("contato@hemocentro.org.br");
+            organizador.setPasswordHash("123456");
+            organizador.setPhone("11999998888");
+            organizador.setInstitution("Fundação Pró-Sangue");
+            usuarioRepository.save(organizador);
+
+            // 2. Criar um Local de Doação
+            Location hemocentro = new Location();
+            hemocentro.setName("Posto Clínicas - Fundação Pró-Sangue");
+            hemocentro.setStreet("Av. Dr. Enéas Carvalho de Aguiar");
+            hemocentro.setNumber("155");
+            hemocentro.setNeighborhood("Cerqueira César");
+            hemocentro.setCity("São Paulo");
+            hemocentro.setState("SP");
+            hemocentro.setZipCode("05403000");
+            localizacaoRepository.save(hemocentro);
+
+            // 3. Criar uma Campanha Ativa
+            Campaign c1 = new Campaign();
+            c1.setTitle("Campanha Sangue Solidário 2026");
+            c1.setDescription(
+                    "Participe da nossa caravana de doação de sangue para abastecer os estoques de hospitais regionais.");
+            c1.setEventDate(LocalDate.now().plusDays(15));
+            c1.setDonationTime(LocalTime.of(9, 30));
+            c1.setSlots(40);
+            c1.setStatus(CampaignStatus.OPEN);
+            c1.setDonationLocation(hemocentro);
+            c1.setOrganizer(organizador);
+            campanhaRepository.save(c1);
+
+            // 4. Criar Conteúdos Educativos
+            EducationalContent dica1 = new EducationalContent();
+            dica1.setTitle("Requisitos Básicos para Doar Sangue");
+            dica1.setType(ContentType.ARTICLE);
+            dica1.setText("Estar em boas condições de saúde, ter entre 16 e 69 anos e pesar no mínimo 50 kg.");
+            dica1.setDisplayOrder(1);
+            conteudoEducativoRepository.save(dica1);
+
+            EducationalContent mito1 = new EducationalContent();
+            mito1.setTitle("Mito: Doar sangue afina ou engrossa o sangue");
+            mito1.setType(ContentType.ARTICLE);
+            mito1.setText("Mito! O volume doado é reposto naturalmente pelo organismo em até 24 a 48 horas.");
+            mito1.setDisplayOrder(2);
+            conteudoEducativoRepository.save(mito1);
+
+            System.out.println(">>> [DataInitializer] Dados de teste carregados com sucesso no MySQL!");
+        }
+    }
+}
