@@ -103,3 +103,4 @@ input,select,textarea{font:inherit;color:inherit}
 .warn-box .warn-head .icon{font-size:20px}
 .warn-box ul{display:grid;gap:6px;font-size:14px;color:var(--warn-text);margin:10px 0 0;padding:0;list-style:none}
 .success-actions{display:flex;gap:12px;flex-wrap:wrap}
+.success-contact-note{color:var(--text2);margin:0 0 18px}

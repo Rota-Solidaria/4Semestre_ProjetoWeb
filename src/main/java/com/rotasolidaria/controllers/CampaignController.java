@@ -25,7 +25,7 @@ public class CampaignController {
     public String listar(Model model) {
         List<Campaign> campanhas = campanhaService.listarTodas();
         model.addAttribute("campanhas", campanhas);
-        return "campanhas"; // -> templates/campanhas.ftlh
+        return "pages/campanhas"; // -> templates/pages/campanhas.ftlh
     }
 
     @GetMapping("/campanhas/{id}")
@@ -34,7 +34,7 @@ public class CampaignController {
         Optional<Campaign> campanha = campanhaService.buscarPorId(id);
         if (campanha.isPresent()) {
             model.addAttribute("campanha", campanha.get());
-            return "detalhes-campanha"; // -> templates/detalhes-campanha.ftlh
+            return "pages/detalhes-campanha"; // -> templates/pages/detalhes-campanha.ftlh
         }
         return "redirect:/campanhas";
     }

@@ -12,7 +12,7 @@ public class InscricaoController {
 
     @GetMapping("/campanhas/{id}/inscrever")
     public String formInscricao(@PathVariable Long id) {
-        return "inscrever-campanha"; // -> templates/inscrever-campanha.ftlh
+        return "pages/inscrever-campanha"; // -> templates/pages/inscrever-campanha.ftlh
     }
 
     @PostMapping("/campanhas/{id}/inscrever")
@@ -22,6 +22,6 @@ public class InscricaoController {
 
     @GetMapping("/sucesso")
     public String sucesso() {
-        return "sucesso"; // -> templates/sucesso.ftlh
+        return "pages/sucesso"; // -> templates/pages/sucesso.ftlh
     }
 }

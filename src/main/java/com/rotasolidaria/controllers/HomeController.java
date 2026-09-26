@@ -9,6 +9,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String index() {
-        return "index"; // -> templates/index.ftlh
+        return "pages/index"; // -> templates/pages/index.ftlh
     }
 }

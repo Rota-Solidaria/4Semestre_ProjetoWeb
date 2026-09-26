@@ -99,3 +99,5 @@ input,select,textarea{font:inherit;color:inherit}
 .login-panel .btn{width:100%;margin-top:22px}
 .login-foot{text-align:center;font-size:14px;color:var(--text2);margin-top:18px}
 .login-foot a{color:var(--brand);font-weight:700}
+.login-msg-error{color:var(--err-text);margin-bottom:14px}
+.login-msg-warn{color:var(--warn-text);margin-bottom:14px}

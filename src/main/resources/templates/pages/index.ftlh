@@ -1,43 +1,6 @@
-<!doctype html>
-<html lang="pt-BR">
+<#import "../layout/main.ftlh" as main>
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Rota Solidária</title>
-  <link rel="icon" href="assets/favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
-  <link rel="stylesheet" href="/css/index.css">
-</head>
-
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="logo" href="/">
-        <span class="logo-mark"><span class="logo-dot"></span></span>
-        <span class="logo-text"><span class="brand">Rota</span> Solidária</span>
-      </a>
-      <nav class="nav">
-        <a class="active" href="/">Início</a>
-        <a href="/campanhas">Campanhas</a>
-        <a href="/educativo">Saiba Mais</a>
-      </nav>
-      <div class="header-actions">
-        <a class="icon-btn" href="#acessibilidade" aria-label="Acessibilidade"><span class="icon">accessibility_new</span></a>
-        <a class="profile-chip" href="/login"><span class="avatar">RS</span>Perfil</a>
-      </div>
-    </div>
-    <div class="mobile-nav container">
-      <a href="/">Início</a>
-      <a href="/campanhas">Campanhas</a>
-      <a href="/educativo">Saiba Mais</a>
-      <a href="/login">Perfil</a>
-    </div>
-  </header>
-
+<@main.layout title="Rota Solidária" css="/css/index.css" currentNav="inicio">
   <main>
     <section class="hero">
       <div class="container hero-grid">
@@ -48,7 +11,7 @@
         </div>
 
         <div class="hero-image">
-          <img src="assets/doacaodesangue.jpeg" alt="Pessoa realizando doação de sangue">
+          <img src="/images/doacaodesangue.jpeg" alt="Pessoa realizando doação de sangue">
 
           </div>
         </div>
@@ -68,7 +31,7 @@
 
         <div class="grid">
           <a class="card" href="/campanhas/1">
-            <div class="card-img"><img src="assets/doacaodesangue.jpeg" alt=""></div>
+            <div class="card-img"><img src="/images/doacaodesangue.jpeg" alt=""></div>
             <div class="card-body">
               <span class="badge badge-open"><span class="dot"></span>Inscrições abertas</span>
               <h3>Campanha Mês Amarelo</h3>
@@ -81,7 +44,7 @@
             </div>
           </a>
           <div class="card is-closed">
-            <div class="card-img"><img src="assets/doacaodesangue.jpeg" alt=""></div>
+            <div class="card-img"><img src="/images/doacaodesangue.jpeg" alt=""></div>
             <div class="card-body">
               <span class="badge badge-closed"><span class="dot"></span>Finalizada</span>
               <h3>Mutirão Solidário de Abril</h3>
@@ -108,7 +71,7 @@
 
         <div class="past-grid">
           <div class="past-card">
-            <img src="assets/excursoes/foto-01.jpeg" alt="Participantes da excursão para doação de sangue">
+            <img src="/images/excursoes/foto-01.jpeg" alt="Participantes da excursão para doação de sangue">
             <div class="past-info">
               <strong>Mutirão Solidário de Abril</strong>
               <span>03 de Abril · Sorocaba</span>
@@ -116,7 +79,7 @@
           </div>
 
           <div class="past-card">
-            <img src="assets/excursoes/foto-02.jpg" alt="Grupo reunido durante uma campanha de doação">
+            <img src="/images/excursoes/foto-02.jpg" alt="Grupo reunido durante uma campanha de doação">
             <div class="past-info">
               <strong>Campanha de Março</strong>
               <span>15 de Março · Sorocaba</span>
@@ -124,7 +87,7 @@
           </div>
 
           <div class="past-card">
-            <img src="assets/excursoes/foto-03.jpg" alt="Participantes durante uma excursão">
+            <img src="/images/excursoes/foto-03.jpg" alt="Participantes durante uma excursão">
             <div class="past-info">
               <strong>Campanha de Fevereiro</strong>
               <span>20 de Fevereiro · Sorocaba</span>
@@ -134,13 +97,4 @@
       </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <span class="footer-brand"><span class="icon">favorite</span><strong>Rota Solidária</strong> · 2026</span>
-      <span>Projeto de Extensão · Angatuba e Região</span>
-    </div>
-  </footer>
-</body>
-
-</html>
+</@main.layout>

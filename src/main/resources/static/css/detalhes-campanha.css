@@ -121,3 +121,6 @@ input,select,textarea{font:inherit;color:inherit}
 .more-link a{color:var(--brand);font-weight:700}
 
 @media(max-width:700px){.info-grid{grid-template-columns:1fr}.detail-body{padding:20px}}
+.detail-section{padding-top:0}
+.row-vagas.detail-vagas-count{font-weight:600;color:var(--text2)}
+.detail-description{color:var(--text2);line-height:1.6;margin-bottom:1.5rem}

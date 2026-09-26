@@ -26,7 +26,7 @@ public class AuthController {
         if (session.getAttribute("usuarioLogado") != null) {
             return "redirect:/campanhas";
         }
-        return "login"; // -> templates/login.ftlh
+        return "pages/login"; // -> templates/pages/login.ftlh
     }
 
     @PostMapping("/login")
@@ -44,7 +44,7 @@ public class AuthController {
 
         // Se errar a senha ou o e-mail não existir
         model.addAttribute("erro", "E-mail ou senha inválidos. Tente novamente.");
-        return "login";
+        return "pages/login";
     }
 
     @GetMapping("/logout")

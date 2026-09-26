@@ -9,6 +9,6 @@ public class EducativoController {
 
     @GetMapping("/educativo")
     public String educativo() {
-        return "educativo"; // -> templates/educativo.ftlh
+        return "pages/educativo"; // -> templates/pages/educativo.ftlh
     }
 }
