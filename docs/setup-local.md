@@ -1,6 +1,6 @@
 # Ambiente de Desenvolvimento
 
-Documentação para execução da infraestrutura local do projeto (**MySQL** e **DBeaver em container**) via Docker Compose. O projeto Spring Boot deve ser executado separadamente na IDE.
+Documentação para execução da infraestrutura local do projeto (**MySQL**, **DBeaver em container** e **Mailpit**) via Docker Compose. O projeto Spring Boot deve ser executado separadamente na IDE.
 
 ---
 
@@ -30,6 +30,10 @@ Documentação para execução da infraestrutura local do projeto (**MySQL** e *
    # Configurações do DBeaver Web (CloudBeaver)
    CB_PORT=8978
 
+   # Configurações do Mailpit (captura os e-mails enviados em desenvolvimento)
+   MAILPIT_SMTP_PORT=1025
+   MAILPIT_UI_PORT=8025
+
    # Configurações da Aplicação (Spring Boot)
    SERVER_PORT=8081
    ```
@@ -43,9 +47,10 @@ Documentação para execução da infraestrutura local do projeto (**MySQL** e *
    ```bash
    docker ps
    ```
-   Você verá dois containers ativos:
+   Você verá três containers ativos:
    - `rotasolidaria_mysql_dev` (com status `Up (healthy)`)
    - `rotasolidaria_cloudbeaver_dev` (DBeaver Web)
+   - `rotasolidaria_mailpit_dev` (servidor de e-mail de teste)
 
 ---
 
@@ -136,6 +141,27 @@ spring.jpa.show-sql=true
 ```
 
 > **Atenção:** Se você alterar a variável `DB_PORT` no seu arquivo `.env`, certifique-se de ajustar a mesma porta na URL do Spring Boot (`localhost:PORTA`).
+
+### E-mails de redefinição de senha (Mailpit ou Gmail)
+
+O fluxo "Esqueci minha senha" envia um e-mail com o link de redefinição. A aplicação lê as configurações de e-mail do arquivo `.env` na raiz do projeto (via `spring.config.import` no `application.properties`).
+
+**Opção A – Mailpit (padrão, sem envio real):** mantenha o bloco "E-mail da aplicação" do `.env` comentado. Os e-mails são capturados pelo container Mailpit e exibidos em [http://localhost:8025](http://localhost:8025) *(ou a porta definida em `MAILPIT_UI_PORT`)*.
+
+**Opção B – Gmail (envio real, gratuito):**
+1. Na sua Conta Google, ative a **Verificação em duas etapas** (Segurança → Verificação em duas etapas).
+2. Gere uma **senha de app** em [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) (nome sugerido: "Rota Solidária"). O Google mostra 16 letras.
+3. No `.env`, descomente o bloco de e-mail e preencha:
+   ```properties
+   MAIL_USERNAME=seu.email@gmail.com
+   MAIL_PASSWORD=abcdefghijklmnop
+   ```
+   Use a senha de app **sem espaços e sem aspas** (não é a senha normal da sua conta).
+4. Reinicie a aplicação. Os e-mails passam a ser enviados a partir de `MAIL_USERNAME`.
+
+> 🔒 **Segurança:** o `.env` está no `.gitignore` — nunca o adicione ao Git, nunca coloque a senha no `application.properties` e não a compartilhe em prints ou mensagens. Se a senha de app vazar, revogue-a na mesma página em que foi criada e gere outra. Para conferir que o arquivo está protegido, rode `git check-ignore .env` (deve imprimir `.env`).
+
+Em produção, defina também `APP_BASE_URL` com o endereço público da aplicação, para que os links do e-mail apontem para o lugar certo. Variáveis de ambiente do sistema têm prioridade sobre o `.env`.
 
 ---
 

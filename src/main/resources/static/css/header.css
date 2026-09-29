@@ -131,3 +131,38 @@
   color: var(--brand) !important;
   font-weight: 700 !important;
 }
+
+/* Logout é um formulário POST (exigido pelo Spring Security), estilizado como link */
+.logout-form {
+  margin: 0;
+}
+
+.logout-form button.dropdown-item {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobile-nav .logout-form button {
+  display: block;
+  width: 100%;
+  padding: 11px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: 700 15px/1 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+}
+
+/* Mantém o rodapé no fim da tela em páginas com pouco conteúdo */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body > main {
+  flex: 1 0 auto;
+}

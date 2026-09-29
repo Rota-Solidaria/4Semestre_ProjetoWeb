@@ -245,29 +245,6 @@ input,select,textarea{font:inherit;color:inherit}
   }
 }
 
-/* Alertas de sucesso e erro */
-.alert-box {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  font: 500 14px/1.4 'IBM Plex Sans', sans-serif;
-}
-
-.alert-success {
-  background: var(--ok-soft);
-  border: 1px solid var(--ok-border);
-  color: var(--ok-text);
-}
-
-.alert-error {
-  background: var(--brand-soft);
-  border: 1px solid var(--brand-soft-border);
-  color: var(--err-text);
-}
-
 /* Seção de Inscrições */
 .section-title-wrap {
   display: flex;

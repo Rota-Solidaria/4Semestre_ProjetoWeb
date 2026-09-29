@@ -1,0 +1,240 @@
+/* =========== Toast "Pulso" (includes/toast.ftlh) ===========
+   Aviso temporário no topo da tela, logo abaixo do header. A gota (pin da marca) indica o tipo e
+   a linha de pulso na base é o cronômetro até o aviso sumir.
+   Tema claro por padrão; tema escuro por prefers-color-scheme ou <html data-theme="dark">. */
+
+.toast {
+  --toast-bg: #FFFFFF;
+  --toast-border: #E4E0DC;
+  --toast-title: #1A1817;
+  --toast-text: #57514E;
+  --toast-muted: #8A827E;
+  --toast-hover: #F3F1EF;
+  --toast-track: #E4E0DC;
+  --toast-shadow: 0 20px 44px #1A181724;
+  --toast-on-accent: #FFFFFF;
+}
+
+.toast--success { --toast-accent: #0E7A4F; --toast-accent-text: #0B5E3C; }
+.toast--info    { --toast-accent: #1E5FA8; --toast-accent-text: #154A85; }
+.toast--warning { --toast-accent: #A65C00; --toast-accent-text: #7A4400; }
+.toast--error   { --toast-accent: #B4232A; --toast-accent-text: #8F1821; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .toast {
+    --toast-bg: #1A1817;
+    --toast-border: #322F2D;
+    --toast-title: #F6F4F2;
+    --toast-text: #B7B0AC;
+    --toast-muted: #B7B0AC;
+    --toast-hover: #232120;
+    --toast-track: #322F2D;
+    --toast-shadow: 0 20px 44px #00000066;
+    --toast-on-accent: #1A1817;
+  }
+  :root:not([data-theme="light"]) .toast--success { --toast-accent: #8FE3B8; --toast-accent-text: #8FE3B8; }
+  :root:not([data-theme="light"]) .toast--info    { --toast-accent: #A8CBF0; --toast-accent-text: #A8CBF0; }
+  :root:not([data-theme="light"]) .toast--warning { --toast-accent: #F5CE8B; --toast-accent-text: #F5CE8B; }
+  :root:not([data-theme="light"]) .toast--error   { --toast-accent: #F2969B; --toast-accent-text: #F2969B; }
+}
+
+:root[data-theme="dark"] .toast {
+  --toast-bg: #1A1817;
+  --toast-border: #322F2D;
+  --toast-title: #F6F4F2;
+  --toast-text: #B7B0AC;
+  --toast-muted: #B7B0AC;
+  --toast-hover: #232120;
+  --toast-track: #322F2D;
+  --toast-shadow: 0 20px 44px #00000066;
+  --toast-on-accent: #1A1817;
+}
+:root[data-theme="dark"] .toast--success { --toast-accent: #8FE3B8; --toast-accent-text: #8FE3B8; }
+:root[data-theme="dark"] .toast--info    { --toast-accent: #A8CBF0; --toast-accent-text: #A8CBF0; }
+:root[data-theme="dark"] .toast--warning { --toast-accent: #F5CE8B; --toast-accent-text: #F5CE8B; }
+:root[data-theme="dark"] .toast--error   { --toast-accent: #F2969B; --toast-accent-text: #F2969B; }
+
+/* --toast-top é a altura do header, medida em includes/scripts.ftlh (no celular o header cresce com o menu) */
+.toast-region {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(var(--toast-top, 72px) + 16px);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  /* alinha à borda direita do conteúdo (.container de 1180px) */
+  padding: 0 max(16px, calc((100vw - 1180px) / 2));
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  width: min(440px, 100%);
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-border);
+  border-radius: 14px;
+  box-shadow: var(--toast-shadow);
+  overflow: hidden;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  animation: toast-in 250ms cubic-bezier(.2, 0, .2, 1) both;
+}
+
+.toast.is-leaving {
+  animation: toast-out 200ms cubic-bezier(.2, 0, .2, 1) forwards;
+}
+
+.toast__body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px 6px 10px;
+}
+
+/* Gota: o pin da marca girado, com o ícone na parte redonda */
+.toast__drop {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.toast__drop::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 4.5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 4px;
+  transform: rotate(-45deg);
+  background: var(--toast-accent);
+}
+
+.toast__drop .icon {
+  position: relative;
+  margin-top: -5px;
+  font-size: 18px;
+  color: var(--toast-on-accent);
+}
+
+.toast__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast__title {
+  margin: 0;
+  font: 600 14px/1.35 'IBM Plex Sans', system-ui, sans-serif;
+  color: var(--toast-title);
+}
+
+.toast__message {
+  margin: 2px 0 0;
+  font: 400 13px/1.4 'IBM Plex Sans', system-ui, sans-serif;
+  color: var(--toast-text);
+}
+
+.toast__action {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font: 600 14px/1 'IBM Plex Sans', system-ui, sans-serif;
+  color: var(--toast-accent-text);
+}
+
+.toast__close {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--toast-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.toast__close .icon {
+  font-size: 20px;
+}
+
+.toast__action:hover,
+.toast__close:hover {
+  background: var(--toast-hover);
+}
+
+/* Linha de pulso: o traço colorido é desenhado da esquerda para a direita durante --toast-duration */
+.toast__pulse {
+  position: relative;
+  height: 14px;
+}
+
+.toast__pulse svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.toast__pulse path {
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.toast__pulse-track path {
+  stroke: var(--toast-track);
+}
+
+.toast__pulse-fill path {
+  stroke: var(--toast-accent);
+}
+
+.toast__pulse-fill {
+  clip-path: inset(0 100% 0 0);
+  animation: toast-pulse var(--toast-duration, 6000ms) linear forwards;
+}
+
+/* Passar o mouse ou focar o aviso pausa o cronômetro */
+.toast:hover .toast__pulse-fill,
+.toast:focus-within .toast__pulse-fill {
+  animation-play-state: paused;
+}
+
+@keyframes toast-pulse {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+}
+
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.is-leaving {
+    animation: none;
+  }
+  .toast__pulse-fill {
+    animation: none;
+    clip-path: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .toast-region {
+    top: calc(var(--toast-top, 64px) + 12px);
+    align-items: center;
+  }
+}

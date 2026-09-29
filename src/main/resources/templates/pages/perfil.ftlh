@@ -35,20 +35,6 @@
   </section>
 
   <main class="container section">
-    <#if sucessoMsg??>
-      <div class="alert-box alert-success">
-        <span class="icon">check_circle</span>
-        <span>${sucessoMsg}</span>
-      </div>
-    </#if>
-
-    <#if erroMsg??>
-      <div class="alert-box alert-error">
-        <span class="icon">error</span>
-        <span>${erroMsg}</span>
-      </div>
-    </#if>
-
     <!-- Indicadores / Estatísticas do Perfil -->
     <div class="stats-grid">
       <div class="stat-card">
@@ -152,6 +138,7 @@
         <p class="subtitle">Atualize suas informações pessoais e médicas para facilitar suas inscrições.</p>
 
         <form method="post" action="/perfil/editar">
+          <#include "../includes/csrf.ftlh">
           <div class="form-field">
             <label for="prof-name">Nome Completo</label>
             <input id="prof-name" name="name" type="text" required value="${usuario.name}">
@@ -205,7 +192,7 @@
 
             <div class="form-field">
               <label for="prof-nova-senha">Nova Senha</label>
-              <input id="prof-nova-senha" name="novaSenha" type="password" placeholder="Mínimo 6 dígitos">
+              <input id="prof-nova-senha" name="novaSenha" type="password" placeholder="Mínimo 8 caracteres">
             </div>
           </div>
 

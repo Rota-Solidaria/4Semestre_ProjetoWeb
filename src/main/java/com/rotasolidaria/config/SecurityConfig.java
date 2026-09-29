@@ -2,11 +2,35 @@ package com.rotasolidaria.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // Rotas que exigem login; todo o resto é público
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/perfil/**", "/campanhas/*/inscrever").authenticated()
+                        .anyRequest().permitAll())
+                // O Spring Security processa o POST /login do formulário em pages/login.ftlh
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("senha")
+                        .defaultSuccessUrl("/campanhas")
+                        .failureUrl("/login?erro"))
+                // Logout via POST /logout (com token CSRF)
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login?logout"));
+
+        return http.build();
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         // Gera hashes usando o algoritmo Argon2id com os parâmetros recomendados:

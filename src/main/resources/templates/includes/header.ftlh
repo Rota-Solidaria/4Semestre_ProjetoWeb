@@ -28,9 +28,12 @@
               <span class="icon">edit</span>Editar Perfil
             </a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item dropdown-danger" href="/logout">
-              <span class="icon">logout</span>Sair do perfil
-            </a>
+            <form class="logout-form" method="post" action="/logout">
+              <#include "csrf.ftlh">
+              <button type="submit" class="dropdown-item dropdown-danger">
+                <span class="icon">logout</span>Sair do perfil
+              </button>
+            </form>
           </div>
         </div>
       <#else>
@@ -45,7 +48,10 @@
     <#if usuarioLogado??>
       <a href="/perfil">Meu Perfil (${usuarioLogado.name?keep_before(" ")})</a>
       <a href="/perfil#editar">Editar Perfil</a>
-      <a href="/logout" class="mobile-logout">Sair do perfil</a>
+      <form class="logout-form" method="post" action="/logout">
+        <#include "csrf.ftlh">
+        <button type="submit" class="mobile-logout">Sair do perfil</button>
+      </form>
     <#else>
       <a href="/login">Perfil</a>
     </#if>

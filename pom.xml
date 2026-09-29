@@ -63,11 +63,16 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Spring Security: permite criar autenticação e autorização de usuários -->
+		<!-- Spring Security: login, sessão, proteção de rotas, CSRF e criptografia de senhas -->
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-crypto</artifactId>
+		<!-- E-mail: envio do link de redefinição de senha -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
 		<!-- Bouncy Castle: provedor do algoritmo Argon2id -->

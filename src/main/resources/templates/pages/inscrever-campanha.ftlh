@@ -68,6 +68,7 @@
 
 
           <form method="post" action="/campanhas/1/inscrever">
+            <#include "../includes/csrf.ftlh">
 
             <div class="form-grid">
 

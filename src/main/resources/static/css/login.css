@@ -97,7 +97,11 @@ input,select,textarea{font:inherit;color:inherit}
 .field label{font:600 14px/1.4 'IBM Plex Sans',sans-serif}
 .field input{height:48px;border:1px solid var(--border2);border-radius:12px;padding:0 14px;background:var(--surface);width:100%}
 .login-panel .btn{width:100%;margin-top:22px}
-.login-foot{text-align:center;font-size:14px;color:var(--text2);margin-top:18px}
+.login-panel > .login-foot{text-align:center;font-size:14px;color:var(--text2);margin:20px 0 0}
 .login-foot a{color:var(--brand);font-weight:700}
 .login-msg-error{color:var(--err-text);margin-bottom:14px}
-.login-msg-warn{color:var(--warn-text);margin-bottom:14px}
+
+.field-label-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.field-link{font:600 13px/1.4 'IBM Plex Sans',sans-serif;color:var(--brand)}
+.field-link:hover{text-decoration:underline}
+.field-optional{font-weight:400;color:var(--text3)}

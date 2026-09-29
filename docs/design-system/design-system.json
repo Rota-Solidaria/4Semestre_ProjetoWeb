@@ -1,0 +1,319 @@
+{
+  "system": "Rota Solidária",
+  "version": "1.0",
+  "domain": "Plataforma de campanhas de doação de sangue com transporte gratuito — Angatuba, Guareí, Itapetininga e Sorocaba (SP).",
+  "language": "pt-BR",
+  "tokensFile": "rota-solidaria.tokens.json",
+  "cssFile": "rota-solidaria-tokens.css",
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "principles": [
+    "A urgência vem antes da institucionalidade: estoque crítico e próxima coleta acima da dobra.",
+    "Toda campanha mostra data, distância, vagas e transporte — a informação que decide a doação.",
+    "Nenhuma informação transmitida só por cor: status é sempre ponto + texto.",
+    "Sem cadastro obrigatório para reservar vaga; nome, WhatsApp e consentimento LGPD bastam.",
+    "Público inclui doadores idosos e conexões lentas: alvos ≥44px, contraste AA, imagens lazy."
+  ],
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": {
+          "bg": "color.brand.600",
+          "fg": "#FFFFFF",
+          "hover": "color.brand.700",
+          "pressed": "color.brand.800"
+        },
+        "secondary": {
+          "bg": "color.neutral.00",
+          "fg": "color.brand.600",
+          "border": "color.neutral.200",
+          "hover": "bg color.brand.50 / border color.brand.600"
+        },
+        "ghost": {
+          "bg": "transparent",
+          "fg": "color.neutral.600",
+          "hover": "bg color.neutral.50"
+        },
+        "danger": {
+          "bg": "color.semantic.error-soft",
+          "fg": "color.semantic.error",
+          "border": "color.brand.200"
+        },
+        "disabled": {
+          "bg": "color.neutral.50",
+          "fg": "color.neutral.400",
+          "border": "color.neutral.100"
+        }
+      },
+      "sizes": {
+        "sm": "40px",
+        "md": "48px",
+        "lg": "52px"
+      },
+      "radius": "radius.md",
+      "typography": "typography.button",
+      "iconSize": "20px",
+      "focus": "outline 3px color.brand.600 @ 35%, offset 2px",
+      "rules": [
+        "Um único botão primário por bloco de decisão.",
+        "Verbo no infinitivo: 'Inscrever-se', 'Reservar minha vaga'."
+      ]
+    },
+    "StatusBadge": {
+      "shape": "pill, dot 7px + label",
+      "states": {
+        "open": {
+          "label": "Inscrições abertas",
+          "bg": "color.semantic.success-soft",
+          "fg": "color.semantic.success-text",
+          "dot": "color.semantic.success"
+        },
+        "few": {
+          "label": "Últimas vagas",
+          "bg": "color.semantic.warning-soft",
+          "fg": "color.semantic.warning-text",
+          "dot": "color.semantic.warning"
+        },
+        "soon": {
+          "label": "Em breve",
+          "bg": "color.semantic.info-soft",
+          "fg": "color.semantic.info-text",
+          "dot": "color.semantic.info"
+        },
+        "closed": {
+          "label": "Finalizada",
+          "bg": "color.neutral.50",
+          "fg": "color.neutral.600",
+          "dot": "color.neutral.400"
+        }
+      },
+      "threshold": "few quando vagas restantes <= 4"
+    },
+    "CampaignCard": {
+      "radius": "radius.lg",
+      "padding": "20px",
+      "media": "imagem 150px altura, object-fit cover; grayscale(1) opacity(.6) quando finalizada",
+      "content": [
+        "StatusBadge (sobreposto, topo-esquerda)",
+        "h3 título",
+        "linha data+hora",
+        "linha local+distância",
+        "linha transporte+vagas",
+        "CTA primário + botão ícone compartilhar"
+      ],
+      "grid": "4 colunas do grid desktop (3 por linha); 1 coluna no mobile",
+      "hover": "translateY(-3px) + shadow.lg"
+    },
+    "Field": {
+      "label": "typography.label sempre visível acima do campo — nunca só placeholder",
+      "control": {
+        "height": "48px",
+        "radius": "radius.md",
+        "border": "color.neutral.200",
+        "bg": "color.neutral.00"
+      },
+      "focus": "border color.brand.600 + outline 3px @25%",
+      "error": {
+        "border": "color.semantic.error",
+        "message": "ícone error 16px + texto 13px color.semantic.error"
+      },
+      "disabled": {
+        "bg": "color.neutral.50",
+        "fg": "color.neutral.400"
+      },
+      "optionalHint": "sufixo '· opcional' em peso 400, color.neutral.400"
+    },
+    "Alert": {
+      "layout": "ícone 20px + título curto em bold + uma frase",
+      "radius": "radius.md",
+      "variants": [
+        "info",
+        "warning",
+        "success",
+        "error"
+      ]
+    },
+    "HeaderDesktop": {
+      "height": "size.header",
+      "bg": "color.neutral.00",
+      "border-bottom": "color.neutral.100",
+      "items": "máx. 4 links + 2 ações",
+      "active": "sublinhado 2px color.brand.600"
+    },
+    "TabBarMobile": {
+      "destinations": [
+        "Início",
+        "Campanhas",
+        "Minhas",
+        "Perfil"
+      ],
+      "iconSize": "24px",
+      "target": "48px",
+      "label": "sempre visível, 11px semibold",
+      "active": "color.brand.600"
+    },
+    "Stepper": {
+      "steps": [
+        "Dados",
+        "Revisão",
+        "Confirmação"
+      ],
+      "activeDot": "color.brand.600 com número branco",
+      "inactiveDot": "color.neutral.100"
+    },
+    "StockBar": {
+      "usage": "estoque por tipo sanguíneo",
+      "track": "3px color.neutral.100",
+      "fill": "success / warning / brand conforme nível",
+      "label": "typography.overline com percentual"
+    },
+    "RouteTimeline": {
+      "usage": "v3 — embarque → parada → hemocentro",
+      "nodes": "11px preenchido (origem), 7px (parada), 11px contorno (destino)",
+      "connector": "1px color.dark.border"
+    }
+  },
+  "iconography": {
+    "family": "Material Symbols Rounded",
+    "settings": "weight 400, fill 0, grade 0, optical size 24",
+    "sizes": {
+      "inline": "18px",
+      "button": "20px",
+      "nav": "24px",
+      "feature": "30px"
+    },
+    "used": [
+      "search",
+      "place",
+      "schedule",
+      "calendar_month",
+      "bloodtype",
+      "favorite",
+      "check_circle",
+      "error",
+      "info",
+      "directions_bus",
+      "directions_walk",
+      "person",
+      "home",
+      "notifications",
+      "share",
+      "dark_mode",
+      "light_mode",
+      "arrow_forward",
+      "arrow_back",
+      "expand_more",
+      "expand_less",
+      "tune",
+      "swap_vert",
+      "accessibility_new",
+      "event_seat",
+      "event_available",
+      "search_off"
+    ],
+    "rule": "Ícone sem rótulo sempre com aria-label."
+  },
+  "logo": {
+    "concept": "Gota de sangue combinada a um marcador de localização — a rota até a campanha.",
+    "files": [
+      "logo-rota-solidaria.svg (lockup horizontal)",
+      "logo-mark.svg (símbolo)",
+      "logo-mono-white.svg (fundos escuros)"
+    ],
+    "clearSpace": "0,4× a altura do símbolo em todos os lados",
+    "minSize": {
+      "mark": "24px",
+      "lockup": "132px de largura"
+    },
+    "donts": [
+      "Não distorcer, inclinar ou espelhar.",
+      "Não usar o vermelho sobre fundos escuros ou saturados.",
+      "Não trocar a tipografia do wordmark nem adicionar sombra/gradiente."
+    ]
+  },
+  "accessibility": {
+    "contrast": {
+      "text": "4.5:1",
+      "icons_borders": "3:1"
+    },
+    "verified": [
+      {
+        "pair": "#FFFFFF on color.brand.600",
+        "ratio": "5.9:1",
+        "level": "AA"
+      },
+      {
+        "pair": "color.neutral.900 on color.neutral.25",
+        "ratio": "15.8:1",
+        "level": "AAA"
+      },
+      {
+        "pair": "color.neutral.600 on white",
+        "ratio": "7.6:1",
+        "level": "AAA"
+      },
+      {
+        "pair": "color.neutral.400 on white",
+        "ratio": "3.7:1",
+        "level": "apenas ≥16px"
+      }
+    ],
+    "touch": "44×44px mínimo, 8px de separação",
+    "focus": "anel 3px color.brand.600 a 35%, offset 2px, sempre visível",
+    "motion": "150–250ms, só opacity/transform, respeita prefers-reduced-motion",
+    "zoom": "200% sem rolagem horizontal"
+  },
+  "voice": {
+    "person": "segunda pessoa — 'você pode doar'",
+    "buttons": "verbo no infinitivo",
+    "avoid": [
+      "jargão médico sem explicação",
+      "alarmismo",
+      "emoji"
+    ],
+    "numbers": "por extenso até dez, exceto dados clínicos"
+  },
+  "screens": {
+    "v1": {
+      "file": "Rota Solidária - Desktop.dc.html / Rota Solidária - Mobile.dc.html",
+      "type": "especificação estática",
+      "screens": [
+        "Início",
+        "Campanhas",
+        "Detalhe + inscrição",
+        "Tema escuro",
+        "Mobile: início, campanhas, detalhe, inscrição, confirmação, escuro"
+      ]
+    },
+    "v2": {
+      "file": "Rota Solidária - Protótipo v2.dc.html",
+      "type": "protótipo interativo",
+      "flows": [
+        "busca e filtros",
+        "detalhe",
+        "inscrição em 2 passos com validação",
+        "confirmação com código",
+        "minhas inscrições com cancelamento"
+      ],
+      "toggles": [
+        "tema claro/escuro",
+        "desktop/mobile"
+      ],
+      "persistence": "localStorage rs2_theme, rs2_device, rs2_mine"
+    },
+    "v3": {
+      "file": "Rota Solidária - v3.dc.html",
+      "type": "direção editorial interativa",
+      "ideas": [
+        "manchete tipográfica em vez de hero fotográfico",
+        "agenda como timetable expansível",
+        "diagrama de rota embarque→hemocentro",
+        "barras de estoque por tipo sanguíneo",
+        "reserva em modal único"
+      ],
+      "persistence": "localStorage rs3_theme, rs3_device"
+    }
+  }
+}

@@ -7,24 +7,22 @@
         <span class="kicker">Acesso</span>
         <h1>Entrar</h1>
         <p>Acesse seu perfil para acompanhar suas inscrições.</p>
-        <#if erro??>
-          <p class="login-msg-error">${erro}</p>
-        </#if>
-        <#if aviso??>
-          <p class="login-msg-warn">${aviso}</p>
-        </#if>
         <form method="post" action="/login">
+          <#include "../includes/csrf.ftlh">
           <div class="field">
             <label for="rs-email">E-mail</label>
-            <input id="rs-email" name="email" type="email" required placeholder="seu@email.com">
+            <input id="rs-email" name="email" type="email" required autocomplete="email" placeholder="seu@email.com">
           </div>
           <div class="field">
-            <label for="rs-senha">Senha</label>
-            <input id="rs-senha" name="senha" type="password" required placeholder="••••••••">
+            <div class="field-label-row">
+              <label for="rs-senha">Senha</label>
+              <a class="field-link" href="/esqueci-senha">Esqueci minha senha</a>
+            </div>
+            <input id="rs-senha" name="senha" type="password" required autocomplete="current-password" placeholder="••••••••">
           </div>
           <button class="btn btn-primary" type="submit">Entrar</button>
         </form>
-        <p class="login-foot">Ainda não possui cadastro? <a href="/campanhas/1/inscrever">Continuar sem cadastro</a></p>
+        <p class="login-foot">Ainda não possui cadastro? <a href="/cadastro">Criar conta</a></p>
       </div>
     </div>
   </main>

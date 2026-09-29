@@ -7,13 +7,18 @@ import com.rotasolidaria.models.enums.BloodType;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
 import com.rotasolidaria.repositories.UserRepository;
+import com.rotasolidaria.exception.BusinessException;
+import com.rotasolidaria.security.AuthenticatedUser;
+import com.rotasolidaria.services.AuthService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -27,37 +32,32 @@ public class ProfileController {
     private final DonorRepository donorRepository;
     private final InscricaoRepository inscricaoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     public ProfileController(UserRepository userRepository,
                              DonorRepository donorRepository,
                              InscricaoRepository inscricaoRepository,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder,
+                             AuthService authService) {
         this.userRepository = userRepository;
         this.donorRepository = donorRepository;
         this.inscricaoRepository = inscricaoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authService = authService;
     }
 
     @GetMapping("/perfil")
-    public String perfil(HttpSession session,
-                         @RequestParam(required = false) String sucesso,
-                         @RequestParam(required = false) String erro,
+    public String perfil(@AuthenticationPrincipal AuthenticatedUser principal,
+                         HttpSession session,
                          Model model) {
-        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
-
-        if (usuarioLogado == null) {
-            return "redirect:/login";
-        }
-
-        // Buscar dados mais recentes do banco
-        Optional<User> userOpt = userRepository.findById(usuarioLogado.getId());
+        // A rota exige login (ver SecurityConfig); buscamos os dados mais recentes do banco
+        Optional<User> userOpt = userRepository.findById(principal.getId());
         if (userOpt.isEmpty()) {
             session.invalidate();
             return "redirect:/login";
         }
 
         User user = userOpt.get();
-        session.setAttribute("usuarioLogado", user);
 
         boolean isDonor = false;
         Donor donor = null;
@@ -76,13 +76,6 @@ public class ProfileController {
         model.addAttribute("inscricoes", inscricoes);
         model.addAttribute("bloodTypes", BloodType.values());
 
-        if (sucesso != null) {
-            model.addAttribute("sucessoMsg", "Perfil atualizado com sucesso!");
-        }
-        if (erro != null) {
-            model.addAttribute("erroMsg", erro);
-        }
-
         return "pages/perfil";
     }
 
@@ -94,15 +87,12 @@ public class ProfileController {
                                @RequestParam(required = false) String birthDate,
                                @RequestParam(required = false) String senhaAtual,
                                @RequestParam(required = false) String novaSenha,
-                               HttpSession session) {
-        User usuarioLogado = (User) session.getAttribute("usuarioLogado");
-
-        if (usuarioLogado == null) {
-            return "redirect:/login";
-        }
-
-        Optional<User> userOpt = userRepository.findById(usuarioLogado.getId());
+                               @AuthenticationPrincipal AuthenticatedUser principal,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        Optional<User> userOpt = userRepository.findById(principal.getId());
         if (userOpt.isEmpty()) {
+            session.invalidate();
             return "redirect:/login";
         }
 
@@ -139,14 +129,24 @@ public class ProfileController {
 
         // Alteração de senha, se solicitada
         if (novaSenha != null && !novaSenha.isBlank()) {
+            // Os demais dados já foram salvos acima; só a troca de senha é recusada
             if (senhaAtual == null || !passwordEncoder.matches(senhaAtual, user.getPasswordHash())) {
-                return "redirect:/perfil?erro=A+senha+atual+informada+est%C3%A1+incorreta.";
+                redirectAttributes.addFlashAttribute("toast",
+                        Toast.error("Senha não alterada", "Seus dados foram salvos, mas a senha atual está incorreta."));
+                return "redirect:/perfil";
+            }
+            try {
+                authService.validatePasswordLength(novaSenha);
+            } catch (BusinessException e) {
+                redirectAttributes.addFlashAttribute("toast",
+                        Toast.error("Senha não alterada", "Seus dados foram salvos. " + e.getMessage()));
+                return "redirect:/perfil";
             }
             user.setPasswordHash(passwordEncoder.encode(novaSenha));
             userRepository.save(user);
         }
 
-        session.setAttribute("usuarioLogado", user);
-        return "redirect:/perfil?sucesso=true";
+        redirectAttributes.addFlashAttribute("toast", Toast.success("Perfil atualizado", "Suas alterações foram salvas."));
+        return "redirect:/perfil";
     }
 }

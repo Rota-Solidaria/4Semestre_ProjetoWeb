@@ -31,6 +31,14 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: rotasolidaria_mailpit_dev
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    restart: unless-stopped
+
 volumes:
   mysql_data:
   cloudbeaver_data:

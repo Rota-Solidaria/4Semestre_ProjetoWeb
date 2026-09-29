@@ -13,7 +13,8 @@ O **Rota Solidária** tem como objetivo facilitar e incentivar a doação de san
 2. **Listagem Dinâmica na Home**: exibição das próximas campanhas confirmadas diretamente na página inicial (limite de até 6 coletas ativas).
 3. **Detalhes e Triagem Prévia**: informações detalhadas sobre local de doação, horários de saída, organizador e checklist pré-embarque.
 4. **Reserva de Vagas e Inscrições**: fluxo simplificado para voluntários garantirem lugar no transporte da caravana.
-5. **Autenticação e Sessão**: login e logout de usuários com senhas criptografadas via Argon2id.
+5. **Autenticação e Sessão (Spring Security)**: cadastro de doadores, login/logout, rotas protegidas (perfil e inscrição), proteção CSRF e senhas criptografadas via Argon2id.
+   - **Redefinição de senha por e-mail**: link de uso único com validade de 30 minutos (em desenvolvimento, os e-mails são capturados pelo Mailpit).
 6. **Área do Doador / Perfil**: painel exclusivo acessível após login contendo:
    - Indicador de vidas impactadas estimadas (cada doação pode salvar até 4 vidas).
    - Histórico e status das inscrições em caravanas.
@@ -32,7 +33,8 @@ O **Rota Solidária** tem como objetivo facilitar e incentivar a doação de san
 * **Spring Data JPA & Hibernate**: persistência e mapeamento objeto-relacional.
 * **MySQL**: banco de dados relacional.
 * **FreeMarker (`.ftlh`)**: template engine modular com layouts e macros reutilizáveis.
-* **Spring Security Crypto**: criptografia de senhas usando o algoritmo seguro Argon2id.
+* **Spring Security**: login por formulário, sessão, autorização de rotas, CSRF e criptografia de senhas com Argon2id.
+* **Spring Mail**: envio do e-mail de redefinição de senha.
 * **Spring Boot DevTools**: recarregamento dinâmico em tempo de desenvolvimento.
 * **Spring Boot Test & JUnit 5**: suíte para testes automatizados.
 
@@ -52,6 +54,7 @@ O projeto adota uma arquitetura limpa e modular de templates e assets:
 │   │   │   ├── models/              # Entidades JPA (User, Donor, Organizer, Campaign, Registration)
 │   │   │   ├── models/enums/        # Enums de domínio (BloodType, CampaignStatus, etc.)
 │   │   │   ├── repositories/        # Repositórios Spring Data JPA
+│   │   │   ├── security/            # Integração do usuário do banco com o Spring Security
 │   │   │   ├── services/            # Camada de regras de negócio
 │   │   │   └── DataInitializer.java # Povoamento automático de dados de demonstração
 │   │   │
@@ -84,6 +87,8 @@ A aplicação inclui um inicializador automático de dados (`DataInitializer`) q
 | :--- | :--- | :--- | :--- |
 | **Doador** | `joao@email.com` | `123456` | Tipo O+, peso 72.5kg, inscrição confirmada em campanha |
 | **Organizador** | `contato@hemocentro.org.br` | `123456` | Fundação Pró-Sangue / Hemocentro Regional |
+
+Novas contas podem ser criadas em [http://localhost:8082/cadastro](http://localhost:8082/cadastro) (senha com no mínimo 8 caracteres). Os e-mails de redefinição de senha podem ser visualizados no Mailpit em [http://localhost:8025](http://localhost:8025) ou enviados de verdade pelo Gmail (veja [docs/setup-local.md](docs/setup-local.md#e-mails-de-redefinição-de-senha-mailpit-ou-gmail)).
 
 ---
 
