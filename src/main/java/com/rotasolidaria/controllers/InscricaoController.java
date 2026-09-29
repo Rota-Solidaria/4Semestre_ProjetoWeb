@@ -29,12 +29,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Optional;
 
 @Controller
 public class InscricaoController {
 
     private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DATA_EXTENSO = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.of("pt", "BR"));
 
     private final CampaignService campaignService;
     private final InscricaoService inscricaoService;
@@ -74,7 +76,8 @@ public class InscricaoController {
         model.addAttribute("usuario", userRepository.findById(principal.getId()).orElse(null));
         model.addAttribute("opcoesEmbarque", inscricaoService.boardingOptions(campanha));
         model.addAttribute("vagasRestantes", inscricaoService.slotsLeft(campanha));
-        model.addAttribute("dataBr", campanha.getEventDate() == null ? null : campanha.getEventDate().format(DATA_BR));
+        model.addAttribute("dataExtenso", campanha.getEventDate() == null ? null : campanha.getEventDate().format(DATA_EXTENSO));
+        model.addAttribute("transporteProprio", InscricaoService.OWN_TRANSPORT);
         return "pages/inscrever-campanha"; // -> templates/pages/inscrever-campanha.ftlh
     }
 
