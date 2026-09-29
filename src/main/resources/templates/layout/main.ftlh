@@ -3,6 +3,7 @@
 <html lang="pt-BR">
 
 <head>
+  <#include "../includes/theme-init.ftlh">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${title}</title>
@@ -17,6 +18,8 @@
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/toast.css">
   <link rel="stylesheet" href="${css}">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/theme.css">
 </head>
 
 <body>
@@ -24,8 +27,10 @@
 
   <#nested>
 
+  <#include "../includes/a11y-panel.ftlh">
   <#include "../includes/toast.ftlh">
   <#include "../includes/footer.ftlh">
+  <#include "../includes/tabbar.ftlh">
   <#include "../includes/scripts.ftlh">
 </body>
 

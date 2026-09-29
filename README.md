@@ -12,7 +12,7 @@ O **Rota Solidária** tem como objetivo facilitar e incentivar a doação de san
 1. **Agenda Regional de Campanhas**: visualização de campanhas abertas e finalizadas, ordenadas por data e proximidade.
 2. **Listagem Dinâmica na Home**: exibição das próximas campanhas confirmadas diretamente na página inicial (limite de até 6 coletas ativas).
 3. **Detalhes e Triagem Prévia**: informações detalhadas sobre local de doação, horários de saída, organizador e checklist pré-embarque.
-4. **Reserva de Vagas e Inscrições**: fluxo simplificado para voluntários garantirem lugar no transporte da caravana.
+4. **Reserva de Vagas e Inscrições**: o doador escolhe o ponto de embarque e recebe na hora um **bilhete de embarque** com o código da vaga, atalho para enviar no WhatsApp e evento de calendário (`.ics`). A página da campanha mostra a rota (embarque → hemocentro) e as vagas restantes.
 5. **Autenticação e Sessão (Spring Security)**: cadastro de doadores, login/logout, rotas protegidas (perfil e inscrição), proteção CSRF e senhas criptografadas via Argon2id.
    - **Redefinição de senha por e-mail**: link de uso único com validade de 30 minutos (em desenvolvimento, os e-mails são capturados pelo Mailpit).
 6. **Área do Doador / Perfil**: painel exclusivo acessível após login contendo:
@@ -22,6 +22,9 @@ O **Rota Solidária** tem como objetivo facilitar e incentivar a doação de san
    - Formulário de edição de dados pessoais, médicos (peso, nascimento, tipo sanguíneo) e alteração de senha.
 7. **Menu Dropdown no Header**: menu dinâmico no cabeçalho com identificação do usuário logado, atalhos rápidos para o perfil e logout seguro.
 8. **Guia Educativo**: orientações completas sobre requisitos básicos, mitos e etapas do processo de doação.
+9. **Carteirinha do Doador**: tipo sanguíneo, doações realizadas e contagem até a próxima doação permitida (60 dias para homens, 90 para mulheres).
+10. **Acessibilidade e Tema Escuro**: painel no header com tamanho do texto, tema claro/escuro/sistema, alto contraste, redução de movimento e destaque de links (preferências salvas no navegador).
+11. **Navegação Inferior no Celular**: barra fixa com Início, Campanhas, Minhas inscrições e Perfil.
 
 ---
 

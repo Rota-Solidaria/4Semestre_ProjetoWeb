@@ -1,6 +1,6 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Criar Conta - Rota Solidária" css="/css/login.css" currentNav="">
+<@main.layout title="Criar Conta - Rota Solidária" css="/css/login.css" currentNav="entrar">
   <main class="container">
     <div class="login-wrap">
       <div class="panel login-panel">
@@ -23,11 +23,11 @@
           </div>
           <div class="field">
             <label for="rs-senha">Senha</label>
-            <input id="rs-senha" name="senha" type="password" required minlength="${minSenha}" autocomplete="new-password" placeholder="Mínimo ${minSenha} caracteres">
+            <input id="rs-senha" name="senha" type="password" data-password data-password-strength required minlength="${minSenha}" autocomplete="new-password" placeholder="Mínimo ${minSenha} caracteres">
           </div>
           <div class="field">
             <label for="rs-confirmar">Confirmar senha</label>
-            <input id="rs-confirmar" name="confirmarSenha" type="password" required minlength="${minSenha}" autocomplete="new-password" placeholder="Repita a senha">
+            <input id="rs-confirmar" name="confirmarSenha" type="password" data-password data-password-confirm="#rs-senha" required minlength="${minSenha}" autocomplete="new-password" placeholder="Repita a senha">
           </div>
           <button class="btn btn-primary" type="submit">Criar conta</button>
         </form>

@@ -49,12 +49,12 @@
 
               <div class="account-field">
                 <span class="account-label">Nome</span>
-                <strong>João da Silva</strong>
+                <strong>${usuario.name}</strong>
               </div>
 
               <div class="account-field">
                 <span class="account-label">WhatsApp</span>
-                <strong>(15) 99999-0000</strong>
+                <strong><#if usuario.phone?? && usuario.phone?has_content>${usuario.phone}<#else><a href="/perfil#editar">Adicionar no perfil</a></#if></strong>
               </div>
 
             </div>
@@ -67,7 +67,7 @@
           </div>
 
 
-          <form method="post" action="/campanhas/1/inscrever">
+          <form method="post" action="/campanhas/${campanha.id}/inscrever">
             <#include "../includes/csrf.ftlh">
 
             <div class="form-grid">
@@ -76,15 +76,14 @@
               <div class="field full">
 
                 <label for="rs-emb">
-                  Cidade de embarque
+                  Local de embarque
                 </label>
 
                 <select id="rs-emb" name="embarque" required>
                   <option value="">Selecione o local de embarque</option>
-                  <option>Angatuba — Praça Matriz</option>
-                  <option>Angatuba — Rodoviária</option>
-                  <option>Guareí — Centro</option>
-                  <option>Vou por conta própria</option>
+                  <#list opcoesEmbarque as opcao>
+                    <option>${opcao}</option>
+                  </#list>
                 </select>
 
               </div>
@@ -100,7 +99,7 @@
 
                 <textarea
                   id="rs-obs"
-                  name="obs"
+                  name="observacoes"
                   rows="3"
                   placeholder="Precisa de acompanhante ou tem alguma observação?"
                 ></textarea>
@@ -133,6 +132,7 @@
                 <button
                   class="btn btn-primary btn-lg"
                   type="submit"
+                  <#if vagasRestantes lte 0>disabled</#if>
                 >
                   Confirmar inscrição
                   <span class="icon">arrow_forward</span>
@@ -140,7 +140,7 @@
 
                 <a
                   class="btn btn-ghost btn-lg"
-                  href="/campanhas/1"
+                  href="/campanhas/${campanha.id}"
                 >
                   Cancelar
                 </a>
@@ -162,35 +162,44 @@
             alt="Doação de sangue"
           >
 
-          <span class="badge badge-open">
-            <span class="dot"></span>
-            Inscrições abertas
-          </span>
+          <#if vagasRestantes gt 0>
+            <span class="badge badge-open">
+              <span class="dot"></span>
+              ${vagasRestantes} <#if vagasRestantes == 1>vaga restante<#else>vagas restantes</#if>
+            </span>
+          <#else>
+            <span class="badge badge-closed">
+              <span class="dot"></span>
+              Vagas esgotadas
+            </span>
+          </#if>
 
           <div class="summary-title">
-            Campanha Mês Amarelo
+            ${campanha.title}
           </div>
 
           <div class="summary-info">
 
             <span>
               <span class="icon">schedule</span>
-              11 de Maio · 05:00h
+              ${dataBr!"Data a definir"}<#if campanha.departureTime??> · Saída ${campanha.departureTime}</#if><#if campanha.donationTime??> · Doação ${campanha.donationTime}</#if>
             </span>
 
-            <span>
-              <span class="icon">place</span>
-              Colsan — Posto de Coleta Sorocaba
-            </span>
+            <#if campanha.donationLocation??>
+              <span>
+                <span class="icon">place</span>
+                ${campanha.donationLocation.name}<#if campanha.donationLocation.city??> — ${campanha.donationLocation.city}</#if>
+              </span>
+            </#if>
 
           </div>
 
           <div class="summary-note">
 
-            <span class="icon">check_circle</span>
+            <span class="icon">confirmation_number</span>
 
             <p>
-              Você recebe o comprovante e o checklist de preparo por WhatsApp.
+              Ao confirmar, você recebe na hora o seu bilhete de embarque com o código da vaga.
             </p>
 
           </div>

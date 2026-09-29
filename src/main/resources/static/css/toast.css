@@ -54,12 +54,12 @@
 :root[data-theme="dark"] .toast--warning { --toast-accent: #F5CE8B; --toast-accent-text: #F5CE8B; }
 :root[data-theme="dark"] .toast--error   { --toast-accent: #F2969B; --toast-accent-text: #F2969B; }
 
-/* --toast-top é a altura do header, medida em includes/scripts.ftlh (no celular o header cresce com o menu) */
+/* --header-h é a altura do header, medida em includes/scripts.ftlh */
 .toast-region {
   position: fixed;
   left: 0;
   right: 0;
-  top: calc(var(--toast-top, 72px) + 16px);
+  top: calc(var(--header-h, 72px) + 16px);
   z-index: 50;
   display: flex;
   flex-direction: column;
@@ -234,7 +234,7 @@
 
 @media (max-width: 620px) {
   .toast-region {
-    top: calc(var(--toast-top, 64px) + 12px);
+    top: calc(var(--header-h, 64px) + 12px);
     align-items: center;
   }
 }

@@ -1,0 +1,79 @@
+/* =========== Tema e preferências de acessibilidade ===========
+   Os atributos em <html> são definidos por includes/theme-init.ftlh (antes da página aparecer)
+   e pelo painel de acessibilidade (includes/a11y-panel.ftlh):
+     data-theme="dark|light"   data-text="large|xlarge"   data-contrast="high"
+     data-motion="reduce"      data-links="underline"
+   Cada página define seus tokens em :root; aqui eles são sobrescritos com seletores mais específicos. */
+
+/* ---- Tema escuro (tokens do design system: neutros quentes, elevação por luminosidade) ---- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121110; --surface: #1A1918; --surface2: #232120; --border: #322F2D; --border2: #46423F;
+  --text: #F6F4F2; --text2: #B7B0AC; --text3: #9C948F;
+  /* No escuro o vermelho vira texto claro; os preenchimentos usam --brand-fill (abaixo) */
+  --brand: #F2969B; --brand-hover: #F6F4F2; --brand-soft: #2A1416; --brand-soft-text: #F2969B; --brand-soft-border: #4A1D21;
+  --brand-fill: #C0333A; --brand-fill-hover: #D4454C;
+  --ok-soft: #0F3D2A; --ok-text: #8FE3B8; --ok-border: #1F6F4C; --ok-dot: #8FE3B8;
+  --warn-soft: #3A2604; --warn-text: #F5CE8B; --warn-border: #6B4A12; --warn-dot: #F5CE8B;
+  --info-soft: #14324F; --info-text: #A8CBF0; --info-border: #24476B;
+  --err-text: #F2969B;
+}
+
+/* Elementos preenchidos de vermelho: continuam vermelhos, com texto branco legível */
+:root[data-theme="dark"] :is(.btn-primary, .cta-primary, .step-num, .page-btn.current, .logo-mark, .page-hero, .cta-panel) {
+  background: var(--brand-fill);
+}
+:root[data-theme="dark"] :is(.btn-primary, .cta-primary):hover {
+  background: var(--brand-fill-hover);
+}
+:root[data-theme="dark"] .btn-primary,
+:root[data-theme="dark"] .cta-primary {
+  color: #FFFFFF;
+}
+:root[data-theme="dark"] .profile-hero {
+  background: linear-gradient(135deg, #8F1821 0%, #4A0F14 100%);
+}
+:root[data-theme="dark"] img {
+  filter: brightness(.9);
+}
+:root[data-theme="dark"] .logo-dot {
+  border-color: #FFFFFF;
+}
+/* Opção escolhida nos seletores do painel: mais clara que o fundo, como no tema claro */
+:root[data-theme="dark"] .segmented button[aria-pressed="true"] {
+  background: #3A3634;
+}
+
+/* ---- Tamanho do texto ---- */
+:root[data-text="large"] { zoom: 1.125; }
+:root[data-text="xlarge"] { zoom: 1.25; }
+
+/* ---- Alto contraste: textos secundários e bordas mais fortes ---- */
+:root[data-contrast="high"] {
+  --text2: #2E2A28; --text3: #45403D; --border: #8A827E; --border2: #57514E;
+}
+:root[data-contrast="high"][data-theme="dark"] {
+  --text2: #F6F4F2; --text3: #D6D0CC; --border: #8A827E; --border2: #B7B0AC;
+}
+
+/* ---- Destacar links ---- */
+:root[data-links="underline"] a:not(.btn):not(.logo):not(.profile-chip):not(.tabbar__item):not(.dropdown-item) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---- Reduzir movimento ---- */
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+  scroll-behavior: auto !important;
+}
+:root[data-motion="reduce"] .toast,
+:root[data-motion="reduce"] .toast.is-leaving,
+:root[data-motion="reduce"] .toast__pulse-fill {
+  animation: none;
+  clip-path: none;
+}

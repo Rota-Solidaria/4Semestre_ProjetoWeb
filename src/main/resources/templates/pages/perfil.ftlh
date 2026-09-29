@@ -1,6 +1,6 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Meu Perfil - Rota Solidária" css="/css/perfil.css" currentNav="">
+<@main.layout title="Meu Perfil - Rota Solidária" css="/css/perfil.css" currentNav="perfil">
   <section class="profile-hero">
     <div class="container profile-hero-inner">
       <div class="profile-user-info">
@@ -25,16 +25,88 @@
         </div>
       </div>
 
-      <div>
+      <div class="profile-hero-actions">
         <span class="profile-hero-badge">
           <span class="icon">check_circle</span>
           <#if isDonor>Doador Solidário<#else>Organizador</#if>
         </span>
+        <form class="logout-form" method="post" action="/logout">
+          <#include "../includes/csrf.ftlh">
+          <button type="submit" class="profile-logout"><span class="icon" aria-hidden="true">logout</span>Sair</button>
+        </form>
       </div>
     </div>
   </section>
 
   <main class="container section">
+    <#if isDonor>
+      <!-- Carteirinha do doador + próxima doação -->
+      <div class="donor-row">
+        <section class="donor-card" aria-label="Carteirinha do doador">
+          <div class="donor-card__top">
+            <div>
+              <span class="donor-card__label">Carteirinha do doador</span>
+              <strong class="donor-card__name">${usuario.name}</strong>
+            </div>
+            <div class="donor-card__type">
+              <span class="donor-card__label">Tipo</span>
+              <strong><#if donor?? && donor.bloodType??>${donor.bloodType.displayName}<#else>?</#if></strong>
+            </div>
+          </div>
+          <dl class="donor-card__stats">
+            <div><dt>Doações</dt><dd>${totalDoacoes}</dd></div>
+            <div><dt>Vidas</dt><dd><#if totalDoacoes gt 0>até ${totalDoacoes * 4}<#else>—</#if></dd></div>
+            <div><dt>Peso</dt><dd><#if donor?? && donor.weight??>${donor.weight} kg<#else>—</#if></dd></div>
+          </dl>
+          <#if !(donor?? && donor.bloodType??)>
+            <a class="donor-card__hint" href="#editar">Informe seu tipo sanguíneo</a>
+          </#if>
+        </section>
+
+        <section class="next-donation" aria-label="Próxima doação">
+          <#if ultimaDoacaoBr??>
+            <#if diasRestantes gt 0>
+              <div class="next-donation__head">
+                <span class="next-donation__icon is-wait"><span class="icon" aria-hidden="true">hourglass_top</span></span>
+                <div>
+                  <strong>Faltam ${diasRestantes} <#if diasRestantes == 1>dia<#else>dias</#if></strong>
+                  <span>Homens podem doar de novo a partir de ${proximaHomensBr}; mulheres, a partir de ${proximaMulheresBr}.</span>
+                </div>
+              </div>
+              <div class="next-donation__bar" role="progressbar" aria-label="Intervalo desde a última doação" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progressoIntervalo}"><span style="width: ${progressoIntervalo}%"></span></div>
+              <div class="next-donation__foot"><span>Última doação ${ultimaDoacaoBr}</span><span>Intervalo 60 dias (90 para mulheres)</span></div>
+            <#else>
+              <div class="next-donation__head">
+                <span class="next-donation__icon is-ok"><span class="icon" aria-hidden="true">check</span></span>
+                <div>
+                  <strong>Você já pode doar de novo</strong>
+                  <span>Última doação em ${ultimaDoacaoBr}. Para mulheres, o intervalo mínimo é até ${proximaMulheresBr}.</span>
+                </div>
+              </div>
+              <a class="btn btn-secondary" href="/campanhas">Ver campanhas abertas</a>
+            </#if>
+          <#elseif proximaInscricao??>
+            <div class="next-donation__head">
+              <span class="next-donation__icon"><span class="icon" aria-hidden="true">event</span></span>
+              <div>
+                <strong>Sua próxima doação</strong>
+                <span>${proximaInscricao.campaign.title} · ${proximaInscricaoDataBr}</span>
+              </div>
+            </div>
+            <a class="btn btn-secondary" href="/inscricoes/${proximaInscricao.id?c}"><span class="icon" aria-hidden="true">confirmation_number</span>Ver bilhete</a>
+          <#else>
+            <div class="next-donation__head">
+              <span class="next-donation__icon"><span class="icon" aria-hidden="true">volunteer_activism</span></span>
+              <div>
+                <strong>Nenhuma doação registrada ainda</strong>
+                <span>Escolha uma campanha e faça sua primeira doação com o transporte gratuito.</span>
+              </div>
+            </div>
+            <a class="btn btn-secondary" href="/campanhas">Ver campanhas</a>
+          </#if>
+        </section>
+      </div>
+    <#else>
     <!-- Indicadores / Estatísticas do Perfil -->
     <div class="stats-grid">
       <div class="stat-card">
@@ -77,12 +149,13 @@
         </div>
       </div>
     </div>
+    </#if>
 
     <!-- Layout 2 Colunas -->
     <div class="profile-main-grid">
 
       <!-- Coluna Principal: Minhas Inscrições -->
-      <div>
+      <div id="inscricoes">
         <div class="section-title-wrap">
           <h2>Minhas Inscrições em Campanhas</h2>
           <a class="btn btn-secondary btn-sm" href="/campanhas">Ver todas as coletas</a>
@@ -107,19 +180,28 @@
                   <span><span class="icon">directions_bus</span>Transporte gratuito</span>
                 </div>
               </div>
-              <div>
-                <a class="btn btn-secondary" href="/campanhas/${reg.campaign.id}">Ver Detalhes</a>
+              <div class="reg-card-actions">
+                <#if reg.status != "CANCELLED">
+                  <a class="btn btn-primary" href="/inscricoes/${reg.id?c}"><span class="icon" aria-hidden="true">confirmation_number</span>Ver bilhete</a>
+                </#if>
+                <a class="btn btn-secondary" href="/campanhas/${reg.campaign.id}">Detalhes</a>
               </div>
             </div>
           </#list>
         <#else>
           <div class="reg-empty">
-            <div class="reg-empty-icon">
-              <span class="icon">calendar_today</span>
+            <div class="reg-empty-art" aria-hidden="true">
+              <span class="reg-empty-drop"></span>
+              <span class="icon">directions_bus</span>
             </div>
-            <h3>Você ainda não possui inscrições ativas</h3>
-            <p>Escolha uma campanha disponível na região para participar com transporte gratuito e garantir sua vaga.</p>
-            <a class="btn btn-primary" href="/campanhas">Explorar Campanhas Disponíveis</a>
+            <div class="reg-empty-text">
+              <h3>Você ainda não tem inscrições</h3>
+              <p>Escolha uma campanha perto de você e garanta sua vaga no ônibus. O transporte é gratuito.</p>
+              <div class="reg-empty-actions">
+                <a class="btn btn-primary" href="/campanhas">Ver campanhas<span class="icon" aria-hidden="true">arrow_forward</span></a>
+                <a class="btn btn-ghost" href="/educativo">Como funciona a doação</a>
+              </div>
+            </div>
           </div>
         </#if>
 
@@ -187,12 +269,12 @@
 
             <div class="form-field">
               <label for="prof-senha-atual">Senha Atual</label>
-              <input id="prof-senha-atual" name="senhaAtual" type="password" placeholder="Digite apenas se desejar trocar">
+              <input id="prof-senha-atual" name="senhaAtual" type="password" data-password autocomplete="current-password" placeholder="Digite apenas se desejar trocar">
             </div>
 
             <div class="form-field">
               <label for="prof-nova-senha">Nova Senha</label>
-              <input id="prof-nova-senha" name="novaSenha" type="password" placeholder="Mínimo 8 caracteres">
+              <input id="prof-nova-senha" name="novaSenha" type="password" data-password data-password-strength autocomplete="new-password" placeholder="Mínimo 8 caracteres">
             </div>
           </div>
 

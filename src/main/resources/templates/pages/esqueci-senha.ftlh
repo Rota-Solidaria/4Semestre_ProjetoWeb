@@ -1,6 +1,6 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Esqueci Minha Senha - Rota Solidária" css="/css/login.css" currentNav="">
+<@main.layout title="Esqueci Minha Senha - Rota Solidária" css="/css/login.css" currentNav="entrar">
   <main class="container">
     <div class="login-wrap">
       <div class="panel login-panel">

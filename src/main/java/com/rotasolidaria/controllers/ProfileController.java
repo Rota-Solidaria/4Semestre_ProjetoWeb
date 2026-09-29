@@ -4,6 +4,7 @@ import com.rotasolidaria.models.Donor;
 import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.User;
 import com.rotasolidaria.models.enums.BloodType;
+import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
 import com.rotasolidaria.repositories.UserRepository;
@@ -21,12 +22,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class ProfileController {
+
+    private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
@@ -70,6 +76,10 @@ public class ProfileController {
             inscricoes = inscricaoRepository.findByDonor(donor);
         }
 
+        if (isDonor) {
+            addDonorCard(inscricoes, model);
+        }
+
         model.addAttribute("usuario", user);
         model.addAttribute("isDonor", isDonor);
         model.addAttribute("donor", donor);
@@ -77,6 +87,43 @@ public class ProfileController {
         model.addAttribute("bloodTypes", BloodType.values());
 
         return "pages/perfil";
+    }
+
+    /**
+     * Dados da carteirinha do doador: doações feitas (inscrições confirmadas em campanhas
+     * que já aconteceram) e quando poderá doar de novo. O intervalo mínimo entre doações é
+     * de 60 dias para homens e 90 para mulheres; como o cadastro não tem sexo, mostramos os dois.
+     */
+    private void addDonorCard(List<Registration> inscricoes, Model model) {
+        LocalDate hoje = LocalDate.now();
+        List<LocalDate> doacoes = inscricoes.stream()
+                .filter(r -> r.getStatus() == RegistrationStatus.CONFIRMED)
+                .map(r -> r.getCampaign().getEventDate())
+                .filter(d -> d != null && d.isBefore(hoje))
+                .sorted()
+                .toList();
+
+        model.addAttribute("totalDoacoes", doacoes.size());
+        if (!doacoes.isEmpty()) {
+            LocalDate ultima = doacoes.get(doacoes.size() - 1);
+            LocalDate proximaHomens = ultima.plusDays(60);
+            LocalDate proximaMulheres = ultima.plusDays(90);
+            long diasDesde = ChronoUnit.DAYS.between(ultima, hoje);
+            model.addAttribute("ultimaDoacaoBr", ultima.format(DATA_BR));
+            model.addAttribute("proximaHomensBr", proximaHomens.format(DATA_BR));
+            model.addAttribute("proximaMulheresBr", proximaMulheres.format(DATA_BR));
+            model.addAttribute("diasRestantes", Math.max(0, ChronoUnit.DAYS.between(hoje, proximaHomens)));
+            model.addAttribute("progressoIntervalo", Math.min(100, diasDesde * 100 / 60));
+        }
+
+        inscricoes.stream()
+                .filter(r -> r.getStatus() == RegistrationStatus.CONFIRMED)
+                .filter(r -> r.getCampaign().getEventDate() != null && !r.getCampaign().getEventDate().isBefore(hoje))
+                .min(Comparator.comparing(r -> r.getCampaign().getEventDate()))
+                .ifPresent(r -> {
+                    model.addAttribute("proximaInscricao", r);
+                    model.addAttribute("proximaInscricaoDataBr", r.getCampaign().getEventDate().format(DATA_BR));
+                });
     }
 
     @PostMapping("/perfil/editar")

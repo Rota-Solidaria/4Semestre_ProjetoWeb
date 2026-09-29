@@ -1,6 +1,6 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Login - Rota Solidária" css="/css/login.css" currentNav="">
+<@main.layout title="Login - Rota Solidária" css="/css/login.css" currentNav="entrar">
   <main class="container">
     <div class="login-wrap">
       <div class="panel login-panel">
@@ -18,7 +18,7 @@
               <label for="rs-senha">Senha</label>
               <a class="field-link" href="/esqueci-senha">Esqueci minha senha</a>
             </div>
-            <input id="rs-senha" name="senha" type="password" required autocomplete="current-password" placeholder="••••••••">
+            <input id="rs-senha" name="senha" type="password" data-password required autocomplete="current-password" placeholder="••••••••">
           </div>
           <button class="btn btn-primary" type="submit">Entrar</button>
         </form>

@@ -11,8 +11,14 @@
         </div>
         <div class="detail-body">
           <div class="detail-top">
-            <span class="badge badge-open"><span class="dot"></span>${campanha.status}</span>
-            <span class="row-vagas detail-vagas-count">${campanha.slots!0} vagas disponíveis</span>
+            <#if campanha.status == "OPEN">
+              <span class="badge badge-open"><span class="dot"></span>Inscrições abertas</span>
+            <#elseif campanha.status == "CLOSED">
+              <span class="badge badge-closed"><span class="dot"></span>Inscrições encerradas</span>
+            <#else>
+              <span class="badge badge-closed"><span class="dot"></span>Campanha cancelada</span>
+            </#if>
+            <span class="row-vagas detail-vagas-count">${vagasRestantes} de ${campanha.slots!0} vagas disponíveis</span>
           </div>
 
           <h1>${campanha.title}</h1>
@@ -64,6 +70,35 @@
             </div>
           </div>
 
+          <section class="route" aria-labelledby="route-title">
+            <span class="kicker">Como chegar</span>
+            <h2 id="route-title">O ônibus leva você até o hemocentro</h2>
+            <ol class="route__stops">
+              <li class="route__stop">
+                <span class="route__dot route__dot--start"><span class="icon" aria-hidden="true">directions_bus</span></span>
+                <div class="route__text">
+                  <span class="route__time"><#if campanha.departureTime??>Saída ${campanha.departureTime}<#else>Horário a confirmar</#if></span>
+                  <strong>Embarque</strong>
+                  <#if campanha.departureLocation??>
+                    <span>${campanha.departureLocation.name}<#if campanha.departureLocation.city??>, ${campanha.departureLocation.city}</#if></span>
+                  <#else>
+                    <span>Na sua cidade — o organizador confirma o ponto</span>
+                  </#if>
+                </div>
+              </li>
+              <li class="route__stop route__stop--end">
+                <span class="route__dot route__dot--end"><span class="icon" aria-hidden="true">bloodtype</span></span>
+                <div class="route__text">
+                  <span class="route__time"><#if campanha.donationTime??>Doação ${campanha.donationTime}<#else>Horário a confirmar</#if></span>
+                  <strong>Hemocentro</strong>
+                  <#if campanha.donationLocation??>
+                    <span>${campanha.donationLocation.name}<#if campanha.donationLocation.city??>, ${campanha.donationLocation.city}</#if></span>
+                  </#if>
+                </div>
+              </li>
+            </ol>
+          </section>
+
           <div class="notice-box">
             <span class="icon">info</span>
             <p><strong>Organizado por:</strong>
@@ -80,7 +115,13 @@
           </ul>
 
           <div class="detail-actions">
-            <a class="btn btn-primary btn-lg" href="/campanhas/${campanha.id}/inscrever">Fazer inscrição<span class="icon">arrow_forward</span></a>
+            <#if minhaInscricao??>
+              <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}"><span class="icon">confirmation_number</span>Ver meu bilhete</a>
+            <#elseif campanha.status != "OPEN" || vagasRestantes lte 0>
+              <span class="btn btn-primary btn-lg btn-disabled" aria-disabled="true"><#if vagasRestantes lte 0>Vagas esgotadas<#else>Inscrições encerradas</#if></span>
+            <#else>
+              <a class="btn btn-primary btn-lg" href="/campanhas/${campanha.id}/inscrever">Fazer inscrição<span class="icon">arrow_forward</span></a>
+            </#if>
             <a class="btn btn-secondary btn-lg" href="/campanhas">Ver outras campanhas</a>
           </div>
         </div>

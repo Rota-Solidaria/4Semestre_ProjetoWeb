@@ -127,11 +127,6 @@
   color: var(--brand);
 }
 
-.mobile-logout {
-  color: var(--brand) !important;
-  font-weight: 700 !important;
-}
-
 /* Logout é um formulário POST (exigido pelo Spring Security), estilizado como link */
 .logout-form {
   margin: 0;
@@ -145,17 +140,6 @@
   cursor: pointer;
 }
 
-.mobile-nav .logout-form button {
-  display: block;
-  width: 100%;
-  padding: 11px 0;
-  border: 0;
-  background: none;
-  text-align: left;
-  font: 700 15px/1 'IBM Plex Sans', sans-serif;
-  cursor: pointer;
-}
-
 /* Mantém o rodapé no fim da tela em páginas com pouco conteúdo */
 body {
   min-height: 100vh;
@@ -165,4 +149,22 @@ body {
 
 body > main {
   flex: 1 0 auto;
+}
+
+/* Deslogado: botão "Entrar" no lugar do avatar, para não parecer que já há alguém conectado */
+.header-actions .profile-chip--login {
+  gap: 8px;
+  padding: 7px 16px 7px 12px;
+  border-color: var(--brand-soft-border);
+  color: var(--brand);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.header-actions .profile-chip--login .icon {
+  font-size: 20px;
+}
+
+.header-actions .profile-chip--login:hover {
+  background: var(--brand-soft);
+  border-color: var(--brand);
 }

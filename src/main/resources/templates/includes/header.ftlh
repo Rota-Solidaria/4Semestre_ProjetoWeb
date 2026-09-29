@@ -6,8 +6,8 @@
     </a>
     <#include "navbar.ftlh">
     <div class="header-actions">
-      <a class="icon-btn" href="#acessibilidade" aria-label="Acessibilidade"><span
-          class="icon">accessibility_new</span></a>
+      <button type="button" class="icon-btn a11y-toggle" aria-label="Acessibilidade" aria-expanded="false" aria-controls="a11y-panel" data-a11y-toggle><span
+          class="icon" aria-hidden="true">accessibility_new</span></button>
       <#if usuarioLogado??>
         <div class="user-dropdown-wrapper" id="userDropdownWrapper">
           <button type="button" class="profile-chip dropdown-toggle" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">
@@ -37,23 +37,8 @@
           </div>
         </div>
       <#else>
-        <a class="profile-chip" href="/login"><span class="avatar">RS</span>Perfil</a>
+        <a class="profile-chip profile-chip--login" href="/login"><span class="icon" aria-hidden="true">login</span>Entrar</a>
       </#if>
     </div>
-  </div>
-  <div class="mobile-nav container">
-    <a href="/">Início</a>
-    <a href="/campanhas">Campanhas</a>
-    <a href="/educativo">Saiba Mais</a>
-    <#if usuarioLogado??>
-      <a href="/perfil">Meu Perfil (${usuarioLogado.name?keep_before(" ")})</a>
-      <a href="/perfil#editar">Editar Perfil</a>
-      <form class="logout-form" method="post" action="/logout">
-        <#include "csrf.ftlh">
-        <button type="submit" class="mobile-logout">Sair do perfil</button>
-      </form>
-    <#else>
-      <a href="/login">Perfil</a>
-    </#if>
   </div>
 </header>

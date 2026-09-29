@@ -83,6 +83,8 @@ public class DataInitializer implements CommandLineRunner {
             c1.setSlots(40);
             c1.setStatus(CampaignStatus.OPEN);
             c1.setDonationLocation(hemocentro);
+            c1.setDepartureLocation(criarPontoDeEmbarque());
+            c1.setDepartureTime(LocalTime.of(6, 30));
             c1.setOrganizer(organizador);
             campanhaRepository.save(c1);
 
@@ -117,7 +119,7 @@ public class DataInitializer implements CommandLineRunner {
                 inscricao.setCampaign(c1);
                 inscricao.setDonor(doador);
                 inscricao.setStatus(RegistrationStatus.CONFIRMED);
-                inscricao.setNotes("Embarque Praça Matriz.");
+                inscricao.setBoardingPoint("Praça Matriz, Angatuba");
                 inscricaoRepository.save(inscricao);
             }
 
@@ -139,9 +141,38 @@ public class DataInitializer implements CommandLineRunner {
                 inscricao.setCampaign(campanhas.get(0));
                 inscricao.setDonor(doador);
                 inscricao.setStatus(RegistrationStatus.CONFIRMED);
-                inscricao.setNotes("Embarque Praça Matriz.");
+                inscricao.setBoardingPoint("Praça Matriz, Angatuba");
                 inscricaoRepository.save(inscricao);
             }
         }
+
+        completarEmbarqueDaCampanhaDemo();
+    }
+
+    // Bancos criados antes do campo de embarque existir: completa a campanha de demonstração
+    private void completarEmbarqueDaCampanhaDemo() {
+        campanhaRepository.findAll().stream()
+                .filter(c -> "Campanha Sangue Solidário 2026".equals(c.getTitle()) && c.getDepartureLocation() == null)
+                .forEach(c -> {
+                    c.setDepartureLocation(criarPontoDeEmbarque());
+                    if (c.getDepartureTime() == null) {
+                        c.setDepartureTime(LocalTime.of(6, 30));
+                    }
+                    campanhaRepository.save(c);
+                    inscricaoRepository.findByCampaign(c).stream()
+                            .filter(r -> r.getBoardingPoint() == null)
+                            .forEach(r -> {
+                                r.setBoardingPoint("Praça Matriz, Angatuba");
+                                inscricaoRepository.save(r);
+                            });
+                });
+    }
+
+    private Location criarPontoDeEmbarque() {
+        Location pracaMatriz = new Location();
+        pracaMatriz.setName("Praça Matriz");
+        pracaMatriz.setCity("Angatuba");
+        pracaMatriz.setState("SP");
+        return localizacaoRepository.save(pracaMatriz);
     }
 }

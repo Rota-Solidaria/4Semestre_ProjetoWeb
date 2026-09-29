@@ -33,6 +33,10 @@ public class Registration {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    // Onde o doador vai embarcar (ou "Vou por conta própria")
+    @Column(name = "boarding_point", length = 160)
+    private String boardingPoint;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
@@ -81,6 +85,19 @@ public class Registration {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getBoardingPoint() {
+        return boardingPoint;
+    }
+
+    public void setBoardingPoint(String boardingPoint) {
+        this.boardingPoint = boardingPoint;
+    }
+
+    /** Código exibido no bilhete de embarque, ex.: RS-00042. */
+    public String getCode() {
+        return id == null ? null : "RS-%05d".formatted(id);
     }
 
     public LocalDateTime getCreatedAt() {

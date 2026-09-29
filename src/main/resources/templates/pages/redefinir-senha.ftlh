@@ -1,6 +1,6 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Redefinir Senha - Rota Solidária" css="/css/login.css" currentNav="">
+<@main.layout title="Redefinir Senha - Rota Solidária" css="/css/login.css" currentNav="entrar">
   <main class="container">
     <div class="login-wrap">
       <div class="panel login-panel">
@@ -13,11 +13,11 @@
             <input type="hidden" name="token" value="${token}">
             <div class="field">
               <label for="rs-senha">Nova senha</label>
-              <input id="rs-senha" name="senha" type="password" required minlength="${minSenha}" autocomplete="new-password" placeholder="Mínimo ${minSenha} caracteres">
+              <input id="rs-senha" name="senha" type="password" data-password data-password-strength required minlength="${minSenha}" autocomplete="new-password" placeholder="Mínimo ${minSenha} caracteres">
             </div>
             <div class="field">
               <label for="rs-confirmar">Confirmar nova senha</label>
-              <input id="rs-confirmar" name="confirmarSenha" type="password" required minlength="${minSenha}" autocomplete="new-password" placeholder="Repita a nova senha">
+              <input id="rs-confirmar" name="confirmarSenha" type="password" data-password data-password-confirm="#rs-senha" required minlength="${minSenha}" autocomplete="new-password" placeholder="Repita a nova senha">
             </div>
             <button class="btn btn-primary" type="submit">Salvar nova senha</button>
           </form>
