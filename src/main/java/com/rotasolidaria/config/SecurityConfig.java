@@ -1,5 +1,6 @@
 package com.rotasolidaria.config;
 
+import com.rotasolidaria.security.FriendlyAccessDeniedHandler;
 import com.rotasolidaria.security.GoogleLoginSuccessHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    ObjectProvider<ClientRegistrationRepository> googleClient,
-                                                   GoogleLoginSuccessHandler googleLoginSuccessHandler) throws Exception {
+                                                   GoogleLoginSuccessHandler googleLoginSuccessHandler,
+                                                   FriendlyAccessDeniedHandler accessDeniedHandler) throws Exception {
         http
                 // Rotas que exigem login; todo o resto é público
                 .authorizeHttpRequests(auth -> auth
@@ -32,7 +34,9 @@ public class SecurityConfig {
                         .failureUrl("/login?erro"))
                 // Logout via POST /logout (com token CSRF)
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout"));
+                        .logoutSuccessUrl("/login?logout"))
+                // Acesso negado (403): redireciona com aviso em vez da página de erro
+                .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler));
 
         // Login com o Google (GET /oauth2/authorization/google), só se GOOGLE_CLIENT_ID estiver definido
         if (googleClient.getIfAvailable() != null) {

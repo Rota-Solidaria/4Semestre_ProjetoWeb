@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -92,6 +94,32 @@ public class InscricaoService {
 
     public Optional<Registration> findForDonor(Campaign campaign, Long userId) {
         return donorRepository.findById(userId).flatMap(donor -> inscricaoRepository.findByCampaignAndDonor(campaign, donor));
+    }
+
+    /** Inscrições ativas (não canceladas) do usuário, pelo id da campanha em texto (como a lista de campanhas lê). */
+    public Map<String, Registration> activeByCampaign(Long userId) {
+        Map<String, Registration> byCampaign = new HashMap<>();
+        donorRepository.findById(userId).ifPresent(donor -> inscricaoRepository.findByDonor(donor).stream()
+                .filter(r -> r.getStatus() != RegistrationStatus.CANCELLED)
+                .forEach(r -> byCampaign.put(r.getCampaign().getId().toString(), r)));
+        return byCampaign;
+    }
+
+    /** Resumo de como o doador chega, para a lista de campanhas: "Seu embarque: Angatuba às 06:30". */
+    public static String arrivalSummary(Registration registration) {
+        if (registration.getCampaign().isMeeting()) {
+            return "Encontro no local, por conta própria";
+        }
+        if (!goesByBus(registration)) {
+            return "Você vai por conta própria";
+        }
+        Location boarding = registration.getBoardingLocation() != null
+                ? registration.getBoardingLocation()
+                : registration.getCampaign().getDepartureLocation();
+        String where = boarding == null ? "na sua cidade"
+                : boarding.getCity() != null && !boarding.getCity().isBlank() ? boarding.getCity() : boarding.getName();
+        LocalTime time = boardingTime(registration);
+        return "Seu embarque: " + where + (time == null ? "" : " às " + time);
     }
 
     /** Busca uma inscrição garantindo que ela pertence ao usuário logado. */

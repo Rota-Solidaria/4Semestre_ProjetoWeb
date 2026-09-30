@@ -127,6 +127,17 @@ input,select,textarea{font:inherit;color:inherit}
   .row-cta{width:100%}
 }
 .row-cta.cta-primary{background:var(--brand);color:#fff}
+/* Campanha em que o usuário já se inscreveu: selo, embarque e os atalhos para o bilhete e a campanha */
+.badge-inscrito{background:var(--brand-soft);color:var(--brand-soft-text);border:1px solid var(--brand-soft-border);padding:5px 12px 5px 8px;gap:6px}
+.badge-inscrito .icon{font-size:16px}
+.row-meta .row-meta__meu{color:var(--text);font-weight:600}
+.row-ctas{display:flex;flex-direction:column;gap:8px;min-width:210px}
+.row-ctas .row-cta{gap:8px}
+.row-ctas .row-cta .icon{font-size:19px}
+.row-cta.cta-primary:hover{background:var(--brand-hover)}
+.row-cta.cta-secondary{height:44px;background:var(--surface);border:1px solid var(--border2);color:var(--text2)}
+.row-cta.cta-secondary:hover{border-color:var(--brand);color:var(--brand)}
+@media(max-width:700px){.row-ctas{min-width:0}}
 .empty-list-msg{padding:2rem;text-align:center;color:var(--text3)}
 /* Organizador: atalho para criar campanha no topo da lista */
 .hero-organizador{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:22px}

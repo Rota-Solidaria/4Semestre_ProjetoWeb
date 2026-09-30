@@ -1,7 +1,9 @@
 // CampanhaController.java
 package com.rotasolidaria.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Location;
+import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.services.CampaignService;
 import com.rotasolidaria.services.InscricaoService;
@@ -28,9 +31,17 @@ public class CampaignController {
     }
 
     @GetMapping("/campanhas")
-    public String listar(Model model) {
+    public String listar(@AuthenticationPrincipal AuthenticatedUser principal, Model model) {
         List<Campaign> campanhas = campanhaService.listarTodas();
         model.addAttribute("campanhas", campanhas);
+        // Campanhas em que o usuário já se inscreveu mostram o selo e o atalho para o bilhete
+        if (principal != null) {
+            Map<String, Registration> minhas = inscricaoService.activeByCampaign(principal.getId());
+            Map<String, String> chegadas = new HashMap<>();
+            minhas.forEach((id, inscricao) -> chegadas.put(id, InscricaoService.arrivalSummary(inscricao)));
+            model.addAttribute("minhasInscricoes", minhas);
+            model.addAttribute("minhasChegadas", chegadas);
+        }
         return "pages/campanhas"; // -> templates/pages/campanhas.ftlh
     }
 

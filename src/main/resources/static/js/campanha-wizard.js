@@ -327,7 +327,7 @@
     var emOrdem = horarios.every(function (h, i) { return i === 0 || h > horarios[i - 1]; });
     var destino = pontos[pontos.length - 1];
     var itens = direto ? [
-      { ok: semMapa === 0, texto: semMapa === 0 ? 'O local está no mapa (o Waze usa esse ponto)' : 'O local ainda não está no mapa', passo: 4 },
+      { ok: semMapa === 0, texto: semMapa === 0 ? 'O local está no mapa' : 'O local ainda não está no mapa', passo: 4 },
       { ok: !!valor(destino, 'nome') && !!valor(destino, 'cidade'), texto: valor(destino, 'nome') ? 'Hemocentro definido' : 'Falta escolher o hemocentro', passo: 4 }
     ] : [
       { ok: emOrdem, texto: emOrdem ? 'Horários seguem a ordem da rota' : 'Há um horário fora da ordem da rota', passo: 3 },
