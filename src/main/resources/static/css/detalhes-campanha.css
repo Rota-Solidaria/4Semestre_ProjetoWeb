@@ -10,7 +10,6 @@
   --max:1180px;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:Archivo,sans-serif;letter-spacing:-.02em;margin:0}
 a{color:inherit;text-decoration:none}
@@ -152,6 +151,8 @@ input,select,textarea{font:inherit;color:inherit}
 .route__dot--stop{background:var(--surface);border:2px solid var(--border2);color:var(--text);font:700 16px/1 'IBM Plex Sans',sans-serif}
 .route__map{margin-top:24px}
 /* Ponto onde o doador logado embarca (ou o hemocentro, se vai por conta própria) */
+.route__nota{display:flex;gap:8px;align-items:center;margin:-6px 0 18px;font-size:13px;color:var(--text2)}
+.route__nota .icon{font-size:16px}
 .route__meu{display:flex;gap:10px;align-items:center;margin:-8px 0 22px;padding:12px 14px;border-radius:12px;background:var(--brand-soft);border:1px solid var(--brand-soft-border);color:var(--brand-soft-text);font-size:15px}
 .route__meu .icon{font-size:20px;flex:none}
 /* span.route__voce: vence .route__text span:last-child */

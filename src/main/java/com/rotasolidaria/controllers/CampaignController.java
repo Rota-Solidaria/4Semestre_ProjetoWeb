@@ -67,7 +67,7 @@ public class CampaignController {
                         if (embarque != null) {
                             model.addAttribute("meuEmbarqueId", embarque.getId());
                             model.addAttribute("meuEmbarqueNome", InscricaoService.describe(embarque.getName(), embarque.getCity()));
-                            model.addAttribute("meuEmbarqueHorario", InscricaoService.boardingTime(inscricao));
+                            model.addAttribute("meuEmbarqueHorario", InscricaoService.boardingTimeTexto(inscricao));
                         }
                     }
                 });

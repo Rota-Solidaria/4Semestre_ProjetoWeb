@@ -55,7 +55,7 @@
                 <h3>${c.title}</h3>
                 <div class="row-meta">
                   <#if c.eventDate??>
-                    <span><span class="icon">schedule</span>${c.eventDateBr} <#if c.donationTime??>· ${c.donationTime}h</#if></span>
+                    <span><span class="icon">schedule</span>${c.eventDateBr} <#if c.donationTime??>· ${c.donationTimeTexto}h</#if></span>
                   </#if>
                   <#if c.donationLocation??>
                     <span><span class="icon">place</span>${c.donationLocation.name} — ${c.donationLocation.city}</span>

@@ -31,6 +31,10 @@ public class Campaign {
     @Column(name = "donation_time")
     private LocalTime donationTime;
 
+    /** O horário da doação foi estimado pela rota (chegada prevista), não confirmado pelo organizador. */
+    @Column(name = "donation_time_estimated", nullable = false)
+    private boolean donationTimeEstimated;
+
     @Column(name = "departure_time")
     private LocalTime departureTime;
 
@@ -107,6 +111,37 @@ public class Campaign {
 
     public void setDonationTime(LocalTime donationTime) {
         this.donationTime = donationTime;
+    }
+
+    public boolean isDonationTimeEstimated() {
+        return donationTimeEstimated;
+    }
+
+    public void setDonationTimeEstimated(boolean donationTimeEstimated) {
+        this.donationTimeEstimated = donationTimeEstimated;
+    }
+
+    /** "09:30", ou "≈ 09:30" se a chegada foi estimada pela rota; nulo sem horário. */
+    public String getDonationTimeTexto() {
+        return Datas.hora(donationTime, donationTimeEstimated);
+    }
+
+    /** "06:30"; a saída nunca é estimada. */
+    public String getDepartureTimeTexto() {
+        return Datas.hora(departureTime, false);
+    }
+
+    /** Há algum horário estimado (para a nota "≈ estimado pela rota" nas telas). */
+    public boolean isAlgumHorarioEstimado() {
+        if (donationTime != null && donationTimeEstimated) {
+            return true;
+        }
+        for (RouteStop parada : stops) {
+            if (parada.getStopTime() != null && parada.isStopTimeEstimated()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public LocalTime getDepartureTime() {

@@ -1,6 +1,7 @@
 package com.rotasolidaria.services;
 
 import com.rotasolidaria.exception.BusinessException;
+import com.rotasolidaria.util.Datas;
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Donor;
 import com.rotasolidaria.models.Location;
@@ -92,6 +93,28 @@ public class InscricaoService {
         return campaign.getDepartureTime();
     }
 
+    /** O horário de embarque foi estimado pela rota (não confirmado pelo organizador)? */
+    public static boolean boardingTimeEstimated(Registration registration) {
+        if (!goesByBus(registration)) {
+            return false;
+        }
+        Campaign campaign = registration.getCampaign();
+        Location chosen = registration.getBoardingLocation();
+        if (chosen != null) {
+            for (RouteStop stop : campaign.getStops()) {
+                if (stop.getLocation().getId().equals(chosen.getId())) {
+                    return stop.isStopTimeEstimated();
+                }
+            }
+        }
+        return false; // embarque na partida: a saída nunca é estimada
+    }
+
+    /** "07:20", ou "≈ 07:20" se estimado; nulo sem horário. */
+    public static String boardingTimeTexto(Registration registration) {
+        return Datas.hora(boardingTime(registration), boardingTimeEstimated(registration));
+    }
+
     public Optional<Registration> findForDonor(Campaign campaign, Long userId) {
         return donorRepository.findById(userId).flatMap(donor -> inscricaoRepository.findByCampaignAndDonor(campaign, donor));
     }
@@ -118,7 +141,7 @@ public class InscricaoService {
                 : registration.getCampaign().getDepartureLocation();
         String where = boarding == null ? "na sua cidade"
                 : boarding.getCity() != null && !boarding.getCity().isBlank() ? boarding.getCity() : boarding.getName();
-        LocalTime time = boardingTime(registration);
+        String time = boardingTimeTexto(registration);
         return "Seu embarque: " + where + (time == null ? "" : " às " + time);
     }
 

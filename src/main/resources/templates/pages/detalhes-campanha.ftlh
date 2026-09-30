@@ -50,7 +50,7 @@
                 </div>
                 <div class="info-sub">
                   <#if campanha.departureTime??>Saída ${campanha.departureTime}h · </#if>
-                  <#if campanha.donationTime??>Doação ${campanha.donationTime}h</#if>
+                  <#if campanha.donationTime??>Doação ${campanha.donationTimeTexto}h</#if>
                 </div>
               </div>
             </div>
@@ -100,7 +100,7 @@
             <#if meuEmbarqueNome??>
               <p class="route__meu"><span class="icon" aria-hidden="true">confirmation_number</span><span>Seu embarque: <strong>${meuEmbarqueNome}</strong><#if meuEmbarqueHorario??> às <strong class="mono">${meuEmbarqueHorario}</strong></#if></span></p>
             <#elseif vouDireto??>
-              <p class="route__meu"><span class="icon" aria-hidden="true">directions_car</span><span>Você vai por conta própria<#if campanha.donationTime??>: encontro no hemocentro às <strong class="mono">${campanha.donationTime}</strong></#if></span></p>
+              <p class="route__meu"><span class="icon" aria-hidden="true">directions_car</span><span>Você vai por conta própria<#if campanha.donationTime??>: encontro no hemocentro às <strong class="mono">${campanha.donationTimeTexto}</strong></#if></span></p>
             </#if>
             <ol class="route__stops<#if campanha.stops?has_content> route__stops--multi</#if>">
               <#if !campanha.meeting>
@@ -120,10 +120,10 @@
               </li>
               <#list campanha.stops as parada>
                 <#assign meu = ehMeuEmbarque(parada.location)>
-                <li class="route__stop route__stop--mid<#if meu> route__stop--meu</#if>"<@pontoMapa local=parada.location tipo="parada" rotulo=parada?counter meu=meu horario=(parada.stopTime?string)!""/>>
+                <li class="route__stop route__stop--mid<#if meu> route__stop--meu</#if>"<@pontoMapa local=parada.location tipo="parada" rotulo=parada?counter meu=meu horario=(parada.stopTimeTexto)!""/>>
                   <span class="route__dot route__dot--stop" aria-hidden="true">${parada?counter}</span>
                   <div class="route__text">
-                    <span class="route__time"><#if parada.stopTime??>${parada.stopTime}<#else>Horário a confirmar</#if></span>
+                    <span class="route__time"><#if parada.stopTime??>${parada.stopTimeTexto}<#else>Horário a confirmar</#if></span>
                     <strong>Parada ${parada?counter}</strong>
                     <span>${parada.location.name}<#if parada.location.city??>, ${parada.location.city}</#if></span>
                     <#if meu><@seloVoce/></#if>
@@ -131,10 +131,10 @@
                 </li>
               </#list>
               </#if>
-              <li class="route__stop route__stop--end<#if vouDireto??> route__stop--meu</#if>"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=vouDireto?? horario=(campanha.donationTime?string)!""/>>
+              <li class="route__stop route__stop--end<#if vouDireto??> route__stop--meu</#if>"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=vouDireto?? horario=(campanha.donationTimeTexto)!""/>>
                 <span class="route__dot route__dot--end"><span class="icon" aria-hidden="true">bloodtype</span></span>
                 <div class="route__text">
-                  <span class="route__time"><#if campanha.donationTime??>Doação ${campanha.donationTime}<#else>Horário a confirmar</#if></span>
+                  <span class="route__time"><#if campanha.donationTime??>Doação ${campanha.donationTimeTexto}<#else>Horário a confirmar</#if></span>
                   <strong>Hemocentro</strong>
                   <#if campanha.donationLocation??>
                     <span>${campanha.donationLocation.name}<#if campanha.donationLocation.city??>, ${campanha.donationLocation.city}</#if></span>
@@ -143,6 +143,9 @@
                 </div>
               </li>
             </ol>
+            <#if campanha.algumHorarioEstimado>
+              <p class="route__nota"><span class="icon" aria-hidden="true">schedule</span>Horários com ≈ são estimados pela rota; confirme com o organizador.</p>
+            </#if>
             <div class="route__map" data-rota-mapa-bloco>
               <div class="rota-mapa" data-rota-mapa=".route__stop[data-lat]" data-rota-resumo="#rota-resumo" role="region" aria-label="Mapa com o trajeto do ônibus e os hemocentros de SP"></div>
               <div class="route__legenda">

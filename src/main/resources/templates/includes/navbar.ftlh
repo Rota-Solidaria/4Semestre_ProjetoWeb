@@ -6,6 +6,6 @@
     <a <#if (currentNav!"") == "organizador">class="active" </#if>href="/organizador/campanhas">Organizar</a>
   </#if>
   <#if usuarioLogado??>
-    <a <#if (currentNav!"") == "minhas">class="active" </#if>href="/perfil#inscricoes">Minhas inscrições</a>
+    <a <#if (currentNav!"") == "minhas">class="active" </#if>href="/perfil">Minhas inscrições</a>
   </#if>
 </nav>

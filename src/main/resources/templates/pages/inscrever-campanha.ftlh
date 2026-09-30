@@ -55,7 +55,7 @@
                     <strong>${dl.name}</strong>
                     <#if endereco?has_content><span>${endereco?join(" — ")}</span></#if>
                   </#if>
-                  <span><#if campanha.donationTime??>Encontro às <span class="mono">${campanha.donationTime}</span> · <#else>Horário a confirmar · </#if>você chega por conta própria</span>
+                  <span><#if campanha.donationTime??>Encontro às <span class="mono">${campanha.donationTimeTexto}</span> · <#else>Horário a confirmar · </#if>você chega por conta própria</span>
                 </span>
                 <span class="icon boarding-card__icon" aria-hidden="true">directions_car</span>
               </div>
@@ -126,7 +126,7 @@
               <li data-embarque="${parada.location.id?c}">
                 <span class="summary__dot summary__dot--stop" aria-hidden="true"></span>
                 <span class="summary__stop">
-                  <span class="mono"><#if parada.stopTime??>${parada.stopTime} · </#if>Parada</span>
+                  <span class="mono"><#if parada.stopTime??>${parada.stopTimeTexto} · </#if>Parada</span>
                   <span>${parada.location.name}<#if parada.location.city??>, ${parada.location.city}</#if></span>
                 </span>
               </li>
@@ -135,7 +135,7 @@
             <li data-embarque="proprio">
               <span class="summary__dot summary__dot--end" aria-hidden="true"></span>
               <span class="summary__stop">
-                <span class="mono"><#if campanha.donationTime??>${campanha.donationTime} · </#if>Doação</span>
+                <span class="mono"><#if campanha.donationTime??>${campanha.donationTimeTexto} · </#if>Doação</span>
                 <#if campanha.donationLocation??>
                   <span>${campanha.donationLocation.name}<#if campanha.donationLocation.city??>, ${campanha.donationLocation.city}</#if></span>
                 </#if>

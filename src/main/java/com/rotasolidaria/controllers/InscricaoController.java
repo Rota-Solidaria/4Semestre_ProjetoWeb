@@ -133,7 +133,7 @@ public class InscricaoController {
         if (wazeUrl != null) {
             model.addAttribute("wazeUrl", wazeUrl);
         }
-        LocalTime horarioEmbarque = InscricaoService.boardingTime(inscricao);
+        String horarioEmbarque = InscricaoService.boardingTimeTexto(inscricao); // "07:20" ou "≈ 07:20" se estimado
         if (horarioEmbarque != null) {
             model.addAttribute("horarioEmbarque", horarioEmbarque);
         }

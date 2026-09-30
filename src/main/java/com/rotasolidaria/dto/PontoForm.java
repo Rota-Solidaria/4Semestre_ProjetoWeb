@@ -24,6 +24,9 @@ public class PontoForm {
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     private LocalTime horario;
 
+    // O horário foi sugerido pelo editor a partir da rota (o organizador não digitou)
+    private boolean horarioEstimado;
+
     // Só para exibição: doadores inscritos para embarcar neste ponto
     private long inscritos;
 
@@ -132,6 +135,14 @@ public class PontoForm {
 
     public void setHorario(LocalTime horario) {
         this.horario = horario;
+    }
+
+    public boolean isHorarioEstimado() {
+        return horarioEstimado;
+    }
+
+    public void setHorarioEstimado(boolean horarioEstimado) {
+        this.horarioEstimado = horarioEstimado;
     }
 
     public long getInscritos() {

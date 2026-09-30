@@ -50,7 +50,7 @@
             <#if horarioEmbarque??>
               <div><dt>Embarque</dt><dd class="mono">${horarioEmbarque}</dd></div>
             </#if>
-            <div><dt><#if encontro>Horário<#else>Doação</#if></dt><dd class="mono"><#if campanha.donationTime??>${campanha.donationTime}<#else>A definir</#if></dd></div>
+            <div><dt><#if encontro>Horário<#else>Doação</#if></dt><dd class="mono"><#if campanha.donationTime??>${campanha.donationTimeTexto}<#else>A definir</#if></dd></div>
             <#if !encontro>
               <div class="span-all"><dt>Ponto de embarque</dt><dd>${inscricao.boardingPoint!"A confirmar com o organizador"}</dd></div>
             </#if>
@@ -90,7 +90,7 @@
       <p class="ticket-note">O organizador da campanha entrará em contato com você pelo WhatsApp informado em até 48 horas.</p>
 
       <div class="ticket-links">
-        <a href="/perfil#inscricoes">Ver minhas inscrições</a>
+        <a href="/perfil">Ver minhas inscrições</a>
         <a href="/campanhas/${campanha.id?c}">Detalhes da campanha</a>
         <a href="/educativo">Guia do doador</a>
       </div>

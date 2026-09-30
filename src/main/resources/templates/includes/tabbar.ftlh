@@ -12,7 +12,7 @@
       <span class="tabbar__icon"><span class="icon" aria-hidden="true">edit_calendar</span></span>Organizar
     </a>
   </#if>
-  <a class="tabbar__item<#if nav == "minhas"> is-active</#if>" href="/perfil#inscricoes"<#if nav == "minhas"> aria-current="page"</#if>>
+  <a class="tabbar__item<#if nav == "minhas"> is-active</#if>" href="/perfil"<#if nav == "minhas"> aria-current="page"</#if>>
     <span class="tabbar__icon"><span class="icon" aria-hidden="true">confirmation_number</span></span>Minhas
   </a>
   <#if usuarioLogado??>

@@ -410,3 +410,8 @@ button.icon-btn {
 
 .pw-match.is-ok { color: var(--ok-text); }
 .pw-match.is-bad { color: var(--err-text); }
+
+/* Medidor de senha: montado pelo script no fim da página. Até lá, o campo já reserva a altura dele
+   (medidor + rótulo + requisitos), para "Confirmar senha" e o botão não descerem de repente */
+.field:has(> input[data-password-strength]){padding-bottom:108px}
+.field:has(.pw-meter){padding-bottom:0}

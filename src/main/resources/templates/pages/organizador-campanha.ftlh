@@ -79,6 +79,9 @@
       <label class="campo campo--2">
         <span class="campo__rotulo">${horarioRotulo}</span>
         <input type="time" data-campo="horario" name="${prefixo}.horario" value="<#if (p.horario)??>${p.horario}</#if>">
+        <#-- true quando o editor sugeriu o horário a partir da rota (rota-editor.js); o organizador pode digitar por cima -->
+        <input type="hidden" data-campo="horarioEstimado" name="${prefixo}.horarioEstimado" value="${((p.horarioEstimado)!false)?c}">
+        <#if tipo != "inicio"><span class="campo__estimado" data-estimado-aviso hidden><span class="icon" aria-hidden="true">schedule</span>Estimado pela rota. Digite para confirmar.</span></#if>
       </label>
       <label class="campo">
         <span class="campo__rotulo">Ponto de referência <span class="muted">(opcional)</span></span>
@@ -107,9 +110,14 @@
      É um formulário só: o servidor recebe tudo junto ao publicar e valida como antes. -->
 <#assign passoInicial = (novo && !(form.titulo?has_content))?then(1, 5)>
 <#assign passos = ["Campanha", "Partida", "Paradas", "Hemocentro", "Revisar e publicar"]>
+<#-- O modo já sai do servidor com o layout certo (passos visíveis, numeração, textos): assim a tela
+     não se reorganiza quando o campanha-wizard.js termina de carregar, depois do MapLibre -->
+<#assign encontro = ((form.modo!"BUS")?string == "MEETING")>
+<#assign ativos = encontro?then([1, 4, 5], [1, 2, 3, 4, 5])>
+<#function kicker n><#return "Passo " + (ativos?seq_index_of(n) + 1) + " de " + ativos?size></#function>
 
 <@main.layout title="${novo?then('Nova campanha', 'Editar campanha')} - Rota Solidária" css="/css/organizador.css" currentNav="organizador" mapa=true scripts=["/js/rota-editor.js", "/js/campanha-wizard.js"]>
-  <main class="container wizard" id="wizard" data-passo-inicial="${passoInicial}" data-novo="${novo?c}">
+  <main class="container wizard" id="wizard" data-passo-inicial="${passoInicial}" data-passo="${passoInicial}" data-novo="${novo?c}">
     <div class="wizard-topo">
       <a class="back-link" href="/organizador/campanhas"><span class="icon" aria-hidden="true">arrow_back</span>Minhas campanhas</a>
       <span class="wizard-topo__titulo"><#if novo>Nova campanha<#else>${campanha.title}</#if></span>
@@ -119,7 +127,7 @@
     <nav class="wizard-passos" aria-label="Passos da campanha">
       <ol>
         <#list passos as nome>
-          <li>
+          <li<#if !ativos?seq_contains(nome?counter)> hidden</#if>>
             <#if nome?counter == 4>
               <#-- Linha antes do passo 5: um batimento cardíaco (o pulso corre até "Revisar e publicar") -->
               <#-- O campanha-wizard.js redesenha o traçado na largura real (viewBox em pixels), para o pulso correr linear -->
@@ -129,7 +137,7 @@
               </svg>
             </#if>
             <button type="button" class="wizard-passos__item" data-ir="${nome?counter}">
-              <span class="wizard-passos__num" aria-hidden="true">${nome?counter}</span>
+              <span class="wizard-passos__num" aria-hidden="true"><#if ativos?seq_contains(nome?counter)>${ativos?seq_index_of(nome?counter) + 1}<#else>${nome?counter}</#if></span>
               <span class="wizard-passos__nome">${nome}<#if nome == "Paradas"> <span class="muted">(opcional)</span></#if></span>
             </button>
           </li>
@@ -152,11 +160,11 @@
           <#-- Celular: barra de progresso no topo do painel -->
           <div class="wizard-progresso" aria-hidden="true">
             <span class="wizard-progresso__alca"></span>
-            <div class="wizard-progresso__linha"><span class="wizard-progresso__barra"><span data-progresso></span></span><span class="wizard-progresso__texto" data-progresso-texto></span></div>
+            <div class="wizard-progresso__linha"><span class="wizard-progresso__barra"><span data-progresso style="width:${((ativos?seq_index_of(passoInicial) + 1) / ativos?size * 100)?c}%"></span></span><span class="wizard-progresso__texto" data-progresso-texto>${ativos?seq_index_of(passoInicial) + 1} de ${ativos?size}</span></div>
           </div>
 
           <section class="wizard-passo" data-passo="1" aria-labelledby="passo-1-titulo">
-            <span class="kicker" data-kicker>Passo 1 de 5</span>
+            <span class="kicker" data-kicker>${kicker(1)}</span>
             <h1 id="passo-1-titulo">Sobre a campanha</h1>
             <p class="wizard-passo__sub">O que os doadores vão ver na lista de campanhas.</p>
             <div class="passo1">
@@ -224,7 +232,7 @@
                 <input type="date" name="data" value="<#if form.data??>${form.data}</#if>" required<#if novo> min="${.now?string('yyyy-MM-dd')}"</#if>>
               </label>
               <label class="campo campo--2">
-                <span class="campo__rotulo" data-rotulo-vagas>Vagas no ônibus</span>
+                <span class="campo__rotulo" data-rotulo-vagas><#if encontro>Vagas<#else>Vagas no ônibus</#if></span>
                 <input type="number" name="vagas" value="<#if form.vagas??>${form.vagas?c}</#if>" min="${(form.inscritos gt 0)?then(form.inscritos?c, '1')}" max="999" required>
                 <#if form.inscritos gt 0><span class="campo__dica">${form.inscritos} <#if form.inscritos == 1>doador inscrito<#else>doadores inscritos</#if></span></#if>
               </label>
@@ -270,8 +278,8 @@
                     <strong class="previa-doador__titulo" data-previa="titulo">${form.titulo!"Título da campanha"}</strong>
                     <span class="previa-doador__meta"><span class="icon" aria-hidden="true">calendar_month</span><span data-previa="data">Data a definir</span> · <span data-previa="vagas">${(form.vagas!40)?c}</span> vagas</span>
                     <p class="previa-doador__descricao" data-previa="descricao"></p>
-                    <div class="previa-doador__rota" aria-hidden="true"><span class="previa-doador__ponto"></span><span class="previa-doador__linha"></span><span class="previa-doador__gota"></span></div>
-                    <span class="previa-doador__dica">A rota aparece aqui quando você montar a partida e o hemocentro.</span>
+                    <div class="previa-doador__rota" aria-hidden="true"<#if encontro> hidden</#if>><span class="previa-doador__ponto"></span><span class="previa-doador__linha"></span><span class="previa-doador__gota"></span></div>
+                    <span class="previa-doador__dica"><#if encontro>Os doadores vão direto ao hemocentro, sem ônibus.<#else>A rota aparece aqui quando você montar a partida e o hemocentro.</#if></span>
                   </div>
                 </article>
               </aside>
@@ -279,14 +287,14 @@
           </section>
 
           <section class="wizard-passo" data-passo="2" aria-labelledby="passo-2-titulo" hidden>
-            <span class="kicker" data-kicker>Passo 2 de 5</span>
+            <span class="kicker" data-kicker>${kicker(2)}</span>
             <h1 id="passo-2-titulo">De onde o ônibus sai?</h1>
             <p class="wizard-passo__sub">Comece pelo CEP: o endereço é preenchido e o ponto aparece no mapa.</p>
             <@ponto p=form.partida prefixo="partida" tipo="inicio" titulo="Partida" sub="Onde o ônibus sai" horarioRotulo="Saída às"/>
           </section>
 
           <section class="wizard-passo" data-passo="3" aria-labelledby="passo-3-titulo" hidden>
-            <span class="kicker" data-kicker>Passo 3 de 5</span>
+            <span class="kicker" data-kicker>${kicker(3)}</span>
             <h1 id="passo-3-titulo">O ônibus para em mais algum lugar?</h1>
             <p class="wizard-passo__sub">Adicione onde ele pega mais doadores, na ordem do caminho. Se ele vai direto, é só continuar.</p>
             <div class="paradas" id="paradas"><#list form.paradas as parada><@ponto p=parada prefixo="paradas[${parada?index}]" tipo="parada" titulo="Parada ${parada?counter}" sub="O ônibus passa e pega mais doadores" horarioRotulo="Passa às" rotulo="${parada?counter}"/></#list></div>
@@ -294,14 +302,14 @@
           </section>
 
           <section class="wizard-passo" data-passo="4" aria-labelledby="passo-4-titulo" hidden>
-            <span class="kicker" data-kicker>Passo 4 de 5</span>
-            <h1 id="passo-4-titulo" data-titulo-bus="Onde acontece a doação?" data-titulo-encontro="Onde as pessoas vão se encontrar?">Onde acontece a doação?</h1>
+            <span class="kicker" data-kicker>${kicker(4)}</span>
+            <h1 id="passo-4-titulo" data-titulo-bus="Onde acontece a doação?" data-titulo-encontro="Onde as pessoas vão se encontrar?"><#if encontro>Onde as pessoas vão se encontrar?<#else>Onde acontece a doação?</#if></h1>
             <p class="wizard-passo__sub">Escolha um hemocentro de SP na lista (ou clicando na gota do mapa), ou digite o endereço.</p>
             <@ponto p=form.destino prefixo="destino" tipo="fim" titulo="Hemocentro" sub="Onde acontece a doação" horarioRotulo="Doação às"/>
           </section>
 
           <section class="wizard-passo" data-passo="5" aria-labelledby="passo-5-titulo" hidden>
-            <span class="kicker" data-kicker>Passo 5 de 5</span>
+            <span class="kicker" data-kicker>${kicker(5)}</span>
             <h1 id="passo-5-titulo"><#if novo>Tudo certo para publicar?<#else>Revise e salve</#if></h1>
             <p class="wizard-passo__sub"><#if novo>Confira antes de abrir as inscrições.<#else>Toque em “Editar” para mudar qualquer parte.</#if></p>
             <div class="revisao" id="revisao" aria-live="polite"></div>
@@ -318,7 +326,7 @@
       <div class="campanha-form__salvar wizard-rodape">
         <button type="button" class="btn btn-secondary" data-wizard="voltar"><span class="icon" aria-hidden="true">arrow_back</span>Voltar</button>
         <span class="wizard-rodape__info" data-wizard-info><#if !novo><a href="/campanhas/${campanha.id?c}">Ver página da campanha</a></#if></span>
-        <button type="button" class="btn btn-primary" data-wizard="avancar"><span data-wizard-proximo>Continuar</span><span class="icon" aria-hidden="true">arrow_forward</span></button>
+        <button type="button" class="btn btn-primary" data-wizard="avancar"><span data-wizard-proximo><#if passoInicial lt 5>${["Voltar à campanha", "Definir a partida", "Adicionar paradas", "Escolher o hemocentro", "Revisar campanha"][ativos[ativos?seq_index_of(passoInicial) + 1] - 1]}<#else>Continuar</#if></span><span class="icon" aria-hidden="true">arrow_forward</span></button>
         <button type="submit" class="btn btn-primary wizard-rodape__publicar" data-wizard="publicar" hidden><span class="icon" aria-hidden="true"><#if novo>bloodtype<#else>check</#if></span><#if novo>Publicar campanha<#else>Salvar alterações</#if></button>
       </div>
     </form>

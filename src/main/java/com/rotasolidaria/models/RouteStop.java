@@ -1,6 +1,8 @@
 package com.rotasolidaria.models;
 
 import jakarta.persistence.*;
+
+import com.rotasolidaria.util.Datas;
 import java.time.LocalTime;
 
 /** Parada intermediária do ônibus na rota de uma campanha. */
@@ -26,6 +28,10 @@ public class RouteStop {
 
     @Column(name = "stop_time")
     private LocalTime stopTime;
+
+    /** O horário foi estimado pela rota (a partir da saída), não confirmado pelo organizador. */
+    @Column(name = "stop_time_estimated", nullable = false)
+    private boolean stopTimeEstimated;
 
     // Getters e Setters
 
@@ -67,5 +73,18 @@ public class RouteStop {
 
     public void setStopTime(LocalTime stopTime) {
         this.stopTime = stopTime;
+    }
+
+    public boolean isStopTimeEstimated() {
+        return stopTimeEstimated;
+    }
+
+    public void setStopTimeEstimated(boolean stopTimeEstimated) {
+        this.stopTimeEstimated = stopTimeEstimated;
+    }
+
+    /** "07:20", ou "≈ 07:20" se estimado; nulo sem horário. */
+    public String getStopTimeTexto() {
+        return Datas.hora(stopTime, stopTimeEstimated);
     }
 }

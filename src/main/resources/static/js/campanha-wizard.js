@@ -14,6 +14,8 @@
 
   var TOTAL = 5; // número do último passo (Revisar)
   var NOMES = ['Campanha', 'Partida', 'Paradas', 'Hemocentro', 'Revisar'];
+  // Rótulo do botão de avançar, pelo passo de destino
+  var ACOES = ['Voltar à campanha', 'Definir a partida', 'Adicionar paradas', 'Escolher o hemocentro', 'Revisar campanha'];
   var novo = wizard.dataset.novo === 'true';
   var CHAVE_RASCUNHO = 'rs-rascunho-nova-campanha';
 
@@ -113,7 +115,11 @@
 
     if (!opcoes.semRolar) {
       var alvo = window.matchMedia('(max-width: 960px)').matches && n > 1 ? form.querySelector('.wizard-folha') : wizard;
-      alvo.scrollIntoView({ behavior: semAnimacao() ? 'auto' : 'smooth', block: 'start' });
+      // Só rola se o topo do passo saiu da tela: rolar a cada "Continuar" cansa e dá a sensação de salto
+      var topo = alvo.getBoundingClientRect().top;
+      if (topo < 0 || topo > window.innerHeight * 0.4) {
+        alvo.scrollIntoView({ behavior: semAnimacao() ? 'auto' : 'smooth', block: 'start' });
+      }
     }
     if (opcoes.focar !== false && anterior !== n) {
       var titulo = secao(n).querySelector('h1');
@@ -125,8 +131,8 @@
 
   function rotuloAvancar(n) {
     if (n >= TOTAL) { return ''; }
-    if (n === 3) { return paradas().length ? 'Continuar: hemocentro' : 'Continuar sem paradas'; }
-    return 'Continuar: ' + NOMES[vizinho(n, 1) - 1].toLowerCase();
+    if (n === 3) { return paradas().length ? ACOES[3] : 'Continuar sem paradas'; }
+    return ACOES[vizinho(n, 1) - 1];
   }
 
   /** O mapa aparece do passo 2 em diante; ao entrar num passo de ponto, o pino dele salta. */
@@ -308,7 +314,8 @@
     pontos.forEach(function (bloco, i) {
       var tipo = bloco.dataset.tipo;
       var li = el('li', 'revisao__ponto revisao__ponto--' + tipo);
-      li.appendChild(el('span', 'revisao__hora mono', valor(bloco, 'horario') || '--:--'));
+      var hora = valor(bloco, 'horario');
+      li.appendChild(el('span', 'revisao__hora mono', hora ? (valor(bloco, 'horarioEstimado') === 'true' ? '≈ ' : '') + hora : '--:--'));
       li.appendChild(el('span', 'revisao__marca', tipo === 'parada' ? String(i) : null));
       var nome = el('span', 'revisao__nome');
       nome.appendChild(el('strong', null, valor(bloco, 'nome') || 'Sem nome'));

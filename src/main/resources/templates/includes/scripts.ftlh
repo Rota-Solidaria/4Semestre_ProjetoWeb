@@ -143,8 +143,10 @@
 </script>
 <script>
   // Campos de senha: botão mostrar/ocultar (data-password), medidor de força (data-password-strength)
-  // e aviso de confirmação (data-password-confirm="#idDaSenha")
-  document.addEventListener('DOMContentLoaded', function () {
+  // e aviso de confirmação (data-password-confirm="#idDaSenha").
+  // Roda na hora (este script fica no fim do <body>, os campos já existem): esperar o DOMContentLoaded
+  // deixava a página pintar antes e o medidor entrava depois, empurrando o formulário
+  (function () {
     const icon = function (name) {
       const s = document.createElement('span');
       s.className = 'icon';
@@ -241,5 +243,5 @@
       input.addEventListener('input', update);
       original.addEventListener('input', update);
     });
-  });
+  })();
 </script>

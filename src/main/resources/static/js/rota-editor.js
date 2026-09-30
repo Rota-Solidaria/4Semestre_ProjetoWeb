@@ -135,8 +135,77 @@
         if (resultado === null && pontos.length >= 2) { return; } // resposta antiga, descartada
         resumo.textContent = !resultado ? ''
           : resultado.pelasRuas ? RotaMapa.resumo(resultado) : 'Traçado aproximado (serviço de rotas indisponível)';
+        guardarRota(pontos, resultado);
+        estimarHorarios();
       });
     }, 500);
+  }
+
+  /* ---------- Horários estimados pela rota ----------
+   * Com a saída preenchida e a rota pelas ruas, as paradas e o hemocentro sem horário recebem uma sugestão:
+   * horário do ponto anterior confirmado + tempo de viagem + 5 min de embarque por parada, arredondado a 5 min.
+   * O que o organizador digita vira referência para os próximos e nunca é sobrescrito; apagar o campo volta à sugestão. */
+  var EMBARQUE_MIN = 5;
+  var ultimaRota = null; // { ids: [id de cada ponto], acumulado: [minutos desde o 1º ponto] } da última rota pelas ruas
+
+  function paraMinutos(hhmm) {
+    var p = (hhmm || '').split(':');
+    var m = p.length >= 2 ? parseInt(p[0], 10) * 60 + parseInt(p[1], 10) : NaN;
+    return isNaN(m) ? null : m;
+  }
+
+  function paraHorario(min) {
+    min = Math.round(min / 5) * 5;
+    min = ((min % 1440) + 1440) % 1440;
+    var h = Math.floor(min / 60);
+    var m = min % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  function marcarEstimado(bloco, estimado) {
+    var oculto = campo(bloco, 'horarioEstimado');
+    if (oculto) { oculto.value = estimado ? 'true' : 'false'; }
+    var aviso = bloco.querySelector('[data-estimado-aviso]');
+    if (aviso) { aviso.hidden = !estimado; }
+    bloco.classList.toggle('is-horario-estimado', estimado);
+  }
+
+  function guardarRota(pontos, resultado) {
+    var trechos = resultado && resultado.pelasRuas ? resultado.trechosMin : null;
+    if (!trechos || trechos.length !== pontos.length - 1) { ultimaRota = null; return; }
+    var acumulado = [0];
+    trechos.forEach(function (t, i) { acumulado.push(acumulado[i] + t); });
+    ultimaRota = { ids: pontos.map(function (p) { return p.id; }), acumulado: acumulado };
+  }
+
+  function estimarHorarios() {
+    var lista = blocos();
+    var inicio = lista[0];
+    if (!inicio || inicio.dataset.tipo !== 'inicio' || !campo(inicio, 'horario')) { return; }
+    var posicao = {};
+    if (ultimaRota) { ultimaRota.ids.forEach(function (id, i) { posicao[id] = i; }); }
+    var ancoraMin = paraMinutos(valor(inicio, 'horario'));
+    var ancoraPos = ultimaRota && posicao[inicio._id] === 0 ? 0 : null;
+    var paradasDepois = 0;
+    var mudou = false;
+    lista.slice(1).forEach(function (bloco) {
+      var input = campo(bloco, 'horario');
+      var indice = posicao[bloco._id];
+      if (input.value && campo(bloco, 'horarioEstimado').value !== 'true') {
+        // Digitado pelo organizador: é a referência dos próximos pontos
+        ancoraMin = paraMinutos(input.value);
+        ancoraPos = indice == null ? null : indice;
+        paradasDepois = 0;
+        return;
+      }
+      if (document.activeElement === input) { return; } // sendo digitado agora
+      var pode = ancoraMin != null && ancoraPos != null && indice != null && indice > ancoraPos;
+      var novo = pode ? paraHorario(ancoraMin + (ultimaRota.acumulado[indice] - ultimaRota.acumulado[ancoraPos]) + paradasDepois * EMBARQUE_MIN) : '';
+      if (input.value !== novo) { input.value = novo; mudou = true; }
+      marcarEstimado(bloco, pode);
+      if (bloco.dataset.tipo === 'parada') { paradasDepois++; }
+    });
+    if (mudou) { form.dispatchEvent(new Event('input', { bubbles: true })); } // rascunho e prévia do assistente
   }
 
   /* ---------- Busca do CEP (ViaCEP) ---------- */
@@ -412,6 +481,14 @@
     ['rua', 'numero', 'cidade', 'uf'].forEach(function (nome) {
       campo(bloco, nome).addEventListener('change', function () { localizar(bloco); });
     });
+    var horario = campo(bloco, 'horario');
+    if (horario) {
+      marcarEstimado(bloco, !!horario.value && campo(bloco, 'horarioEstimado').value === 'true');
+      horario.addEventListener('change', function () {
+        marcarEstimado(bloco, false); // digitado (ou apagado) pelo organizador
+        estimarHorarios();
+      });
+    }
     campo(bloco, 'nome').addEventListener('change', function () {
       if (!coordenada(bloco)) { localizar(bloco); } else { atualizarMapa(false); }
     });

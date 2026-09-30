@@ -42,6 +42,10 @@ public class Registration {
     @JoinColumn(name = "boarding_location_id")
     private Location boardingLocation;
 
+    /** Quando o lembrete de 24h foi enviado (nulo = ainda não enviado). */
+    @Column(name = "reminder_sent_at")
+    private LocalDateTime reminderSentAt;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
@@ -119,6 +123,14 @@ public class Registration {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getReminderSentAt() {
+        return reminderSentAt;
+    }
+
+    public void setReminderSentAt(LocalDateTime reminderSentAt) {
+        this.reminderSentAt = reminderSentAt;
     }
 
 }

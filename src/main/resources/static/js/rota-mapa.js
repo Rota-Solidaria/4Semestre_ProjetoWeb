@@ -266,7 +266,8 @@
     return medidas[melhor];
   }
 
-  /** Traçado pelas ruas no OSRM. Resolve com { coords, distanciaKm, duracaoMin, pelasRuas }. */
+  /** Traçado pelas ruas no OSRM. Resolve com { coords, distanciaKm, duracaoMin, trechosMin, pelasRuas }
+   *  (trechosMin: minutos de cada trecho entre pontos consecutivos). */
   function tracar(pontos) {
     if (pontos.length < 2) { return Promise.resolve(null); }
     var retas = pontos.map(function (p) { return [p.lng, p.lat]; });
@@ -276,7 +277,10 @@
       .then(function (dados) {
         var rota = dados.routes && dados.routes[0];
         if (dados.code !== 'Ok' || !rota) { throw new Error('OSRM sem rota'); }
-        return { coords: rota.geometry.coordinates, distanciaKm: rota.distance / 1000, duracaoMin: rota.duration / 60, pelasRuas: true };
+        return {
+          coords: rota.geometry.coordinates, distanciaKm: rota.distance / 1000, duracaoMin: rota.duration / 60,
+          trechosMin: (rota.legs || []).map(function (l) { return l.duration / 60; }), pelasRuas: true
+        };
       })
       .catch(function () { return { coords: retas, pelasRuas: false }; });
   }

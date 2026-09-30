@@ -37,11 +37,11 @@ public class RotaService {
 
     /** Preenche o formulário com a rota atual da campanha. */
     public void preencher(RotaForm form, Campaign campaign) {
-        form.setPartida(pontoDe(campaign.getDepartureLocation(), campaign.getDepartureTime()));
+        form.setPartida(pontoDe(campaign.getDepartureLocation(), campaign.getDepartureTime(), false));
         for (RouteStop stop : campaign.getStops()) {
-            form.getParadas().add(pontoDe(stop.getLocation(), stop.getStopTime()));
+            form.getParadas().add(pontoDe(stop.getLocation(), stop.getStopTime(), stop.isStopTimeEstimated()));
         }
-        form.setDestino(pontoDe(campaign.getDonationLocation(), campaign.getDonationTime()));
+        form.setDestino(pontoDe(campaign.getDonationLocation(), campaign.getDonationTime(), campaign.isDonationTimeEstimated()));
         contarInscritos(form);
     }
 
@@ -106,6 +106,7 @@ public class RotaService {
         campaign.setDepartureTime(encontro ? null : form.getPartida().getHorario());
         campaign.setDonationLocation(localizacaoRepository.save(destino));
         campaign.setDonationTime(form.getDestino().getHorario());
+        campaign.setDonationTimeEstimated(!encontro && estimado(form.getDestino()));
 
         campaign.getStops().clear();
         for (int i = 0; i < paradas.size(); i++) {
@@ -114,6 +115,7 @@ public class RotaService {
             stop.setLocation(localizacaoRepository.save(locaisDasParadas.get(i)));
             stop.setPosition(i);
             stop.setStopTime(paradas.get(i).getHorario());
+            stop.setStopTimeEstimated(estimado(paradas.get(i)));
             campaign.getStops().add(stop);
         }
     }
@@ -170,9 +172,15 @@ public class RotaService {
         return location;
     }
 
-    private static PontoForm pontoDe(Location location, LocalTime horario) {
+    /** Só conta como estimado quando há um horário; um campo vazio nunca é "estimado". */
+    private static boolean estimado(PontoForm ponto) {
+        return ponto.getHorario() != null && ponto.isHorarioEstimado();
+    }
+
+    private static PontoForm pontoDe(Location location, LocalTime horario, boolean estimado) {
         PontoForm ponto = new PontoForm();
         ponto.setHorario(horario);
+        ponto.setHorarioEstimado(horario != null && estimado);
         if (location == null) {
             return ponto;
         }

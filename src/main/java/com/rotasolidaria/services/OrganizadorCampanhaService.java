@@ -10,6 +10,8 @@ import com.rotasolidaria.models.enums.TransportMode;
 import com.rotasolidaria.repositories.CampanhaRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
 import com.rotasolidaria.repositories.OrganizerRepository;
+import com.rotasolidaria.events.CampaignCancelledEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,15 +36,18 @@ public class OrganizadorCampanhaService {
     private final InscricaoRepository inscricaoRepository;
     private final OrganizerRepository organizerRepository;
     private final RotaService rotaService;
+    private final ApplicationEventPublisher events;
 
     public OrganizadorCampanhaService(CampanhaRepository campanhaRepository,
                                       InscricaoRepository inscricaoRepository,
                                       OrganizerRepository organizerRepository,
-                                      RotaService rotaService) {
+                                      RotaService rotaService,
+                                      ApplicationEventPublisher events) {
         this.campanhaRepository = campanhaRepository;
         this.inscricaoRepository = inscricaoRepository;
         this.organizerRepository = organizerRepository;
         this.rotaService = rotaService;
+        this.events = events;
     }
 
     public List<Campaign> campanhasDoOrganizador(Long organizerId) {
@@ -110,12 +115,16 @@ public class OrganizadorCampanhaService {
     public void atualizar(Long campaignId, Long organizerId, CampanhaForm form) {
         Campaign campaign = buscarDoOrganizador(campaignId, organizerId)
                 .orElseThrow(() -> new BusinessException("Campanha não encontrada."));
+        CampaignStatus statusAnterior = campaign.getStatus();
         aplicarDados(campaign, form, inscritos(campaign));
         if (form.getStatus() != null) {
             campaign.setStatus(form.getStatus());
         }
         rotaService.aplicar(campaign, form);
         campanhaRepository.save(campaign);
+        if (statusAnterior != CampaignStatus.CANCELLED && campaign.getStatus() == CampaignStatus.CANCELLED) {
+            events.publishEvent(new CampaignCancelledEvent(campaign.getId()));
+        }
     }
 
     private void aplicarDados(Campaign campaign, CampanhaForm form, long inscritos) {

@@ -77,3 +77,19 @@
   animation: none;
   clip-path: none;
 }
+
+/* ---- Estabilidade do layout (evita saltos ao carregar e ao navegar) ---- */
+/* Ícones são palavras (ligaduras) até a fonte chegar: a caixa fixa de 1em impede que o texto
+   "confirmation_number" ocupe espaço e depois encolha, empurrando o resto da tela */
+.icon{width:1em;height:1em;line-height:1;overflow:hidden;white-space:nowrap;word-wrap:normal;flex-shrink:0}
+/* A barra de rolagem não aparece/some entre páginas curtas e longas (Windows) */
+html{scrollbar-gutter:stable}
+/* Rolagem suave só em cliques dentro da página, nunca ao abrir um link com #âncora */
+html:focus-within{scroll-behavior:smooth}
+/* Troca de página sem piscar: o navegador faz um cross-fade e o cabeçalho fica parado */
+@view-transition{navigation:auto}
+.site-header{view-transition-name:cabecalho}
+.tabbar{view-transition-name:barra-inferior}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}
+@media(prefers-reduced-motion:reduce){@view-transition{navigation:none}html:focus-within{scroll-behavior:auto}}
+:root[data-motion="reduce"]{scroll-behavior:auto}

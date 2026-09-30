@@ -23,7 +23,7 @@
         data-hemocentro="${(destino.name)!""}"
         data-data="${campanha.eventDateBr!""}"
         data-saida="<#if campanha.departureTime??>${campanha.departureTime}</#if>"
-        data-doacao="<#if campanha.donationTime??>${campanha.donationTime}</#if>"
+        data-doacao="${campanha.donationTimeTexto!""}"
         data-vagas="${(campanha.slots!0)?c}"
         data-paradas="${paradasTexto}">
 
@@ -50,7 +50,7 @@
             <dl class="bilhete__dados">
               <div><dt>Data</dt><dd>${campanha.eventDateBr!"A definir"}</dd></div>
               <div><dt>Saída</dt><dd><#if campanha.departureTime??>${campanha.departureTime}<#else>—</#if></dd></div>
-              <div><dt>Doação</dt><dd><#if campanha.donationTime??>${campanha.donationTime}<#else>—</#if></dd></div>
+              <div><dt>Doação</dt><dd>${campanha.donationTimeTexto!"—"}</dd></div>
               <div><dt>Vagas</dt><dd>${(campanha.slots!0)?c}</dd></div>
             </dl>
             <#if campanha.stops?has_content>
@@ -59,13 +59,13 @@
               <#list campanha.stops as p><#assign cidadesParadas = cidadesParadas + [p.location.city!p.location.name]></#list>
               <#function cidadeRepetida cidade><#local n = 0><#list cidadesParadas as c><#if c == cidade><#local n = n + 1></#if></#list><#return (n > 1)></#function>
               <div class="bilhete__paradas"><span class="icon" aria-hidden="true">location_on</span><span>Paradas:
-                <#list campanha.stops as parada><#assign cidade = parada.location.city!parada.location.name><strong>${cidade}<#if cidadeRepetida(cidade) && parada.location.name != cidade> (${parada.location.name})</#if><#if parada.stopTime??> ${parada.stopTime}</#if></strong><#sep> · </#sep></#list></span></div>
+                <#list campanha.stops as parada><#assign cidade = parada.location.city!parada.location.name><strong>${cidade}<#if cidadeRepetida(cidade) && parada.location.name != cidade> (${parada.location.name})</#if><#if parada.stopTime??> ${parada.stopTimeTexto}</#if></strong><#sep> · </#sep></#list></span></div>
             </#if>
           </div>
           <div class="bilhete__canhoto">
             <div class="rota-mapa rota-mapa--compacta" data-rota-mapa=".divulgar-pontos li" data-rota-compacto role="img" aria-label="Mapa da rota até o hemocentro"></div>
             <div class="bilhete__hemocentro">
-              <span>Hemocentro<#if campanha.donationTime??> · ${campanha.donationTime}</#if></span>
+              <span>Hemocentro<#if campanha.donationTime??> · ${campanha.donationTimeTexto}</#if></span>
               <strong>${(destino.name)!"A definir"}</strong>
             </div>
           </div>

@@ -41,7 +41,7 @@
                       <h3>${c.title}</h3>
                       <div class="meta">
                         <#if c.eventDate??>
-                          <span><span class="icon">schedule</span>${c.eventDateBr}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTime}h</#if></span>
+                          <span><span class="icon">schedule</span>${c.eventDateBr}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTimeTexto}h</#if></span>
                         </#if>
                         <#if c.donationLocation??>
                           <span><span class="icon">place</span>${c.donationLocation.name}<#if c.donationLocation.city??> — ${c.donationLocation.city}</#if></span>
@@ -59,7 +59,7 @@
                       <h3>${c.title}</h3>
                       <div class="meta">
                         <#if c.eventDate??>
-                          <span><span class="icon">schedule</span>${c.eventDateBr}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTime}h</#if></span>
+                          <span><span class="icon">schedule</span>${c.eventDateBr}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTimeTexto}h</#if></span>
                         </#if>
                         <#if c.donationLocation??>
                           <span><span class="icon">place</span>${c.donationLocation.name}<#if c.donationLocation.city??> — ${c.donationLocation.city}</#if></span>

@@ -10,7 +10,6 @@
   --max:1180px;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:Archivo,sans-serif;letter-spacing:-.02em;margin:0}
 a{color:inherit;text-decoration:none}
@@ -126,6 +125,11 @@ input,select,textarea{font:inherit;color:inherit}
 .ponto--parada .ponto__pin{background:#fff;color:#1A1817;border-color:#1A1817}
 .ponto--fim .ponto__pin{background:#B4232A;color:#fff}
 .ponto__titulo{display:grid;gap:2px;flex:1;min-width:0}
+/* Horário sugerido pela rota (rota-editor.js): o campo fica em itálico e ganha o aviso abaixo */
+.campo__estimado{display:flex;align-items:center;gap:4px;margin-top:4px;font:500 12px/1.3 'IBM Plex Sans',sans-serif;color:var(--text2)}
+.campo__estimado .icon{font-size:15px}
+.campo__estimado[hidden]{display:none}
+.ponto.is-horario-estimado [data-campo="horario"]{font-style:italic;color:var(--text2)}
 .ponto__titulo strong{font:700 16px/1.2 Archivo,sans-serif}
 .ponto__titulo span{font-size:13px;color:var(--text2)}
 .ponto__acoes{display:flex;gap:4px}
@@ -279,7 +283,7 @@ input,select,textarea{font:inherit;color:inherit}
 .wizard-passos__item.is-feito .wizard-passos__num::before{content:"check";font:400 20px/1 'Material Symbols Rounded';color:#FFFFFF}
 .wizard-passos__item:not(:disabled):not(.is-atual):hover .wizard-passos__num{border-color:var(--brand)}
 
-.wizard-rascunho{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px;padding:12px 14px;border-radius:12px;background:var(--info-soft);border:1px solid var(--info-border);color:var(--info-text);font-size:14px}
+.wizard-rascunho{position:fixed;z-index:30;left:50%;bottom:96px;transform:translateX(-50%);width:min(560px,calc(100% - 32px));box-sizing:border-box;box-shadow:0 16px 40px rgba(26,24,23,.18);display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0;padding:12px 14px;border-radius:12px;background:var(--info-soft);border:1px solid var(--info-border);color:var(--info-text);font-size:14px}
 .wizard-rascunho[hidden]{display:none}
 .wizard-rascunho .icon{font-size:20px}
 .wizard-rascunho span:nth-child(2){flex:1;min-width:200px}
@@ -314,10 +318,10 @@ input,select,textarea{font:inherit;color:inherit}
 .wizard-passo__sub{margin:0 0 4px;color:var(--text2);font-size:15px}
 /* A partida e o hemocentro já têm o título do passo */
 .wizard-passo[data-passo="2"] .ponto__head,.wizard-passo[data-passo="4"] .ponto__head{display:none}
-.wizard-passo--entra-frente{animation:wz-frente .34s cubic-bezier(.2,.8,.3,1)}
-.wizard-passo--entra-tras{animation:wz-tras .34s cubic-bezier(.2,.8,.3,1)}
-@keyframes wz-frente{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
-@keyframes wz-tras{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+.wizard-passo--entra-frente{animation:wz-frente .2s cubic-bezier(.2,.8,.3,1)}
+.wizard-passo--entra-tras{animation:wz-tras .2s cubic-bezier(.2,.8,.3,1)}
+@keyframes wz-frente{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes wz-tras{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 :root[data-motion="reduce"] .wizard-passo--entra-frente,:root[data-motion="reduce"] .wizard-passo--entra-tras{animation:none}
 @media(prefers-reduced-motion:reduce){.wizard-passo--entra-frente,.wizard-passo--entra-tras{animation:none}}
 
@@ -337,9 +341,9 @@ input,select,textarea{font:inherit;color:inherit}
 .revisao__editar{border:0;background:none;padding:0 6px;min-height:44px;color:var(--brand);font:600 13px/1 'IBM Plex Sans',sans-serif;cursor:pointer;flex:none}
 .revisao__editar:hover{text-decoration:underline}
 .revisao__rota{margin:0;padding:0;list-style:none;display:grid}
-.revisao__ponto{display:grid;grid-template-columns:52px 20px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px;color:var(--text2)}
+.revisao__ponto{display:grid;grid-template-columns:64px 20px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px;color:var(--text2)}
 .revisao__ponto strong{color:var(--text)}
-.revisao__hora{font:500 14px/1 'IBM Plex Mono',monospace;color:var(--text)}
+.revisao__hora{font:500 14px/1 'IBM Plex Mono',monospace;color:var(--text);white-space:nowrap}
 .revisao__marca{width:16px;height:16px;box-sizing:border-box;border-radius:50%;border:3px solid var(--text);font-size:0}
 .revisao__ponto--inicio .revisao__marca{border:0;background:#0E7A4F}
 .revisao__ponto--fim .revisao__marca{border:0;border-radius:50% 50% 50% 3px;transform:rotate(-45deg);background:var(--brand-fill,var(--brand))}
@@ -399,8 +403,8 @@ input,select,textarea{font:inherit;color:inherit}
 .divulgar-grade{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:36px;align-items:start}
 .divulgar-bilhete{display:grid;gap:16px;min-width:0}
 
-.bilhete{display:grid;grid-template-columns:minmax(0,1fr) 260px;background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:0 14px 36px rgba(26,24,23,.10);overflow:hidden;animation:bilhete-entra .7s cubic-bezier(.2,.8,.3,1) both}
-@keyframes bilhete-entra{from{opacity:0;transform:translateY(24px) rotate(-1.5deg)}to{opacity:1;transform:none}}
+.bilhete{display:grid;grid-template-columns:minmax(0,1fr) 260px;background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:0 14px 36px rgba(26,24,23,.10);overflow:hidden;animation:bilhete-entra .4s cubic-bezier(.2,.8,.3,1) both}
+@keyframes bilhete-entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .bilhete__principal{padding:24px 26px;display:grid;gap:16px;align-content:start;min-width:0}
 .bilhete__sobre{font:500 12px/1.3 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);overflow-wrap:anywhere}
 .bilhete__rota{display:flex;align-items:center;gap:14px}
