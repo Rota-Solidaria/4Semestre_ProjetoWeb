@@ -5,8 +5,13 @@
     <div class="ticket-page">
       <div class="ticket-intro">
         <span class="ticket-status"><span class="icon" aria-hidden="true">check_circle</span>Inscrição confirmada</span>
-        <h1>Sua vaga no ônibus está garantida</h1>
-        <p>Mostre este bilhete no embarque. Ele também fica salvo em Minhas inscrições.</p>
+        <#if (inscricao.boardingPoint!"") == "Vou por conta própria">
+          <h1>Sua inscrição está confirmada</h1>
+          <p>Mostre este bilhete no hemocentro. Ele também fica salvo em Minhas inscrições.</p>
+        <#else>
+          <h1>Sua vaga no ônibus está garantida</h1>
+          <p>Mostre este bilhete no embarque. Ele também fica salvo em Minhas inscrições.</p>
+        </#if>
       </div>
 
       <article class="ticket" aria-label="Bilhete de embarque">

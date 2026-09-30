@@ -84,92 +84,92 @@ input,select,textarea{font:inherit;color:inherit}
   .footer-inner{flex-direction:column;text-align:center}
 }
 
-/* =========== Estilos específicos desta página (index) =========== */
+/* =========== Estilos específicos desta página (inscrição em campanha) =========== */
 
-.hero{background:var(--surface);border-bottom:1px solid var(--border)}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:64px 0}
-.hero h1{font:800 clamp(2.1rem,4.2vw,3.4rem)/1.08 Archivo,sans-serif;margin:14px 0 16px}
-.hero p{font-size:18px;color:var(--text2);max-width:480px;margin:0 0 26px}
-.search-field{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0 14px;height:52px;min-width:0}
-.search-field .icon{font-size:20px;color:var(--text3)}
-.search-field input{flex:1;border:0;background:transparent;font:400 15px/1 'IBM Plex Sans',sans-serif;min-width:0;outline:none}
-.stat-num{font:800 26px/1 Archivo,sans-serif;color:var(--brand)}
-.stat-label{font-size:14px;color:var(--text2)}
-.stat-divider{width:1px;background:var(--border)}
-.hero-image{position:relative}
-.hero-image img{border-radius:24px;height:400px;width:100%;object-fit:cover;box-shadow:0 20px 44px #1a181724}
-.callout-title{font:600 14px/1.3 'IBM Plex Sans',sans-serif}
-.callout-sub{font-size:13px;color:var(--text3)}
+.signup-page{padding:28px 0 56px;display:flex;flex-direction:column;gap:20px}
+.mono{font-family:'IBM Plex Mono',monospace;font-weight:500}
 
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:24px;flex-wrap:wrap}
-.section-head h2{font:700 30px/1.15 Archivo,sans-serif;margin:8px 0 4px}
-.section-head p{font-size:15px;color:var(--text2);margin:0}
+.signup-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.back-link{display:inline-flex;align-items:center;gap:6px;font:600 14px/1 'IBM Plex Sans',sans-serif;color:var(--text2)}
+.back-link:hover{color:var(--brand)}
+.back-link .icon{font-size:18px}
+.signup-steps{margin:0;padding:0;list-style:none;display:flex;align-items:center;gap:10px;font:600 13px/1 'IBM Plex Sans',sans-serif;color:var(--text2)}
+.signup-steps li{display:flex;align-items:center;gap:8px}
+.signup-steps__num{width:24px;height:24px;box-sizing:border-box;border-radius:50%;border:2px solid var(--border2);display:grid;place-items:center;font:500 12px/1 'IBM Plex Mono',monospace}
+.signup-steps .is-current{color:var(--brand)}
+.signup-steps .is-current .signup-steps__num{border:0;background:var(--brand-fill,var(--brand));color:#fff}
+.signup-steps__line{width:40px;border-top:2px dashed var(--border2)}
 
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 6px 20px #1a181710;transition:transform .18s ease,box-shadow .18s ease}
-.card:hover{transform:translateY(-3px);box-shadow:0 14px 30px #1a18171f}
-.card-img{height:150px;overflow:hidden}
-.card-img img{width:100%;height:100%;object-fit:cover}
-.card.is-closed .card-img img{filter:grayscale(1) opacity(.7)}
-.card-body{padding:20px}
-.card h3{font:700 20px/1.25 Archivo,sans-serif;margin:12px 0 12px}
-.card .meta{display:grid;gap:8px;font-size:14px;color:var(--text2);margin-bottom:18px}
-.card .meta span{display:flex;gap:8px;align-items:center}
-.card .meta .icon{font-size:18px;color:var(--brand)}
-.card-cta{display:flex;align-items:center;justify-content:center;height:46px;border-radius:12px;font:600 15px/1 'IBM Plex Sans',sans-serif}
-.cta-primary{background:var(--brand);color:#fff}
-.cta-disabled{background:var(--surface2);color:var(--text3)}
+.signup-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:28px;align-items:start}
 
-.past-section{
-  background:var(--surface2);
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
+/* Formulário */
+.signup-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:32px;display:flex;flex-direction:column;gap:28px;min-width:0}
+.signup-intro{display:flex;flex-direction:column;gap:8px}
+.signup-intro h1{font:800 34px/1.1 Archivo,sans-serif;letter-spacing:-.03em;margin:0}
+.signup-intro p{margin:0;color:var(--text2)}
+.signup-section{margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+.signup-section h2,.signup-section legend{display:flex;align-items:center;gap:10px;padding:0;font:700 18px/1.3 Archivo,sans-serif;letter-spacing:-.01em;margin:0}
+.signup-section legend{margin-bottom:12px}
+.signup-num{width:28px;height:28px;flex:none;border-radius:50%;background:var(--brand-soft);color:var(--brand-soft-text);display:grid;place-items:center;font:500 13px/1 'IBM Plex Mono',monospace}
+.signup-heading{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.signup-optional{font:500 13px/1 'IBM Plex Sans',sans-serif;color:var(--text2)}
+
+.account-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface2);border-radius:14px;flex-wrap:wrap}
+.account-avatar{width:44px;height:44px;flex:none;border-radius:12px;background:var(--brand-soft);color:var(--brand-soft-text);display:grid;place-items:center;font:600 15px/1 'IBM Plex Sans',sans-serif}
+.account-info{flex:1;min-width:160px;display:flex;flex-direction:column;gap:2px}
+.account-info strong{font-size:15px}
+.account-info span{font-size:14px;color:var(--text2)}
+.account-info .account-missing{color:var(--warn-text)}
+.account-row a{font:600 14px/1 'IBM Plex Sans',sans-serif;color:var(--brand)}
+
+/* Cartões de embarque: o rádio real fica visível e o cartão inteiro é clicável */
+.boarding-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.boarding-card{display:flex;align-items:flex-start;gap:12px;padding:16px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);cursor:pointer;transition:border-color .15s,background .15s}
+.boarding-card:hover{border-color:var(--brand)}
+.boarding-card input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--brand-fill,var(--brand))}
+.boarding-card:has(input:checked){border:2px solid var(--brand);padding:15px;background:var(--brand-soft)}
+.boarding-card:has(input:focus-visible){outline:3px solid #B4232A59;outline-offset:2px}
+.boarding-card__text{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.boarding-card__text strong{font-size:15px}
+.boarding-card__text > span{font-size:14px;color:var(--text2)}
+.boarding-card__icon{font-size:24px;color:var(--text2)}
+.boarding-card:has(input:checked) .boarding-card__icon{color:var(--brand)}
+
+.signup-form textarea{box-sizing:border-box;width:100%;min-height:92px;padding:12px 14px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);font:400 15px/1.5 'IBM Plex Sans',sans-serif;resize:vertical}
+.signup-form textarea:focus{outline:3px solid #B4232A40;border-color:var(--brand)}
+
+.consent{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--info-border);border-radius:12px;background:var(--info-soft);color:var(--info-text);font-size:14px;line-height:1.5;cursor:pointer}
+.consent input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--brand-fill,var(--brand))}
+
+/* Resumo fixo com o botão de confirmar */
+.summary{position:sticky;top:calc(var(--header-h,72px) + 20px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;box-shadow:0 6px 20px #1a181714}
+.summary__img{display:block;width:100%;height:170px;object-fit:cover}
+.summary__body{padding:22px;display:flex;flex-direction:column;gap:16px}
+.summary__slots{display:flex;align-items:center;gap:10px;font-size:13px}
+.summary__title{font:700 21px/1.25 Archivo,sans-serif;letter-spacing:-.015em;margin:0}
+.summary__date{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text2)}
+.summary__date .icon{font-size:18px;color:var(--brand)}
+.summary__route{position:relative;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:18px}
+.summary__route::before{content:"";position:absolute;left:6px;top:18px;bottom:30px;border-left:2px dashed var(--border2)}
+.summary__route li{position:relative;display:flex;gap:12px}
+.summary__dot{width:14px;height:14px;margin-top:3px;flex:none;box-sizing:border-box;border-radius:50%;background:var(--brand-fill,var(--brand))}
+.summary__dot--end{background:var(--surface);border:3px solid var(--brand)}
+.summary__stop{display:flex;flex-direction:column;gap:2px;font-size:14px}
+.summary__stop span:last-child{color:var(--text2)}
+.summary__divider{border-top:1px solid var(--border)}
+.summary__cta{width:100%}
+.summary__note{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
+.summary__note .icon{font-size:18px;color:var(--ok-dot)}
+
+@media(max-width:960px){
+  .signup-grid{grid-template-columns:1fr}
+  .summary{position:static}
+  .summary__img{height:140px}
 }
-
-.past-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
+@media(max-width:620px){
+  .signup-page{padding:20px 0 32px}
+  .signup-form{padding:22px 18px;gap:24px}
+  .signup-intro h1{font-size:28px}
+  .boarding-options{grid-template-columns:1fr}
+  .signup-steps{display:none}
 }
-
-.past-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 6px 20px #1a181710;
-}
-
-.past-card img{
-  width:100%;
-  height:210px;
-  object-fit:cover;
-}
-
-.past-info{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  padding:16px 18px;
-}
-
-.past-info strong{
-  font:700 17px/1.25 Archivo,sans-serif;
-}
-
-.past-info span{
-  font-size:14px;
-  color:var(--text2);
-}
-
-@media(max-width:900px){
-  .past-grid{
-    grid-template-columns:1fr;
-  }
-
-  .past-card img{
-    height:240px;
-  }
-}
-
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr;padding:44px 0}.grid{grid-template-columns:1fr}.hero-image img{height:280px}}
