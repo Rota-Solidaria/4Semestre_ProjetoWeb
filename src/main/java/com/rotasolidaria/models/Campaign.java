@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rotasolidaria.util.Datas;
+
 import com.rotasolidaria.models.enums.CampaignStatus;
 
 @Entity
@@ -88,6 +90,11 @@ public class Campaign {
         this.eventDate = eventDate;
     }
 
+    /** Data da campanha no padrão brasileiro, para as telas (ex.: 14/10/2026). */
+    public String getEventDateBr() {
+        return Datas.br(eventDate);
+    }
+
     public LocalTime getDonationTime() {
         return donationTime;
     }
@@ -158,6 +165,55 @@ public class Campaign {
 
     public void setStops(List<RouteStop> stops) {
         this.stops = stops;
+    }
+
+    /**
+     * Cidades por onde a caravana passa, na ordem da rota, sem repetição e sem a cidade de
+     * partida nem a do hemocentro (elas já aparecem em destaque). Serve para o resumo do story
+     * e da mensagem compartilhada: duas paradas em Itapetininga viram só "Itapetininga".
+     */
+    public List<String> getCidadesIntermediarias() {
+        List<String> cidades = new ArrayList<>();
+        String partida = cidadeDe(departureLocation);
+        String destino = cidadeDe(donationLocation);
+        for (RouteStop parada : stops) {
+            String cidade = cidadeDe(parada.getLocation());
+            if (cidade.isEmpty() || mesmaCidade(cidade, partida) || mesmaCidade(cidade, destino)) {
+                continue;
+            }
+            boolean repetida = false;
+            for (String existente : cidades) {
+                if (mesmaCidade(existente, cidade)) { repetida = true; break; }
+            }
+            if (!repetida) {
+                cidades.add(cidade);
+            }
+        }
+        return cidades;
+    }
+
+    /** "Itapetininga, Tatuí e Sorocaba" (ou "" quando não há cidade intermediária). */
+    public String getPassaPor() {
+        List<String> cidades = getCidadesIntermediarias();
+        if (cidades.isEmpty()) {
+            return "";
+        }
+        if (cidades.size() == 1) {
+            return cidades.get(0);
+        }
+        return String.join(", ", cidades.subList(0, cidades.size() - 1)) + " e " + cidades.get(cidades.size() - 1);
+    }
+
+    private static String cidadeDe(Location local) {
+        if (local == null) {
+            return "";
+        }
+        String cidade = local.getCity() != null && !local.getCity().isBlank() ? local.getCity() : local.getName();
+        return cidade == null ? "" : cidade.trim();
+    }
+
+    private static boolean mesmaCidade(String a, String b) {
+        return !a.isEmpty() && a.equalsIgnoreCase(b);
     }
 
 }

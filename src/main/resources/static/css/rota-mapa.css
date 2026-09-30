@@ -244,19 +244,19 @@
   24% { transform: scale(1.08); }
 }
 
-/* ---------- Ônibus que percorre a rota ---------- */
-.rp-onibus { width: 0; height: 0; pointer-events: none; }
-.rp-onibus__corpo {
-  position: absolute; left: -15px; top: -15px; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; background: var(--rp-marca); color: #FFFFFF;
-  border: 3px solid #FFFFFF; box-shadow: 0 3px 10px rgba(143, 24, 33, .45);
-  animation: rp-onibus-entra .3s cubic-bezier(.3, 1.4, .5, 1) both;
+/* 8. Destaque (lista ↔ mapa): o pino salta, fica erguido e ganha um alvo no chão */
+.maplibregl-marker:has(.rp--destacado) { z-index: 6 !important; }
+.rp--destacado .rp__corpo { transform: translateY(-8px) scale(1.14); transition: transform .28s cubic-bezier(.3, 1.6, .5, 1); filter: drop-shadow(0 8px 6px rgba(26, 24, 23, .22)); }
+.rp--destacado .rp__onda { animation: rp-alvo 1.1s ease-in-out infinite; }
+.rp--destacado .rp__disco { box-shadow: 0 0 0 4px var(--rp-marca-suave), 0 3px 10px var(--rp-sombra); }
+.rp--saltando .rp__batida { animation: rp-salto .52s cubic-bezier(.3, .8, .4, 1); }
+@keyframes rp-salto {
+  0% { transform: none; }
+  35% { transform: translateY(-14px) scale(.94, 1.08); }
+  62% { transform: translateY(0) scale(1.08, .92); }
+  80% { transform: translateY(-3px) scale(.98, 1.02); }
+  100% { transform: none; }
 }
-:root[data-theme="dark"] .rp-onibus__corpo { border-color: #F6F4F2; box-shadow: 0 0 18px rgba(242, 150, 155, .6); }
-.rp-onibus__corpo svg { width: 15px; height: 15px; }
-.rp-onibus--saindo .rp-onibus__corpo { animation: rp-onibus-sai .35s ease-in forwards; }
-@keyframes rp-onibus-entra { from { transform: scale(0); } to { transform: none; } }
-@keyframes rp-onibus-sai { to { transform: scale(0); opacity: 0; } }
 
 /* ---------- Sem animação ---------- */
 :root[data-motion="reduce"] .rota-mapa *, :root[data-motion="reduce"] .rota-mapa *::after, :root[data-motion="reduce"] .rota-mapa::after {

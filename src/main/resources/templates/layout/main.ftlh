@@ -2,7 +2,7 @@
      scripts lista arquivos JS da página, carregados no fim do <body>. -->
 <#macro layout title="Rota Solidária" css="/css/index.css" currentNav="" mapa=false scripts=[]>
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR"<#if celebrar??> data-celebrar</#if>>
 
 <head>
   <#include "../includes/theme-init.ftlh">
@@ -40,6 +40,10 @@
   <#include "../includes/footer.ftlh">
   <#include "../includes/tabbar.ftlh">
   <#include "../includes/scripts.ftlh">
+  <#-- Depois de uma inscrição ou de salvar a campanha: gotas comemorando (static/js/gotas.js) -->
+  <#if celebrar??>
+    <script src="/js/gotas.js"></script>
+  </#if>
   <#if mapa>
     <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
     <script src="/js/rota-mapa.js"></script>

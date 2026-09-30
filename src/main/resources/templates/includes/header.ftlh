@@ -8,6 +8,9 @@
     <div class="header-actions">
       <button type="button" class="icon-btn a11y-toggle" aria-label="Acessibilidade" aria-expanded="false" aria-controls="a11y-panel" data-a11y-toggle><span
           class="icon" aria-hidden="true">accessibility_new</span></button>
+      <#if ehOrganizador!false>
+        <a class="header-cta" href="/organizador/campanhas/nova"><span class="icon" aria-hidden="true">add</span>Nova campanha</a>
+      </#if>
       <#if usuarioLogado??>
         <div class="user-dropdown-wrapper" id="userDropdownWrapper">
           <button type="button" class="profile-chip dropdown-toggle" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">

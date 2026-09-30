@@ -1,7 +1,6 @@
 package com.rotasolidaria.controllers;
 
 import com.rotasolidaria.exception.BusinessException;
-import com.rotasolidaria.models.Donor;
 import com.rotasolidaria.models.User;
 import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.security.AutoLogin;
@@ -73,9 +72,9 @@ public class AuthController {
                                     RedirectAttributes redirectAttributes,
                                     Model model) {
         try {
-            Donor donor = authService.register(name, email, phone, senha, confirmarSenha);
+            User usuario = authService.register(name, email, phone, senha, confirmarSenha);
             // Já entra logado e volta para onde estava (ex.: inscrição) ou vai completar o perfil
-            autoLogin.login(donor, request, response);
+            autoLogin.login(usuario, request, response);
             redirectAttributes.addFlashAttribute("toast",
                     Toast.success("Conta criada", "Complete seus dados de doador para agilizar suas inscrições.")
                             .withAction("Completar", "/perfil#editar"));

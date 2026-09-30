@@ -24,9 +24,14 @@ public class AutoLogin {
     private final SecurityContextHolderStrategy contextHolder = SecurityContextHolder.getContextHolderStrategy();
     private final SecurityContextRepository contextRepository = new HttpSessionSecurityContextRepository();
     private final RequestCache requestCache = new HttpSessionRequestCache();
+    private final DatabaseUserDetailsService userDetailsService;
+
+    public AutoLogin(DatabaseUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     public void login(User user, HttpServletRequest request, HttpServletResponse response) {
-        AuthenticatedUser principal = new AuthenticatedUser(user);
+        AuthenticatedUser principal = userDetailsService.principal(user);
         principal.eraseCredentials();
 
         // Troca o ID da sessão para evitar "session fixation", como o login normal do Spring faz

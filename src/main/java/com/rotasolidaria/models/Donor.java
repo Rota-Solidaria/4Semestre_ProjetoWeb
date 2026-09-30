@@ -1,21 +1,28 @@
 package com.rotasolidaria.models;
 
 import java.time.LocalDate;
-import org.springframework.context.annotation.Primary;
 
 import com.rotasolidaria.models.enums.BloodType;
+import com.rotasolidaria.util.Datas;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
+/** Perfil de doador de uma conta (mesmo id do usuário). */
 @Entity
 @Table(name = "donors")
-@PrimaryKeyJoinColumn(name = "user_id")
-public class Donor extends User {
+public class Donor {
+
+    @Id
+    private Long id;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "blood_type", length = 15)
-    private BloodType bloodType; 
+    private BloodType bloodType;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
@@ -23,11 +30,40 @@ public class Donor extends User {
     @Column(name = "weight")
     private Double weight;
 
+    protected Donor() {
+    }
+
+    public Donor(User user) {
+        this.user = user;
+    }
+
+    // Atalhos para os dados da conta (ex.: inscricao.donor.name nos templates)
+
+    public String getName() {
+        return user.getName();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public String getPhone() {
+        return user.getPhone();
+    }
+
     // Getters and Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
 
     public BloodType getBloodType() {
         return bloodType;
-    }    
+    }
 
     public void setBloodType(BloodType bloodType) {
         this.bloodType = bloodType;
@@ -41,6 +77,11 @@ public class Donor extends User {
         this.birthDate = birthDate;
     }
 
+    /** Data de nascimento no padrão brasileiro, para as telas. */
+    public String getBirthDateBr() {
+        return Datas.br(birthDate);
+    }
+
     public Double getWeight() {
         return weight;
     }
@@ -48,5 +89,4 @@ public class Donor extends User {
     public void setWeight(Double weight) {
         this.weight = weight;
     }
-
 }

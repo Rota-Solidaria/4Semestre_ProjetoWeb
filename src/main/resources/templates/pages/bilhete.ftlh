@@ -4,7 +4,7 @@
   <main class="container">
     <div class="ticket-page">
       <div class="ticket-intro">
-        <span class="ticket-status"><span class="icon" aria-hidden="true">check_circle</span>Inscrição confirmada</span>
+        <span class="ticket-status" data-gotas-origem><span class="icon" aria-hidden="true">check_circle</span>Inscrição confirmada</span>
         <#if !vaiDeOnibus>
           <h1>Sua inscrição está confirmada</h1>
           <p>Mostre este bilhete no hemocentro. Ele também fica salvo em Minhas inscrições.</p>

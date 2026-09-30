@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import com.rotasolidaria.util.Datas;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.Collections;
@@ -32,7 +32,6 @@ import java.util.Optional;
 @Controller
 public class ProfileController {
 
-    private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
@@ -109,9 +108,9 @@ public class ProfileController {
             LocalDate proximaHomens = ultima.plusDays(60);
             LocalDate proximaMulheres = ultima.plusDays(90);
             long diasDesde = ChronoUnit.DAYS.between(ultima, hoje);
-            model.addAttribute("ultimaDoacaoBr", ultima.format(DATA_BR));
-            model.addAttribute("proximaHomensBr", proximaHomens.format(DATA_BR));
-            model.addAttribute("proximaMulheresBr", proximaMulheres.format(DATA_BR));
+            model.addAttribute("ultimaDoacaoBr", ultima.format(Datas.DATA_BR));
+            model.addAttribute("proximaHomensBr", proximaHomens.format(Datas.DATA_BR));
+            model.addAttribute("proximaMulheresBr", proximaMulheres.format(Datas.DATA_BR));
             model.addAttribute("diasRestantes", Math.max(0, ChronoUnit.DAYS.between(hoje, proximaHomens)));
             model.addAttribute("progressoIntervalo", Math.min(100, diasDesde * 100 / 60));
         }
@@ -122,7 +121,7 @@ public class ProfileController {
                 .min(Comparator.comparing(r -> r.getCampaign().getEventDate()))
                 .ifPresent(r -> {
                     model.addAttribute("proximaInscricao", r);
-                    model.addAttribute("proximaInscricaoDataBr", r.getCampaign().getEventDate().format(DATA_BR));
+                    model.addAttribute("proximaInscricaoDataBr", r.getCampaign().getEventDate().format(Datas.DATA_BR));
                 });
     }
 
@@ -147,12 +146,12 @@ public class ProfileController {
         user.setName(name);
         user.setPhone(phone);
 
-        // Se o usuário for Doador, atualiza os campos específicos
+        userRepository.save(user);
+
+        // Se a conta tiver perfil de doador, atualiza os campos específicos
         Optional<Donor> donorOpt = donorRepository.findById(user.getId());
         if (donorOpt.isPresent()) {
             Donor donor = donorOpt.get();
-            donor.setName(name);
-            donor.setPhone(phone);
             if (bloodType != null && !bloodType.isBlank()) {
                 try {
                     donor.setBloodType(BloodType.valueOf(bloodType));
@@ -169,9 +168,6 @@ public class ProfileController {
                 }
             }
             donorRepository.save(donor);
-            user = donor;
-        } else {
-            userRepository.save(user);
         }
 
         // Alteração de senha, se solicitada

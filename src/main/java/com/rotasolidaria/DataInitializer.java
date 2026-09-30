@@ -15,6 +15,7 @@ import com.rotasolidaria.models.EducationalContent;
 import com.rotasolidaria.models.Location;
 import com.rotasolidaria.models.Organizer;
 import com.rotasolidaria.models.RouteStop;
+import com.rotasolidaria.models.User;
 import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.ContentType;
 import com.rotasolidaria.repositories.CampanhaRepository;
@@ -26,7 +27,9 @@ import com.rotasolidaria.models.Donor;
 import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.enums.BloodType;
 import com.rotasolidaria.models.enums.RegistrationStatus;
+import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
+import com.rotasolidaria.repositories.OrganizerRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -37,6 +40,8 @@ public class DataInitializer implements CommandLineRunner {
     private final ConteudoEducativoRepository conteudoEducativoRepository;
     private final InscricaoRepository inscricaoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DonorRepository donorRepository;
+    private final OrganizerRepository organizerRepository;
     private final TransactionTemplate transactionTemplate;
 
     public DataInitializer(CampanhaRepository campanhaRepository,
@@ -45,6 +50,8 @@ public class DataInitializer implements CommandLineRunner {
             ConteudoEducativoRepository conteudoEducativoRepository,
             InscricaoRepository inscricaoRepository,
             PasswordEncoder passwordEncoder,
+            DonorRepository donorRepository,
+            OrganizerRepository organizerRepository,
             PlatformTransactionManager transactionManager) {
         this.campanhaRepository = campanhaRepository;
         this.localizacaoRepository = localizacaoRepository;
@@ -52,6 +59,8 @@ public class DataInitializer implements CommandLineRunner {
         this.conteudoEducativoRepository = conteudoEducativoRepository;
         this.inscricaoRepository = inscricaoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.donorRepository = donorRepository;
+        this.organizerRepository = organizerRepository;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -61,13 +70,10 @@ public class DataInitializer implements CommandLineRunner {
         if (campanhaRepository.count() == 0) {
 
             // 1. Criar um Organizador
-            Organizer organizador = new Organizer();
-            organizador.setName("Hemocentro Regional");
-            organizador.setEmail("contato@hemocentro.org.br");
-            organizador.setPasswordHash(passwordEncoder.encode("123456"));
-            organizador.setPhone("11999998888");
+            User contaOrganizador = criarConta("Hemocentro Regional", "contato@hemocentro.org.br", "11999998888");
+            Organizer organizador = new Organizer(contaOrganizador);
             organizador.setInstitution("Fundação Pró-Sangue");
-            usuarioRepository.save(organizador);
+            organizerRepository.save(organizador);
 
             // 2. Criar um Local de Doação
             Location hemocentro = new Location();
@@ -114,15 +120,7 @@ public class DataInitializer implements CommandLineRunner {
 
             // 5. Criar Doador Padrão de Teste
             if (!usuarioRepository.existsByEmail("joao@email.com")) {
-                Donor doador = new Donor();
-                doador.setName("João da Silva");
-                doador.setEmail("joao@email.com");
-                doador.setPasswordHash(passwordEncoder.encode("123456"));
-                doador.setPhone("(15) 99999-0000");
-                doador.setBloodType(BloodType.O_POSITIVE);
-                doador.setBirthDate(LocalDate.of(1995, 5, 15));
-                doador.setWeight(72.5);
-                usuarioRepository.save(doador);
+                Donor doador = criarDoadorJoao();
 
                 Registration inscricao = new Registration();
                 inscricao.setCampaign(c1);
@@ -134,15 +132,7 @@ public class DataInitializer implements CommandLineRunner {
 
             System.out.println(">>> [DataInitializer] Dados de teste carregados com sucesso no MySQL!");
         } else if (!usuarioRepository.existsByEmail("joao@email.com")) {
-            Donor doador = new Donor();
-            doador.setName("João da Silva");
-            doador.setEmail("joao@email.com");
-            doador.setPasswordHash(passwordEncoder.encode("123456"));
-            doador.setPhone("(15) 99999-0000");
-            doador.setBloodType(BloodType.O_POSITIVE);
-            doador.setBirthDate(LocalDate.of(1995, 5, 15));
-            doador.setWeight(72.5);
-            usuarioRepository.save(doador);
+            Donor doador = criarDoadorJoao();
 
             var campanhas = campanhaRepository.findAll();
             if (!campanhas.isEmpty()) {
@@ -157,6 +147,23 @@ public class DataInitializer implements CommandLineRunner {
 
         completarEmbarqueDaCampanhaDemo();
         transactionTemplate.executeWithoutResult(status -> completarRotaDaCampanhaDemo());
+    }
+
+    private User criarConta(String nome, String email, String telefone) {
+        User conta = new User();
+        conta.setName(nome);
+        conta.setEmail(email);
+        conta.setPasswordHash(passwordEncoder.encode("123456"));
+        conta.setPhone(telefone);
+        return usuarioRepository.save(conta);
+    }
+
+    private Donor criarDoadorJoao() {
+        Donor doador = new Donor(criarConta("João da Silva", "joao@email.com", "(15) 99999-0000"));
+        doador.setBloodType(BloodType.O_POSITIVE);
+        doador.setBirthDate(LocalDate.of(1995, 5, 15));
+        doador.setWeight(72.5);
+        return donorRepository.save(doador);
     }
 
     // Bancos criados antes das paradas e do mapa: coordenadas e duas paradas na campanha de demonstração

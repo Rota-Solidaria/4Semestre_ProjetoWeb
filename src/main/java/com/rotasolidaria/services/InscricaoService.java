@@ -10,6 +10,7 @@ import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
+import com.rotasolidaria.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +32,13 @@ public class InscricaoService {
 
     private final InscricaoRepository inscricaoRepository;
     private final DonorRepository donorRepository;
+    private final UserRepository userRepository;
 
-    public InscricaoService(InscricaoRepository inscricaoRepository, DonorRepository donorRepository) {
+    public InscricaoService(InscricaoRepository inscricaoRepository, DonorRepository donorRepository,
+                            UserRepository userRepository) {
         this.inscricaoRepository = inscricaoRepository;
         this.donorRepository = donorRepository;
+        this.userRepository = userRepository;
     }
 
     /** Opções de embarque da campanha: a partida, cada parada da rota (em ordem) e ir por conta própria. */
@@ -94,8 +98,12 @@ public class InscricaoService {
 
     @Transactional
     public Registration register(Campaign campaign, Long userId, String boardingKey, String notes, boolean lgpdAccepted) {
-        Donor donor = donorRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException("Apenas doadores podem se inscrever nas campanhas."));
+        if (campaign.getOrganizer() != null && campaign.getOrganizer().getId().equals(userId)) {
+            throw new BusinessException("Você organiza esta campanha. Para doar, escolha a campanha de outro organizador.");
+        }
+        // Quem ainda não tem perfil de doador (ex.: um organizador) ganha um na primeira inscrição
+        Donor donor = donorRepository.findById(userId).orElseGet(() -> donorRepository.save(new Donor(
+                userRepository.findById(userId).orElseThrow(() -> new BusinessException("Faça login para se inscrever.")))));
 
         if (inscricaoRepository.existsByCampaignAndDonor(campaign, donor)) {
             throw new BusinessException("Você já está inscrito nesta campanha.");

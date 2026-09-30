@@ -29,13 +29,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import com.rotasolidaria.util.Datas;
 import java.util.Locale;
 import java.util.Optional;
 
 @Controller
 public class InscricaoController {
 
-    private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter DATA_EXTENSO = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.of("pt", "BR"));
 
     private final CampaignService campaignService;
@@ -95,6 +95,7 @@ public class InscricaoController {
             Registration inscricao = inscricaoService.register(campanhaOpt.get(), principal.getId(), embarque, observacoes, lgpd != null);
             redirectAttributes.addFlashAttribute("toast",
                     Toast.success("Inscrição confirmada", "Sua vaga no ônibus está garantida.").withIcon("confirmation_number"));
+            redirectAttributes.addFlashAttribute("celebrar", true);
             return "redirect:/inscricoes/" + inscricao.getId();
         } catch (BusinessException e) {
             redirectAttributes.addFlashAttribute("toast", Toast.error("Não foi possível concluir a inscrição", e.getMessage()));
@@ -114,7 +115,7 @@ public class InscricaoController {
         Registration inscricao = inscricaoOpt.get();
         Campaign campanha = inscricao.getCampaign();
 
-        String dataBr = campanha.getEventDate() == null ? "a definir" : campanha.getEventDate().format(DATA_BR);
+        String dataBr = campanha.getEventDate() == null ? "a definir" : campanha.getEventDate().format(Datas.DATA_BR);
         String mensagem = "Vou doar sangue na " + campanha.getTitle() + " em " + dataBr
                 + ", com o transporte gratuito do Rota Solidária. Vamos juntos? "
                 + baseUrl + "/campanhas/" + campanha.getId();

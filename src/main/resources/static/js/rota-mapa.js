@@ -7,8 +7,10 @@
  * Animações (todas desligadas com "Reduzir movimento" do painel de acessibilidade ou do sistema):
  *   - o pino "cai" no mapa e quica ao ganhar coordenada, com uma onda no chão;
  *   - ao arrastar, o pino é "levantado" e pousa com um quique; ao mudar de endereço, ele desliza;
- *   - a rota se desenha da partida ao hemocentro, com o ônibus na ponta da linha;
- *   - o hemocentro da campanha pulsa como um coração; o ponto de embarque do doador tem um anel.
+ *   - a rota se desenha da partida ao hemocentro;
+ *   - o hemocentro da campanha pulsa como um coração; o ponto de embarque do doador tem um anel;
+ *   - lista ↔ mapa: passar o mouse (ou o foco) num ponto da lista faz o pino saltar, e vice-versa;
+ *   - depois de salvar, gotas saem do hemocentro (static/js/gotas.js, quando a página tem data-celebrar).
  *
  * Uso automático: <div data-rota-mapa=".seletor-dos-pontos"></div>; cada ponto tem data-lat, data-lng,
  * data-nome, data-tipo ("inicio", "parada" ou "fim") e, opcionais, data-rotulo, data-horario e data-meu.
@@ -288,6 +290,10 @@
     return '≈ ' + Math.round(resultado.distanciaKm) + ' km · ' + tempo + ' de viagem';
   }
 
+  function normalizar(texto) {
+    return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
   function suave(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
@@ -391,8 +397,9 @@
       style: estilo(this.paleta),
       bounds: ESTADO_SP,
       fitBoundsOptions: { padding: 24 },
-      attributionControl: { compact: true },
-      cooperativeGestures: true,
+      attributionControl: this.opcoes.compacto ? false : { compact: true },
+      cooperativeGestures: false, // a rolagem do mouse aproxima o mapa direto, sem Ctrl/⌘
+      interactive: !this.opcoes.compacto, // compacto: só mostra (canhoto do bilhete de divulgação)
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
@@ -401,7 +408,12 @@
     });
     this.map.touchZoomRotate.disableRotation();
     this.map.keyboard.disableRotation();
-    this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
+    if (!this.opcoes.compacto) {
+      this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
+    } else {
+      // Mapa compacto: créditos no alto, para não ficarem sob o cartão do hemocentro
+      this.map.addControl(new maplibregl.AttributionControl({ compact: true }), 'top-right');
+    }
     if (this.opcoes.hemocentros !== false) {
       this.map.addControl(new ControleHemocentros(this), 'top-right');
     }
@@ -415,6 +427,11 @@
     this.pronto = new Promise(function (ok) {
       self.map.on('load', function () {
         el.classList.remove('rota-mapa--carregando');
+        if (self.opcoes.compacto) {
+          // Créditos recolhidos no mapa pequeno (abrem no "i")
+          var creditos = el.querySelector('.maplibregl-ctrl-attrib');
+          if (creditos) { creditos.classList.remove('maplibregl-compact-show'); creditos.removeAttribute('open'); }
+        }
         ok();
       });
     });
@@ -485,6 +502,15 @@
     el.addEventListener('click', function () {
       if (opts.aoClicar) { opts.aoClicar(registro.ponto.id); }
     });
+    el.addEventListener('mouseenter', function () {
+      el.classList.add('rp--destacado');
+      if (opts.aoPassarMouse) { opts.aoPassarMouse(registro.ponto.id, true); }
+    });
+    el.addEventListener('mouseleave', function () {
+      el.classList.remove('rp--destacado');
+      if (opts.aoPassarMouse) { opts.aoPassarMouse(registro.ponto.id, false); }
+    });
+    if (ponto.tipo === 'fim') { this._celebrar(el, atraso); }
     if (opts.editavel) {
       marcador.on('dragstart', function () { el.classList.add('rp--levantado'); });
       marcador.on('dragend', function () {
@@ -495,6 +521,28 @@
         if (opts.aoArrastar) { opts.aoArrastar(registro.ponto.id, pos); }
       });
     }
+  };
+
+  /** Destaca o pino de um ponto (a pessoa passou o mouse ou o foco nele na lista). */
+  Mapa.prototype.destacar = function (id, ligado) {
+    var registro = this.marcadores[id];
+    if (!registro) { return; }
+    registro.el.classList.toggle('rp--destacado', !!ligado);
+    if (ligado) { animarClasse(registro.el, 'rp--saltando', 520); }
+  };
+
+  /** Depois de salvar (data-celebrar na página), gotas saem do hemocentro assim que ele pousa. */
+  Mapa.prototype._celebrar = function (el, atraso) {
+    var raiz = document.documentElement;
+    if (!raiz.hasAttribute('data-celebrar') || raiz.dataset.celebrado || !window.RotaGotas) { return; }
+    raiz.dataset.celebrado = 'true';
+    setTimeout(function () {
+      var r = el.querySelector('.rp__corpo').getBoundingClientRect();
+      var visivel = r.bottom > 0 && r.top < window.innerHeight && r.right > 0 && r.left < window.innerWidth;
+      // Mapa fora da tela (a página voltou ao topo): as gotas saem do aviso de "salvo"
+      if (!visivel) { r = (document.querySelector('.toast') || document.body).getBoundingClientRect(); }
+      window.RotaGotas.estourar(r.left + r.width / 2, Math.max(40, r.top + Math.min(r.height, 80) / 2));
+    }, (atraso || 0) + (semAnimacao() ? 0 : 650));
   };
 
   Mapa.prototype._atualizarMarcador = function (registro, ponto) {
@@ -551,13 +599,14 @@
     }
     var limites = new maplibregl.LngLatBounds();
     pontos.forEach(function (p) { limites.extend([p.lng, p.lat]); });
-    map.fitBounds(limites, { padding: { top: 80, bottom: 100, left: 70, right: 130 }, maxZoom: 13, duration: duracao });
+    var margem = this.opcoes.compacto ? { top: 64, bottom: 78, left: 46, right: 46 } : { top: 80, bottom: 100, left: 100, right: 130 };
+    map.fitBounds(limites, { padding: margem, maxZoom: 13, duration: duracao });
   };
 
   /**
    * Busca e desenha a rota. opts: divisao (índice do ponto onde começa o trecho do doador),
-   * duracao (ms da animação), aoPassar(i) (o ônibus passou pelo ponto i), onibus (true = o ônibus
-   * refaz o trecho do doador, em loop). Resolve com o traçado, ou null se outro pedido o substituiu.
+   * duracao (ms da animação), aoPassar(i) (a linha chegou ao ponto i).
+   * Resolve com o traçado, ou null se outro pedido o substituiu.
    */
   Mapa.prototype.desenharRota = function (pontos, opts) {
     var self = this;
@@ -579,9 +628,7 @@
         linha: linha, medidas: medidas, total: medidas[medidas.length - 1],
         corte: opts.divisao != null ? marcos[opts.divisao] : 0
       };
-      self._animarRota(opts.duracao == null ? 1400 : opts.duracao, marcos, opts.aoPassar).then(function () {
-        if (opts.onibus && self._pedidoRota === pedido) { self._onibusEmLoop(); }
-      });
+      self._animarRota(opts.duracao == null ? 1400 : opts.duracao, marcos, opts.aoPassar);
       return resultado;
     });
   };
@@ -597,25 +644,7 @@
     map.getSource('rota-trecho').setData(linhaGeojson(cortar(rota.linha, rota.medidas, rota.corte, d)));
   };
 
-  Mapa.prototype._onibus = function () {
-    if (!this._marcadorOnibus) {
-      var el = document.createElement('div');
-      el.className = 'rp-onibus';
-      el.innerHTML = '<span class="rp-onibus__corpo">' + SVG_ONIBUS + '</span>';
-      this._marcadorOnibus = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat(this._rota.linha[0]).addTo(this.map);
-    }
-    return this._marcadorOnibus;
-  };
-
-  Mapa.prototype._esconderOnibus = function () {
-    var onibus = this._marcadorOnibus;
-    if (!onibus) { return; }
-    this._marcadorOnibus = null;
-    onibus.getElement().classList.add('rp-onibus--saindo');
-    setTimeout(function () { onibus.remove(); }, 400);
-  };
-
-  /** A linha "se desenha" da partida ao hemocentro, com o ônibus na ponta. */
+  /** A linha "se desenha" da partida ao hemocentro. */
   Mapa.prototype._animarRota = function (duracao, marcos, aoPassar) {
     var self = this;
     var rota = this._rota;
@@ -633,7 +662,6 @@
       avisar(rota.total);
       return Promise.resolve();
     }
-    var onibus = this._onibus();
     return new Promise(function (ok) {
       var inicio = performance.now();
       (function passo(agora) {
@@ -641,43 +669,19 @@
         var t = Math.min(1, (agora - inicio) / duracao);
         var d = suave(t) * rota.total;
         self._atualizarRota(rota, d);
-        onibus.setLngLat(pontoEm(rota.linha, rota.medidas, d));
         avisar(d);
         if (t < 1) {
           self._quadroRota = requestAnimationFrame(passo);
         } else {
-          self._esconderOnibus();
           ok();
         }
       })(inicio);
     });
   };
 
-  /** Na página da campanha: o ônibus refaz o trecho do doador (embarque → hemocentro) de tempos em tempos. */
-  Mapa.prototype._onibusEmLoop = function () {
-    var self = this;
-    var rota = this._rota;
-    if (semAnimacao() || !rota || rota.total - rota.corte <= 0) { return; }
-    var duracao = 5200, pausa = 1800;
-    var inicio = null;
-    (function passo(agora) {
-      if (self._rota !== rota) { return; }
-      if (inicio === null) { inicio = agora; }
-      var t = (agora - inicio) / duracao;
-      if (t >= 1) {
-        self._esconderOnibus();
-        if (agora - inicio >= duracao + pausa) { inicio = agora; }
-      } else if (!document.hidden) {
-        self._onibus().setLngLat(pontoEm(rota.linha, rota.medidas, rota.corte + suave(t) * (rota.total - rota.corte)));
-      }
-      self._quadroRota = requestAnimationFrame(passo);
-    })(performance.now());
-  };
-
   Mapa.prototype._pararRota = function () {
     cancelAnimationFrame(this._quadroRota);
     this._rota = null;
-    this._esconderOnibus();
   };
 
   /* ---------- Hemocentros de SP ---------- */
@@ -697,8 +701,8 @@
   };
 
   /** Esconde da camada "outros" o hemocentro que já é o destino da rota. */
-  Mapa.prototype.destacarHemocentro = function (lng, lat) {
-    this._destino = lng == null ? null : [lng, lat];
+  Mapa.prototype.destacarHemocentro = function (lng, lat, nome) {
+    this._destino = lng == null ? null : { coords: [lng, lat], nome: normalizar(nome) };
     this._atualizarHemocentros();
   };
 
@@ -708,7 +712,8 @@
     var destino = this._destino;
     var features = [];
     this._hemocentros.forEach(function (h, i) {
-      if (destino && distancia(destino, [h.lng, h.lat]) < 0.003) { return; } // ~300 m
+      // É o mesmo lugar do destino (mesmo nome, ou a menos de ~800 m): não repete a gota
+      if (destino && (distancia(destino.coords, [h.lng, h.lat]) < 0.008 || (destino.nome && normalizar(h.nome) === destino.nome))) { return; }
       features.push({ type: 'Feature', properties: { indice: i }, geometry: { type: 'Point', coordinates: [h.lng, h.lat] } });
     });
     this.pronto.then(function () { self.map.getSource('hemocentros').setData({ type: 'FeatureCollection', features: features }); });
@@ -834,18 +839,21 @@
 
   /* ---------- Página da campanha: sequência de abertura ---------- */
 
-  function lerPontos(seletor) {
+  function lerPontos(seletor, semEtiquetas) {
     var pontos = [];
     document.querySelectorAll(seletor).forEach(function (el) {
       var lat = parseFloat(el.dataset.lat);
       var lng = parseFloat(el.dataset.lng);
       if (isNaN(lat) || isNaN(lng)) { return; }
+      el.dataset.pontoId = 'p' + pontos.length;
       var ponto = {
         id: 'p' + pontos.length, lat: lat, lng: lng, nome: el.dataset.nome, tipo: el.dataset.tipo,
         rotulo: el.dataset.rotulo, meu: el.dataset.meu === 'true'
       };
       var horario = el.dataset.horario;
-      if (ponto.tipo === 'fim') {
+      if (semEtiquetas) {
+        // mapa compacto: só os pinos
+      } else if (ponto.tipo === 'fim') {
         ponto.etiqueta = { linha: (ponto.meu ? 'Você vai direto' : 'Hemocentro') + (horario ? ' · ' + horario : ''), titulo: ponto.nome };
       } else if (ponto.meu) {
         ponto.etiqueta = { titulo: 'Seu embarque' + (horario ? ' · ' + horario : '') };
@@ -857,27 +865,51 @@
 
   function iniciarMapasDaPagina() {
     document.querySelectorAll('[data-rota-mapa]').forEach(function (el) {
-      var pontos = lerPontos(el.dataset.rotaMapa);
+      if (!el.getClientRects().length) { return; } // escondido nesta tela (ex.: canhoto do bilhete no celular)
+      var compacto = el.hasAttribute('data-rota-compacto');
+      var pontos = lerPontos(el.dataset.rotaMapa, compacto);
       if (pontos.length < 2 || !window.maplibregl) {
         (el.closest('[data-rota-mapa-bloco]') || el).hidden = true;
         return;
       }
-      var mapa = new Mapa(el, { hemocentros: true });
+      var mapa;
+      try {
+        mapa = new Mapa(el, { hemocentros: !compacto, compacto: compacto });
+      } catch (e) { // sem WebGL (aparelho antigo ou navegador restrito): esconde o mapa e segue com o resto da página
+        (el.closest('[data-rota-mapa-bloco]') || el).hidden = true;
+        return;
+      }
       var fim = pontos.filter(function (p) { return p.tipo === 'fim'; })[0];
-      if (fim) { mapa.destacarHemocentro(fim.lng, fim.lat); }
+      if (fim) { mapa.destacarHemocentro(fim.lng, fim.lat, fim.nome); }
       var divisao = null;
       pontos.forEach(function (p, i) { if (p.meu && p.tipo !== 'fim') { divisao = i; } });
       var legenda = el.dataset.rotaResumo && document.querySelector(el.dataset.rotaResumo);
 
+      // Linha do tempo ↔ mapa: o item e o pino se destacam juntos
+      var itens = {};
+      document.querySelectorAll(el.dataset.rotaMapa).forEach(function (item) {
+        if (!item.dataset.pontoId) { return; }
+        itens[item.dataset.pontoId] = item;
+        ['mouseenter', 'focusin'].forEach(function (ev) {
+          item.addEventListener(ev, function () { mapa.destacar(item.dataset.pontoId, true); });
+        });
+        ['mouseleave', 'focusout'].forEach(function (ev) {
+          item.addEventListener(ev, function () { mapa.destacar(item.dataset.pontoId, false); });
+        });
+      });
+
       mapa.pronto.then(function () {
-        mapa.definirPontos([], {});
+        mapa.definirPontos([], {
+          aoPassarMouse: function (id, ligado) {
+            if (itens[id]) { itens[id].classList.toggle('is-destacado', ligado); }
+          }
+        });
         mapa.enquadrar(pontos, true);
-        // A câmera chega e o ônibus "desenha" o caminho, deixando os pinos pelo trajeto
+        // A câmera chega e a linha se desenha, deixando os pinos pelo trajeto
         setTimeout(function () {
           mapa.desenharRota(pontos, {
             divisao: divisao,
             duracao: 2400,
-            onibus: divisao !== null,
             aoPassar: function (i) { mapa.adicionarPonto(pontos[i]); }
           }).then(function (resultado) {
             pontos.forEach(function (p) { mapa.adicionarPonto(p); });

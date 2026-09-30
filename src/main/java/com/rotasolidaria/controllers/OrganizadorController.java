@@ -6,6 +6,7 @@ import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.services.OrganizadorCampanhaService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,9 +24,12 @@ import java.util.Optional;
 public class OrganizadorController {
 
     private final OrganizadorCampanhaService campanhaService;
+    private final String baseUrl;
 
-    public OrganizadorController(OrganizadorCampanhaService campanhaService) {
+    public OrganizadorController(OrganizadorCampanhaService campanhaService,
+                                 @Value("${app.base-url}") String baseUrl) {
         this.campanhaService = campanhaService;
+        this.baseUrl = baseUrl;
     }
 
     @GetMapping("/organizador/campanhas")
@@ -48,10 +52,9 @@ public class OrganizadorController {
         try {
             exigirSemErrosDeFormato(binding);
             Campaign campanha = campanhaService.criar(principal.getId(), form);
-            redirectAttributes.addFlashAttribute("toast", Toast.success("Campanha criada", "As inscrições já estão abertas.")
-                    .withIcon("campaign")
-                    .withAction("Ver campanha", "/campanhas/" + campanha.getId()));
-            return "redirect:/organizador/campanhas/" + campanha.getId() + "/editar";
+            // Campanha nova: vai para o bilhete de divulgação, com as gotas comemorando
+            redirectAttributes.addFlashAttribute("celebrar", true);
+            return "redirect:/organizador/campanhas/" + campanha.getId() + "/divulgar";
         } catch (BusinessException e) {
             campanhaService.completarExibicao(form, Optional.empty());
             model.addAttribute("toast", Toast.error("Não foi possível criar a campanha", e.getMessage()));
@@ -87,8 +90,8 @@ public class OrganizadorController {
             campanhaService.atualizar(id, principal.getId(), form);
             redirectAttributes.addFlashAttribute("toast", Toast.success("Campanha salva", "Os doadores já veem as mudanças.")
                     .withIcon("campaign")
-                    .withAction("Ver campanha", "/campanhas/" + id));
-            return "redirect:/organizador/campanhas/" + id + "/editar";
+                    .withAction("Divulgar", "/organizador/campanhas/" + id + "/divulgar"));
+            return "redirect:/organizador/campanhas";
         } catch (BusinessException e) {
             // Mostra o formulário de novo com o que foi digitado, sem perder as paradas
             // (recarrega a campanha: o rollback descarta as alterações feitas nela)
@@ -97,6 +100,25 @@ public class OrganizadorController {
             model.addAttribute("toast", Toast.error("Não foi possível salvar a campanha", e.getMessage()));
             return formulario(model, form, campanha.orElse(null));
         }
+    }
+
+    /** Bilhete da campanha para divulgar: imagem para as redes, WhatsApp, link e QR code. */
+    @GetMapping("/organizador/campanhas/{id}/divulgar")
+    public String divulgar(@PathVariable Long id,
+                           @AuthenticationPrincipal AuthenticatedUser principal,
+                           RedirectAttributes redirectAttributes,
+                           Model model) {
+        Optional<Campaign> campanhaOpt = campanhaService.buscarDoOrganizador(id, principal.getId());
+        if (campanhaOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("toast", Toast.error("Campanha não encontrada", "Escolha uma das suas campanhas."));
+            return "redirect:/organizador/campanhas";
+        }
+        Campaign campanha = campanhaOpt.get();
+        model.addAttribute("campanha", campanha);
+        model.addAttribute("linkPublico", baseUrl + "/campanhas/" + campanha.getId());
+        // "Itapetininga, Tatuí e Sorocaba": sem repetições e sem a cidade de partida nem a do hemocentro
+        model.addAttribute("paradasTexto", campanha.getPassaPor());
+        return "pages/organizador-divulgar"; // -> templates/pages/organizador-divulgar.ftlh
     }
 
     private static void exigirSemErrosDeFormato(BindingResult binding) {

@@ -2,6 +2,8 @@ package com.rotasolidaria.services;
 
 import com.rotasolidaria.exception.BusinessException;
 import com.rotasolidaria.models.Donor;
+import com.rotasolidaria.models.User;
+import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final DonorRepository donorRepository;
+
+    public AuthService(UserRepository userRepository, DonorRepository donorRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.donorRepository = donorRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
-    public Donor register(String name, String email, String phone, String password, String passwordConfirmation) {
+    /** Cria a conta já com o perfil de doador (o de organizador é dado à parte). */
+    public User register(String name, String email, String phone, String password, String passwordConfirmation) {
         String normalizedName = name == null ? "" : name.trim();
         String normalizedEmail = normalizeEmail(email);
         String normalizedPhone = phone == null || phone.isBlank() ? null : phone.trim();
@@ -44,12 +50,14 @@ public class AuthService {
             throw new BusinessException("Este e-mail já está cadastrado. Faça login ou redefina sua senha.");
         }
 
-        Donor donor = new Donor();
-        donor.setName(normalizedName);
-        donor.setEmail(normalizedEmail);
-        donor.setPhone(normalizedPhone);
-        donor.setPasswordHash(passwordEncoder.encode(password));
-        return userRepository.save(donor);
+        User user = new User();
+        user.setName(normalizedName);
+        user.setEmail(normalizedEmail);
+        user.setPhone(normalizedPhone);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user = userRepository.save(user);
+        donorRepository.save(new Donor(user));
+        return user;
     }
 
     public void validatePassword(String password, String passwordConfirmation) {

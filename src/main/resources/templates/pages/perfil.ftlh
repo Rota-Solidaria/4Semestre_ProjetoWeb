@@ -19,7 +19,7 @@
               <span><span class="icon">call</span>${usuario.phone}</span>
             </#if>
             <#if isDonor && donor?? && donor.birthDate??>
-              <span><span class="icon">cake</span>${donor.birthDate}</span>
+              <span><span class="icon">cake</span>${donor.birthDateBr}</span>
             </#if>
           </div>
         </div>
@@ -172,7 +172,7 @@
                 <h3>${reg.campaign.title}</h3>
                 <div class="reg-meta">
                   <#if reg.campaign.eventDate??>
-                    <span><span class="icon">schedule</span>${reg.campaign.eventDate} <#if reg.campaign.departureTime??>· Saída ${reg.campaign.departureTime}h</#if></span>
+                    <span><span class="icon">schedule</span><#if reg.campaign.eventDate??>${reg.campaign.eventDateBr}</#if> <#if reg.campaign.departureTime??>· Saída ${reg.campaign.departureTime}h</#if></span>
                   </#if>
                   <#if reg.campaign.donationLocation??>
                     <span><span class="icon">place</span>${reg.campaign.donationLocation.name} (${reg.campaign.donationLocation.city})</span>

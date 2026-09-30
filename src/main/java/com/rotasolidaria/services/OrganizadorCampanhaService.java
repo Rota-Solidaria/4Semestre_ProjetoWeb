@@ -8,7 +8,7 @@ import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.repositories.CampanhaRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
-import com.rotasolidaria.repositories.UserRepository;
+import com.rotasolidaria.repositories.OrganizerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +31,16 @@ public class OrganizadorCampanhaService {
 
     private final CampanhaRepository campanhaRepository;
     private final InscricaoRepository inscricaoRepository;
-    private final UserRepository userRepository;
+    private final OrganizerRepository organizerRepository;
     private final RotaService rotaService;
 
     public OrganizadorCampanhaService(CampanhaRepository campanhaRepository,
                                       InscricaoRepository inscricaoRepository,
-                                      UserRepository userRepository,
+                                      OrganizerRepository organizerRepository,
                                       RotaService rotaService) {
         this.campanhaRepository = campanhaRepository;
         this.inscricaoRepository = inscricaoRepository;
-        this.userRepository = userRepository;
+        this.organizerRepository = organizerRepository;
         this.rotaService = rotaService;
     }
 
@@ -89,9 +89,7 @@ public class OrganizadorCampanhaService {
 
     @Transactional
     public Campaign criar(Long organizerId, CampanhaForm form) {
-        Organizer organizer = userRepository.findById(organizerId)
-                .filter(Organizer.class::isInstance)
-                .map(Organizer.class::cast)
+        Organizer organizer = organizerRepository.findById(organizerId)
                 .orElseThrow(() -> new BusinessException("Apenas organizadores podem criar campanhas."));
         if (form.getData() != null && form.getData().isBefore(LocalDate.now())) {
             throw new BusinessException("A data da campanha não pode estar no passado.");

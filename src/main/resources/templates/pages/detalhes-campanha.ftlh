@@ -46,7 +46,7 @@
               <span class="icon-box"><span class="icon">schedule</span></span>
               <div>
                 <div class="info-title">
-                  <#if campanha.eventDate??>${campanha.eventDate}</#if>
+                  <#if campanha.eventDate??>${campanha.eventDateBr}</#if>
                 </div>
                 <div class="info-sub">
                   <#if campanha.departureTime??>Saída ${campanha.departureTime}h · </#if>

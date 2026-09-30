@@ -7,6 +7,12 @@
         <span class="kicker">Agenda regional</span>
         <h1>Campanhas na região</h1>
         <p>Filtre por cidade, distância e transporte disponível para encontrar a coleta mais próxima de você.</p>
+        <#if ehOrganizador!false>
+          <div class="hero-organizador">
+            <a class="hero-organizador__botao" href="/organizador/campanhas/nova"><span class="icon" aria-hidden="true">add</span>Criar campanha</a>
+            <a class="hero-organizador__link" href="/organizador/campanhas">Ver minhas campanhas</a>
+          </div>
+        </#if>
       </div>
     </section>
 
@@ -25,13 +31,19 @@
               <img src="${c.imageUrl!"/images/doacaodesangue.jpeg"}" alt="${c.title}">
               <div>
                 <div class="row-top">
-                  <span class="badge badge-open"><span class="dot"></span>${c.status}</span>
+                  <#if c.status == "OPEN">
+                    <span class="badge badge-open"><span class="dot"></span>Inscrições abertas</span>
+                  <#elseif c.status == "CLOSED">
+                    <span class="badge badge-closed"><span class="dot"></span>Encerrada</span>
+                  <#else>
+                    <span class="badge badge-closed"><span class="dot"></span>Cancelada</span>
+                  </#if>
                   <span class="row-vagas">${c.slots!0} vagas</span>
                 </div>
                 <h3>${c.title}</h3>
                 <div class="row-meta">
                   <#if c.eventDate??>
-                    <span><span class="icon">schedule</span>${c.eventDate} <#if c.donationTime??>· ${c.donationTime}h</#if></span>
+                    <span><span class="icon">schedule</span>${c.eventDateBr} <#if c.donationTime??>· ${c.donationTime}h</#if></span>
                   </#if>
                   <#if c.donationLocation??>
                     <span><span class="icon">place</span>${c.donationLocation.name} — ${c.donationLocation.city}</span>

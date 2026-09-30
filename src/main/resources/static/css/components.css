@@ -27,6 +27,17 @@
   body {
     padding-bottom: calc(68px + env(safe-area-inset-bottom));
   }
+
+  /* Organizador: cinco itens (com "Organizar") */
+  .tabbar--5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .tabbar--5 .tabbar__icon {
+    width: 48px;
+  }
 }
 
 .tabbar__item {

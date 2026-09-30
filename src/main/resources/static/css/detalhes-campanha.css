@@ -185,3 +185,9 @@ input,select,textarea{font:inherit;color:inherit}
 :root[data-theme="dark"] .simbolo--outros{background:#C0333A;border-color:rgba(242,150,155,.5)}
 .route__map .rota-mapa{height:420px}
 @media(max-width:620px){.route__map .rota-mapa{height:320px}}
+/* Linha do tempo ↔ mapa: o item cujo pino está sob o mouse */
+.route__stop[data-ponto-id]{cursor:default}
+.route__stop .route__dot{transition:transform .25s cubic-bezier(.3,1.6,.5,1),box-shadow .25s}
+.route__stop.is-destacado .route__dot{transform:scale(1.14);box-shadow:0 0 0 4px var(--surface),0 0 0 7px var(--brand-soft)}
+.route__stop.is-destacado .route__text strong{color:var(--brand)}
+:root[data-motion="reduce"] .route__stop .route__dot{transition:none}

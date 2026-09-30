@@ -168,3 +168,38 @@ body > main {
   background: var(--brand-soft);
   border-color: var(--brand);
 }
+
+/* ================= Atalho "Nova campanha" (só organizadores) ================= */
+.header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px 0 10px;
+  border-radius: 12px;
+  background: var(--brand-fill, var(--brand));
+  color: #FFFFFF;
+  font: 600 14px/1 'IBM Plex Sans', sans-serif;
+  white-space: nowrap;
+  transition: background .15s ease, transform .15s ease;
+}
+
+.header-cta:hover {
+  background: var(--brand-hover);
+  color: #FFFFFF;
+}
+
+:root[data-theme="dark"] .header-cta:hover {
+  background: var(--brand-fill-hover, #D4454C);
+}
+
+.header-cta .icon {
+  font-size: 20px;
+}
+
+/* No celular o atalho fica na barra de baixo ("Organizar") */
+@media (max-width: 900px) {
+  .header-cta {
+    display: none;
+  }
+}

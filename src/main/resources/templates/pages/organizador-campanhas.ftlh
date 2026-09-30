@@ -1,7 +1,7 @@
 <#import "../layout/main.ftlh" as main>
 
 <#-- Área do organizador: campanhas dele, com atalho para editar a rota do ônibus -->
-<@main.layout title="Minhas campanhas - Rota Solidária" css="/css/organizador.css">
+<@main.layout title="Minhas campanhas - Rota Solidária" css="/css/organizador.css" currentNav="organizador">
   <main class="container">
     <div class="org-head">
       <span class="kicker">Área do organizador</span>
@@ -28,7 +28,7 @@
               </div>
               <h2>${c.title}</h2>
               <div class="org-card__meta">
-                <span><span class="icon" aria-hidden="true">calendar_month</span><#if c.eventDate??>${c.eventDate}<#else>Data a definir</#if></span>
+                <span><span class="icon" aria-hidden="true">calendar_month</span><#if c.eventDate??>${c.eventDateBr}<#else>Data a definir</#if></span>
                 <span><span class="icon" aria-hidden="true">route</span>
                   <#if c.departureLocation??>${c.departureLocation.city!c.departureLocation.name}<#else>Partida a definir</#if>
                   → <#if c.stops?has_content>${c.stops?size} <#if c.stops?size == 1>parada<#else>paradas</#if> → </#if>
@@ -38,6 +38,7 @@
             </div>
             <div class="org-card__actions">
               <a class="btn btn-secondary" href="/campanhas/${c.id?c}">Ver página</a>
+              <a class="btn btn-secondary" href="/organizador/campanhas/${c.id?c}/divulgar"><span class="icon" aria-hidden="true">share</span>Divulgar</a>
               <a class="btn btn-primary" href="/organizador/campanhas/${c.id?c}/editar"><span class="icon" aria-hidden="true">edit</span>Editar</a>
             </div>
           </li>

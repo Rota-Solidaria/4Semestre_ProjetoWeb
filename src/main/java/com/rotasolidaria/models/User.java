@@ -3,9 +3,13 @@ package com.rotasolidaria.models;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
+/**
+ * Conta de acesso (login). Os papéis são perfis ligados a ela pelo mesmo id:
+ * Donor (tabela donors) e Organizer (tabela organizers). Uma pessoa pode ter os dois,
+ * organizando uma campanha e doando em outras.
+ */
 @Entity
 @Table(name = "users")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     @Id

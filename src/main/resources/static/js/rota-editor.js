@@ -2,7 +2,8 @@
  * Fluxo de cada ponto, como num app de transporte:
  *   1. CEP com 8 dígitos → ViaCEP preenche rua, bairro, cidade e UF (grátis, sem chave);
  *   2. endereço completo → Nominatim/OpenStreetMap acha a coordenada e coloca o pin (grátis, 1 busca por segundo);
- *   3. opcional: arrastar o pin, ou "Marcar no mapa" e clicar no lugar exato.
+ *   3. opcional: arrastar o pin, ou "Marcar no mapa" e clicar no lugar exato; o endereço do lugar
+ *      escolhido é preenchido sozinho (Nominatim, busca inversa).
  * O hemocentro pode vir da lista de SP (no seletor ou clicando na gota do mapa).
  * As paradas podem ser adicionadas, reordenadas e removidas; os nomes paradas[i].* são renumerados.
  * As animações dos pinos (cair, deslizar, pousar, sumir) ficam em rota-mapa.js / rota-mapa.css. */
@@ -108,15 +109,20 @@
         var bloco = blocoPorId(id);
         if (!bloco) { return; }
         definirCoordenada(bloco, pos.lat, pos.lng);
-        status(bloco, 'Posição ajustada no mapa', 'ok');
         atualizarMapa(false);
+        enderecoPeloPino(bloco, pos.lat, pos.lng);
       },
       aoClicar: function (id) {
         var bloco = blocoPorId(id);
         if (bloco && !marcando) { ativar(bloco, true); }
+      },
+      // Mouse no pino: destaca o ponto na lista
+      aoPassarMouse: function (id, ligado) {
+        var bloco = blocoPorId(id);
+        if (bloco) { bloco.classList.toggle('is-destacado', ligado); }
       }
     });
-    mapa.destacarHemocentro(destino ? destino.lng : null, destino ? destino.lat : null);
+    mapa.destacarHemocentro(destino ? destino.lng : null, destino ? destino.lat : null, destino ? destino.nome : null);
     if (enquadrar) { mapa.enquadrar(pontos, true); }
 
     var duracao = primeiraVez ? 1800 : 900;
@@ -139,14 +145,28 @@
     return d;
   }
 
-  function buscarCep(bloco) {
+  function lupa(bloco, buscando) {
+    var botao = bloco.querySelector('[data-acao="buscar-cep"]');
+    if (!botao) { return; }
+    botao.classList.toggle('is-buscando', buscando);
+    botao.querySelector('.icon').textContent = buscando ? 'progress_activity' : 'search';
+  }
+
+  /** forcar = a pessoa clicou na lupa ou apertou Enter: busca mesmo que o CEP não tenha mudado. */
+  function buscarCep(bloco, forcar) {
     var cep = mascaraCep(campo(bloco, 'cep'));
-    if (cep.length !== 8 || bloco._ultimoCep === cep) { return; }
+    if (cep.length !== 8) {
+      if (forcar) { status(bloco, 'Digite os 8 números do CEP.', 'aviso'); }
+      return;
+    }
+    if (!forcar && bloco._ultimoCep === cep) { return; }
     bloco._ultimoCep = cep;
     status(bloco, 'Buscando o CEP…', 'buscando');
+    lupa(bloco, true);
     fetch('https://viacep.com.br/ws/' + cep + '/json/')
       .then(function (r) { return r.json(); })
       .then(function (d) {
+        lupa(bloco, false);
         if (d.erro) {
           status(bloco, 'CEP não encontrado. Preencha o endereço à mão.', 'erro');
           return;
@@ -155,7 +175,7 @@
         if (d.bairro) { campo(bloco, 'bairro').value = d.bairro; }
         campo(bloco, 'cidade').value = d.localidade || '';
         campo(bloco, 'uf').value = d.uf || '';
-        if (!valor(bloco, 'nome') && d.logradouro) { campo(bloco, 'nome').value = d.logradouro; }
+        if (nomeAutomatico(bloco) && d.logradouro) { definirNomeAutomatico(bloco, d.logradouro); }
         status(bloco, 'Endereço preenchido pelo CEP', 'ok');
         if (d.logradouro && !valor(bloco, 'numero')) {
           campo(bloco, 'numero').focus();
@@ -163,6 +183,7 @@
         localizar(bloco);
       })
       .catch(function () {
+        lupa(bloco, false);
         bloco._ultimoCep = null;
         status(bloco, 'Não foi possível consultar o CEP agora. Preencha o endereço à mão.', 'erro');
       });
@@ -171,17 +192,19 @@
   /* ---------- Endereço → coordenada (Nominatim, no máximo 1 busca por segundo) ---------- */
 
   var NOMINATIM = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=br&accept-language=pt-BR&';
+  var NOMINATIM_REVERSO = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&accept-language=pt-BR&';
   var fila = Promise.resolve();
   var ultimaBusca = 0;
 
-  function nominatim(params) {
+  /** Uma busca no Nominatim por vez, com 1,1 s entre elas (política de uso gratuito). */
+  function nominatim(params, base) {
     var busca = fila.then(function () {
       var espera = Math.max(0, ultimaBusca + 1100 - Date.now());
       return new Promise(function (ok) { setTimeout(ok, espera); });
     }).then(function () {
       ultimaBusca = Date.now();
       var qs = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
-      return fetch(NOMINATIM + qs).then(function (r) { return r.ok ? r.json() : []; });
+      return fetch((base || NOMINATIM) + qs).then(function (r) { return r.ok ? r.json() : []; });
     }).catch(function () { return []; });
     fila = busca;
     return busca;
@@ -233,6 +256,52 @@
     })(0);
   }
 
+  /** O nome do local ainda é o que o sistema preencheu (vazio ou igual ao último automático)? Então pode trocar. */
+  function nomeAutomatico(bloco) {
+    var nome = valor(bloco, 'nome');
+    return !nome || nome === bloco._nomeAuto;
+  }
+
+  function definirNomeAutomatico(bloco, nome) {
+    campo(bloco, 'nome').value = nome;
+    bloco._nomeAuto = nome;
+  }
+
+  /** O pino foi posto à mão (arrastado ou clicado no mapa): preenche o endereço daquele lugar. */
+  function enderecoPeloPino(bloco, lat, lng) {
+    var pedido = (bloco._pedido || 0) + 1;
+    bloco._pedido = pedido; // cancela uma busca pelo endereço digitado que ainda estava na fila
+    status(bloco, 'Buscando o endereço deste ponto…', 'buscando');
+    nominatim({ lat: lat.toFixed(7), lon: lng.toFixed(7) }, NOMINATIM_REVERSO).then(function (r) {
+      if (bloco._pedido !== pedido) { return; } // o pino mudou de novo enquanto buscava
+      var a = r && r.address;
+      if (!a) {
+        status(bloco, 'Posição marcada. Não achamos o endereço aqui — preencha à mão.', 'aviso');
+        return;
+      }
+      var rua = a.road || a.pedestrian || a.footway || a.square || '';
+      var cidade = a.city || a.town || a.village || a.municipality || '';
+      var uf = (a['ISO3166-2-lvl4'] || '').replace(/^BR-/, '');
+      var cep = (a.postcode || '').replace(/\D/g, '');
+      campo(bloco, 'rua').value = rua;
+      campo(bloco, 'numero').value = a.house_number || '';
+      campo(bloco, 'bairro').value = a.suburb || a.neighbourhood || a.quarter || a.city_district || '';
+      if (cidade) { campo(bloco, 'cidade').value = cidade; }
+      if (uf) { campo(bloco, 'uf').value = uf; }
+      campo(bloco, 'cep').value = cep.length === 8 ? cep.slice(0, 5) + '-' + cep.slice(5) : '';
+      bloco._ultimoCep = cep;
+      if (nomeAutomatico(bloco)) {
+        definirNomeAutomatico(bloco, rua ? rua + (a.house_number ? ', ' + a.house_number : '') : cidade);
+      }
+      // Um hemocentro escolhido da lista deixa de valer quando o pino vai para outro lugar
+      if (bloco.dataset.tipo === 'fim' && selectHemocentros) { selectHemocentros.value = ''; }
+      status(bloco, !rua ? 'Não há rua neste ponto: confira o endereço ou ajuste o pino.'
+        : a.house_number ? 'Endereço preenchido pelo pino.' : 'Endereço preenchido pelo pino — confira o número.',
+      rua ? 'ok' : 'aviso');
+      atualizarMapa(false);
+    });
+  }
+
   /* ---------- Marcar o ponto clicando no mapa ---------- */
 
   function ativar(bloco, rolar) {
@@ -262,9 +331,9 @@
     if (!marcando) { return; }
     var bloco = marcando;
     definirCoordenada(bloco, lngLat.lat, lngLat.lng);
-    status(bloco, 'Posição marcada no mapa', 'ok');
     encerrarMarcacao();
     atualizarMapa(false);
+    enderecoPeloPino(bloco, lngLat.lat, lngLat.lng);
   });
 
   document.addEventListener('keydown', function (e) {
@@ -301,6 +370,9 @@
     switch (botao.dataset.acao) {
       case 'localizar':
         localizar(bloco);
+        break;
+      case 'buscar-cep':
+        buscarCep(bloco, true);
         break;
       case 'marcar':
         iniciarMarcacao(bloco);
@@ -342,13 +414,25 @@
       if (!coordenada(bloco)) { localizar(bloco); } else { atualizarMapa(false); }
     });
 
-    bloco.addEventListener('focusin', function () { ativar(bloco, false); });
+    bloco.addEventListener('focusin', function () { ativar(bloco, false); mapa.destacar(bloco._id, true); });
+    bloco.addEventListener('focusout', function (e) {
+      if (!bloco.contains(e.relatedTarget)) { mapa.destacar(bloco._id, false); }
+    });
+    // Mouse no ponto da lista: o pino salta no mapa
+    bloco.addEventListener('mouseenter', function () { mapa.destacar(bloco._id, true); });
+    bloco.addEventListener('mouseleave', function () {
+      if (!bloco.contains(document.activeElement)) { mapa.destacar(bloco._id, false); }
+    });
 
     // Enter num campo do ponto não envia o formulário; só confirma o campo
     bloco.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && e.target.matches('input')) {
         e.preventDefault();
-        e.target.dispatchEvent(new Event('change', { bubbles: true }));
+        if (e.target.dataset.campo === 'cep') {
+          buscarCep(bloco, true);
+        } else {
+          e.target.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       }
     });
 
@@ -429,4 +513,10 @@
   renumerar();
   atualizarMapa(true);
   carregarHemocentros();
+
+  // Usado pelo assistente de passos (campanha-wizard.js)
+  window.RotaEditor = {
+    mapa: mapa,
+    atualizar: function (enquadrar) { atualizarMapa(enquadrar); }
+  };
 })();

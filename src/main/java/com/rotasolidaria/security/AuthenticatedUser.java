@@ -1,13 +1,12 @@
 package com.rotasolidaria.security;
 
-import com.rotasolidaria.models.Donor;
-import com.rotasolidaria.models.Organizer;
 import com.rotasolidaria.models.User;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,22 +23,21 @@ public class AuthenticatedUser implements UserDetails, CredentialsContainer {
     private final boolean active;
     private final List<GrantedAuthority> authorities;
 
-    public AuthenticatedUser(User user) {
+    /** Os papéis vêm dos perfis da conta: uma pessoa pode ser doadora e organizadora ao mesmo tempo. */
+    public AuthenticatedUser(User user, boolean donor, boolean organizer) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.passwordHash = user.getPasswordHash();
         this.active = Boolean.TRUE.equals(user.getActive());
-        this.authorities = List.of(new SimpleGrantedAuthority(roleOf(user)));
-    }
-
-    private static String roleOf(User user) {
-        if (user instanceof Organizer) {
-            return "ROLE_ORGANIZER";
+        List<GrantedAuthority> roles = new ArrayList<>();
+        roles.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if (donor) {
+            roles.add(new SimpleGrantedAuthority("ROLE_DONOR"));
         }
-        if (user instanceof Donor) {
-            return "ROLE_DONOR";
+        if (organizer) {
+            roles.add(new SimpleGrantedAuthority("ROLE_ORGANIZER"));
         }
-        return "ROLE_USER";
+        this.authorities = List.copyOf(roles);
     }
 
     public Long getId() {

@@ -97,7 +97,7 @@ public class PasswordResetService {
                 .orElseThrow(() -> new BusinessException("Este link de redefinição é inválido ou expirou. Solicite um novo."));
         authService.validatePassword(newPassword, passwordConfirmation);
 
-        // unproxy: token.getUser() é um proxy LAZY; precisamos da classe real (Donor/Organizer) para o papel do usuário
+        // unproxy: token.getUser() é um proxy LAZY; o AutoLogin usa o usuário fora desta transação
         User user = Hibernate.unproxy(token.getUser(), User.class);
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
