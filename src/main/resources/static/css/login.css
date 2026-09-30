@@ -98,6 +98,13 @@ input,select,textarea{font:inherit;color:inherit}
 .login-foot a{color:var(--brand);font-weight:700}
 .login-msg-error{color:var(--err-text);margin-bottom:14px}
 
+/* Login com o Google */
+.auth-divider{display:flex;align-items:center;gap:12px;margin:22px 0 0;font:500 13px/1 'IBM Plex Sans',sans-serif;color:var(--text3)}
+.auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.login-panel .btn-google{margin-top:16px;background:var(--surface);border-color:var(--border2);color:var(--text)}
+.btn-google:hover{border-color:var(--text3);background:var(--surface2)}
+.btn-google svg{width:20px;height:20px;flex-shrink:0}
+
 .field-label-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .field-link{font:600 13px/1.4 'IBM Plex Sans',sans-serif;color:var(--brand)}
 .field-link:hover{text-decoration:underline}

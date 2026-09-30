@@ -1,6 +1,7 @@
 package com.rotasolidaria.dto;
 
 import com.rotasolidaria.models.enums.CampaignStatus;
+import com.rotasolidaria.models.enums.TransportMode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -19,6 +20,9 @@ public class CampanhaForm extends RotaForm {
 
     private Integer vagas;
     private CampaignStatus status;
+
+    // Ônibus com rota (BUS) ou encontro direto no local da doação (MEETING)
+    private TransportMode modo = TransportMode.BUS;
 
     // Uma das fotos do projeto (/images/...) ou, se preenchido, o link de outra imagem
     private String imagemUrl;
@@ -67,6 +71,14 @@ public class CampanhaForm extends RotaForm {
 
     public void setStatus(CampaignStatus status) {
         this.status = status;
+    }
+
+    public TransportMode getModo() {
+        return modo;
+    }
+
+    public void setModo(TransportMode modo) {
+        this.modo = modo == null ? TransportMode.BUS : modo;
     }
 
     public String getImagemUrl() {

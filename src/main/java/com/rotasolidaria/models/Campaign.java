@@ -9,6 +9,7 @@ import java.util.List;
 import com.rotasolidaria.util.Datas;
 
 import com.rotasolidaria.models.enums.CampaignStatus;
+import com.rotasolidaria.models.enums.TransportMode;
 
 @Entity
 @Table(name = "campaigns")
@@ -40,6 +41,11 @@ public class Campaign {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    // Ônibus com rota ou encontro direto no local; nulo (campanhas antigas) vale ônibus
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transport_mode", length = 10)
+    private TransportMode transportMode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "donation_location_id", nullable = false)
@@ -125,6 +131,19 @@ public class Campaign {
 
     public void setStatus(CampaignStatus status) {
         this.status = status;
+    }
+
+    public TransportMode getTransportMode() {
+        return transportMode == null ? TransportMode.BUS : transportMode;
+    }
+
+    public void setTransportMode(TransportMode transportMode) {
+        this.transportMode = transportMode;
+    }
+
+    /** Modo Encontro: sem ônibus nem rota, cada doador vai por conta própria até o local da doação. */
+    public boolean isMeeting() {
+        return getTransportMode() == TransportMode.MEETING;
     }
 
     public String getImageUrl() {

@@ -5,7 +5,10 @@
     <div class="ticket-page">
       <div class="ticket-intro">
         <span class="ticket-status" data-gotas-origem><span class="icon" aria-hidden="true">check_circle</span>Inscrição confirmada</span>
-        <#if !vaiDeOnibus>
+        <#if encontro>
+          <h1>Sua presença está confirmada</h1>
+          <p>Mostre este bilhete no hemocentro. Ele também fica salvo em Minhas inscrições.</p>
+        <#elseif !vaiDeOnibus>
           <h1>Sua inscrição está confirmada</h1>
           <p>Mostre este bilhete no hemocentro. Ele também fica salvo em Minhas inscrições.</p>
         <#else>
@@ -18,27 +21,39 @@
         <div class="ticket__main">
           <span class="ticket__overline">${campanha.title}</span>
 
-          <div class="ticket__route">
-            <div class="ticket__stop">
-              <span class="ticket__label">Embarque</span>
-              <strong>${origem}</strong>
+          <#if encontro>
+            <div class="ticket__route ticket__route--encontro">
+              <div class="ticket__stop">
+                <span class="ticket__label">Encontro no hemocentro</span>
+                <strong><#if campanha.donationLocation?? && campanha.donationLocation.city??>${campanha.donationLocation.city}<#else>Hemocentro</#if></strong>
+              </div>
+              <span class="icon ticket__route-icon" aria-hidden="true">bloodtype</span>
             </div>
-            <div class="ticket__path" aria-hidden="true">
-              <span class="line"></span><span class="icon">directions_bus</span><span class="line"></span>
+          <#else>
+            <div class="ticket__route">
+              <div class="ticket__stop">
+                <span class="ticket__label">Embarque</span>
+                <strong>${origem}</strong>
+              </div>
+              <div class="ticket__path" aria-hidden="true">
+                <span class="line"></span><span class="icon">directions_bus</span><span class="line"></span>
+              </div>
+              <div class="ticket__stop ticket__stop--end">
+                <span class="ticket__label">Doação</span>
+                <strong><#if campanha.donationLocation?? && campanha.donationLocation.city??>${campanha.donationLocation.city}<#else>Hemocentro</#if></strong>
+              </div>
             </div>
-            <div class="ticket__stop ticket__stop--end">
-              <span class="ticket__label">Doação</span>
-              <strong><#if campanha.donationLocation?? && campanha.donationLocation.city??>${campanha.donationLocation.city}<#else>Hemocentro</#if></strong>
-            </div>
-          </div>
+          </#if>
 
           <dl class="ticket__data">
             <div><dt>Data</dt><dd class="mono">${dataBr}</dd></div>
             <#if horarioEmbarque??>
               <div><dt>Embarque</dt><dd class="mono">${horarioEmbarque}</dd></div>
             </#if>
-            <div><dt>Doação</dt><dd class="mono"><#if campanha.donationTime??>${campanha.donationTime}<#else>A definir</#if></dd></div>
-            <div class="span-all"><dt>Ponto de embarque</dt><dd>${inscricao.boardingPoint!"A confirmar com o organizador"}</dd></div>
+            <div><dt><#if encontro>Horário<#else>Doação</#if></dt><dd class="mono"><#if campanha.donationTime??>${campanha.donationTime}<#else>A definir</#if></dd></div>
+            <#if !encontro>
+              <div class="span-all"><dt>Ponto de embarque</dt><dd>${inscricao.boardingPoint!"A confirmar com o organizador"}</dd></div>
+            </#if>
             <#if campanha.donationLocation??>
               <div class="span-all"><dt>Hemocentro</dt><dd>${campanha.donationLocation.name}</dd></div>
             </#if>
@@ -54,7 +69,10 @@
       </article>
 
       <div class="ticket-actions">
-        <a class="btn btn-primary btn-lg" href="${whatsappUrl}" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">send</span>Enviar no WhatsApp</a>
+        <#if wazeUrl??>
+          <a class="btn btn-primary btn-lg" href="${wazeUrl}" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">navigation</span>Ir com o Waze</a>
+        </#if>
+        <a class="btn <#if wazeUrl??>btn-secondary<#else>btn-primary</#if> btn-lg" href="${whatsappUrl}" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">send</span>Enviar no WhatsApp</a>
         <#if campanha.eventDate??>
           <a class="btn btn-secondary btn-lg" href="/inscricoes/${inscricao.id?c}/calendario.ics"><span class="icon" aria-hidden="true">event</span>Adicionar ao calendário</a>
         </#if>

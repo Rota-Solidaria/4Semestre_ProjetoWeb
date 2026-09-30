@@ -22,8 +22,13 @@ public class User {
     @Column(length = 160, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    // Nulo nas contas criadas pelo Google que ainda não definiram senha
+    @Column(name = "password_hash")
     private String passwordHash;
+
+    // "sub" da conta Google vinculada (login social)
+    @Column(name = "google_id", length = 64, unique = true)
+    private String googleId;
 
     @Column(length = 20)
     private String phone;
@@ -97,5 +102,15 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public boolean hasPassword() {
+        return passwordHash != null && !passwordHash.isBlank();
+    }
 }

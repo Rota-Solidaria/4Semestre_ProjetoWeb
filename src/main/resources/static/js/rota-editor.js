@@ -95,6 +95,8 @@
     var numParada = 0;
     var destino = null;
     blocos().forEach(function (bloco) {
+      // Passos que o modo Encontro esconde (partida e paradas) não entram no mapa
+      if (bloco.closest('[data-inativo]')) { return; }
       if (bloco.dataset.tipo === 'parada') { numParada++; }
       var ponto = pontoDoBloco(bloco, numParada);
       if (!ponto) { return; }

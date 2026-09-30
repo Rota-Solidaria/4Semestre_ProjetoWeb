@@ -475,6 +475,13 @@ input,select,textarea{font:inherit;color:inherit}
   gap: 8px;
 }
 
+.password-hint {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text2);
+  margin: 0 0 12px;
+}
+
 /* Botão Sair no topo do perfil (no celular o menu do usuário não aparece) */
 .profile-hero-actions {
   display: flex;

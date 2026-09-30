@@ -30,6 +30,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import com.rotasolidaria.util.Datas;
+import com.rotasolidaria.util.Navegacao;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -93,8 +94,9 @@ public class InscricaoController {
         }
         try {
             Registration inscricao = inscricaoService.register(campanhaOpt.get(), principal.getId(), embarque, observacoes, lgpd != null);
+            String garantida = campanhaOpt.get().isMeeting() ? "Sua vaga está garantida." : "Sua vaga no ônibus está garantida.";
             redirectAttributes.addFlashAttribute("toast",
-                    Toast.success("Inscrição confirmada", "Sua vaga no ônibus está garantida.").withIcon("confirmation_number"));
+                    Toast.success("Inscrição confirmada", garantida).withIcon("confirmation_number"));
             redirectAttributes.addFlashAttribute("celebrar", true);
             return "redirect:/inscricoes/" + inscricao.getId();
         } catch (BusinessException e) {
@@ -117,7 +119,7 @@ public class InscricaoController {
 
         String dataBr = campanha.getEventDate() == null ? "a definir" : campanha.getEventDate().format(Datas.DATA_BR);
         String mensagem = "Vou doar sangue na " + campanha.getTitle() + " em " + dataBr
-                + ", com o transporte gratuito do Rota Solidária. Vamos juntos? "
+                + (campanha.isMeeting() ? ". Vamos juntos? " : ", com o transporte gratuito do Rota Solidária. Vamos juntos? ")
                 + baseUrl + "/campanhas/" + campanha.getId();
 
         model.addAttribute("inscricao", inscricao);
@@ -125,6 +127,12 @@ public class InscricaoController {
         model.addAttribute("dataBr", dataBr);
         model.addAttribute("origem", origem(inscricao));
         model.addAttribute("vaiDeOnibus", InscricaoService.goesByBus(inscricao));
+        model.addAttribute("encontro", campanha.isMeeting());
+        // Quem chega por conta própria (modo Encontro ou "Vou por conta própria") segue direto para o hemocentro
+        String wazeUrl = InscricaoService.goesByBus(inscricao) ? null : Navegacao.waze(campanha.getDonationLocation());
+        if (wazeUrl != null) {
+            model.addAttribute("wazeUrl", wazeUrl);
+        }
         LocalTime horarioEmbarque = InscricaoService.boardingTime(inscricao);
         if (horarioEmbarque != null) {
             model.addAttribute("horarioEmbarque", horarioEmbarque);
@@ -163,7 +171,8 @@ public class InscricaoController {
         if (campanha.getDonationLocation() != null) {
             ics.append("LOCATION:").append(escapeIcs(local(campanha.getDonationLocation()))).append("\r\n");
         }
-        ics.append("DESCRIPTION:").append(escapeIcs("Embarque: " + inscricao.getBoardingPoint()
+        String ondeVai = campanha.isMeeting() ? "Encontro direto no local da doação" : "Embarque: " + inscricao.getBoardingPoint();
+        ics.append("DESCRIPTION:").append(escapeIcs(ondeVai
                         + "\nCódigo da vaga: " + inscricao.getCode()
                         + "\nLeve documento oficial com foto."))
            .append("\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n");

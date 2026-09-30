@@ -29,6 +29,9 @@ public class InscricaoService {
     public static final String OWN_TRANSPORT = "Vou por conta própria";
     /** Valor do formulário para "Vou por conta própria". */
     public static final String OWN_TRANSPORT_KEY = "proprio";
+    /** Ponto de embarque gravado nas inscrições do modo Encontro (não há ônibus). */
+    public static final String MEETING_POINT = "Encontro no local da doação";
+    public static final String MEETING_KEY = "encontro";
 
     private final InscricaoRepository inscricaoRepository;
     private final DonorRepository donorRepository;
@@ -41,9 +44,16 @@ public class InscricaoService {
         this.userRepository = userRepository;
     }
 
-    /** Opções de embarque da campanha: a partida, cada parada da rota (em ordem) e ir por conta própria. */
+    /**
+     * Opções de embarque da campanha: a partida, cada parada da rota (em ordem) e ir por conta própria.
+     * No modo Encontro só existe o encontro no local da doação.
+     */
     public List<BoardingOption> boardingOptions(Campaign campaign) {
         List<BoardingOption> options = new ArrayList<>();
+        if (campaign.isMeeting()) {
+            options.add(new BoardingOption(MEETING_KEY, MEETING_POINT, campaign.getDonationTime(), null, false));
+            return options;
+        }
         Location departure = campaign.getDepartureLocation();
         if (departure != null) {
             options.add(busOption(departure, campaign.getDepartureTime()));
@@ -60,7 +70,7 @@ public class InscricaoService {
 
     /** Vai de ônibus? Inscrições antigas só têm o texto do ponto de embarque. */
     public static boolean goesByBus(Registration registration) {
-        return !OWN_TRANSPORT.equals(registration.getBoardingPoint());
+        return !registration.getCampaign().isMeeting() && !OWN_TRANSPORT.equals(registration.getBoardingPoint());
     }
 
     /** Horário em que o ônibus passa no ponto escolhido pelo doador (nulo se vai por conta própria). */
@@ -113,13 +123,15 @@ public class InscricaoService {
             throw new BusinessException("As inscrições desta campanha estão encerradas.");
         }
         if (slotsLeft(campaign) <= 0) {
-            throw new BusinessException("Não há mais vagas no ônibus desta campanha.");
+            throw new BusinessException(campaign.isMeeting() ? "Não há mais vagas nesta campanha."
+                    : "Não há mais vagas no ônibus desta campanha.");
         }
         if (!lgpdAccepted) {
             throw new BusinessException("É preciso autorizar o envio dos seus dados ao organizador.");
         }
+        // No modo Encontro só há um jeito de chegar, então o formulário nem pergunta
         BoardingOption boarding = boardingOptions(campaign).stream()
-                .filter(o -> o.getKey().equals(boardingKey))
+                .filter(o -> campaign.isMeeting() || o.getKey().equals(boardingKey))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException("Escolha um local de embarque."));
 

@@ -156,11 +156,32 @@
           </div>
 
           <section class="wizard-passo" data-passo="1" aria-labelledby="passo-1-titulo">
-            <span class="kicker">Passo 1 de 5</span>
+            <span class="kicker" data-kicker>Passo 1 de 5</span>
             <h1 id="passo-1-titulo">Sobre a campanha</h1>
             <p class="wizard-passo__sub">O que os doadores vão ver na lista de campanhas.</p>
             <div class="passo1">
           <div class="form-card">
+            <#assign modoAtual = (form.modo!"BUS")?string>
+            <fieldset class="modo">
+              <legend class="campo__rotulo">Como os doadores chegam?</legend>
+              <div class="modo__opcoes">
+                <label class="modo__opcao">
+                  <input type="radio" name="modo" value="BUS"<#if modoAtual == "BUS"> checked</#if><#if form.inscritos gt 0> disabled</#if>>
+                  <span class="icon" aria-hidden="true">directions_bus</span>
+                  <span class="modo__texto"><strong>Ônibus com rota</strong><span>Você define a partida, as paradas e o hemocentro.</span></span>
+                </label>
+                <label class="modo__opcao">
+                  <input type="radio" name="modo" value="MEETING"<#if modoAtual == "MEETING"> checked</#if><#if form.inscritos gt 0> disabled</#if>>
+                  <span class="icon" aria-hidden="true">pin_drop</span>
+                  <span class="modo__texto"><strong>Encontro no local</strong><span>Sem transporte: cada um vai até o hemocentro.</span></span>
+                </label>
+              </div>
+              <#if form.inscritos gt 0>
+                <input type="hidden" name="modo" value="${modoAtual}">
+                <span class="campo__dica">Já há doadores inscritos: não dá para mudar entre ônibus e encontro.</span>
+              </#if>
+            </fieldset>
+
             <div class="campos">
               <label class="campo">
                 <span class="campo__rotulo">Título</span>
@@ -175,7 +196,7 @@
                 <input type="date" name="data" value="<#if form.data??>${form.data}</#if>" required<#if novo> min="${.now?string('yyyy-MM-dd')}"</#if>>
               </label>
               <label class="campo campo--2">
-                <span class="campo__rotulo">Vagas no ônibus</span>
+                <span class="campo__rotulo" data-rotulo-vagas>Vagas no ônibus</span>
                 <input type="number" name="vagas" value="<#if form.vagas??>${form.vagas?c}</#if>" min="${(form.inscritos gt 0)?then(form.inscritos?c, '1')}" max="999" required>
                 <#if form.inscritos gt 0><span class="campo__dica">${form.inscritos} <#if form.inscritos == 1>doador inscrito<#else>doadores inscritos</#if></span></#if>
               </label>
@@ -230,14 +251,14 @@
           </section>
 
           <section class="wizard-passo" data-passo="2" aria-labelledby="passo-2-titulo" hidden>
-            <span class="kicker">Passo 2 de 5</span>
+            <span class="kicker" data-kicker>Passo 2 de 5</span>
             <h1 id="passo-2-titulo">De onde o ônibus sai?</h1>
             <p class="wizard-passo__sub">Comece pelo CEP: o endereço é preenchido e o ponto aparece no mapa.</p>
             <@ponto p=form.partida prefixo="partida" tipo="inicio" titulo="Partida" sub="Onde o ônibus sai" horarioRotulo="Saída às"/>
           </section>
 
           <section class="wizard-passo" data-passo="3" aria-labelledby="passo-3-titulo" hidden>
-            <span class="kicker">Passo 3 de 5</span>
+            <span class="kicker" data-kicker>Passo 3 de 5</span>
             <h1 id="passo-3-titulo">O ônibus para em mais algum lugar?</h1>
             <p class="wizard-passo__sub">Adicione onde ele pega mais doadores, na ordem do caminho. Se ele vai direto, é só continuar.</p>
             <div class="paradas" id="paradas"><#list form.paradas as parada><@ponto p=parada prefixo="paradas[${parada?index}]" tipo="parada" titulo="Parada ${parada?counter}" sub="O ônibus passa e pega mais doadores" horarioRotulo="Passa às" rotulo="${parada?counter}"/></#list></div>
@@ -245,14 +266,14 @@
           </section>
 
           <section class="wizard-passo" data-passo="4" aria-labelledby="passo-4-titulo" hidden>
-            <span class="kicker">Passo 4 de 5</span>
-            <h1 id="passo-4-titulo">Onde acontece a doação?</h1>
+            <span class="kicker" data-kicker>Passo 4 de 5</span>
+            <h1 id="passo-4-titulo" data-titulo-bus="Onde acontece a doação?" data-titulo-encontro="Onde as pessoas vão se encontrar?">Onde acontece a doação?</h1>
             <p class="wizard-passo__sub">Escolha um hemocentro de SP na lista (ou clicando na gota do mapa), ou digite o endereço.</p>
             <@ponto p=form.destino prefixo="destino" tipo="fim" titulo="Hemocentro" sub="Onde acontece a doação" horarioRotulo="Doação às"/>
           </section>
 
           <section class="wizard-passo" data-passo="5" aria-labelledby="passo-5-titulo" hidden>
-            <span class="kicker">Passo 5 de 5</span>
+            <span class="kicker" data-kicker>Passo 5 de 5</span>
             <h1 id="passo-5-titulo"><#if novo>Tudo certo para publicar?<#else>Revise e salve</#if></h1>
             <p class="wizard-passo__sub"><#if novo>Confira antes de abrir as inscrições.<#else>Toque em “Editar” para mudar qualquer parte.</#if></p>
             <div class="revisao" id="revisao" aria-live="polite"></div>

@@ -27,6 +27,7 @@ import com.rotasolidaria.models.Donor;
 import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.enums.BloodType;
 import com.rotasolidaria.models.enums.RegistrationStatus;
+import com.rotasolidaria.models.enums.TransportMode;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
 import com.rotasolidaria.repositories.OrganizerRepository;
@@ -147,6 +148,41 @@ public class DataInitializer implements CommandLineRunner {
 
         completarEmbarqueDaCampanhaDemo();
         transactionTemplate.executeWithoutResult(status -> completarRotaDaCampanhaDemo());
+        transactionTemplate.executeWithoutResult(status -> criarCampanhaDeEncontroDemo());
+    }
+
+    // Campanha de demonstração no modo Encontro (sem ônibus), para bancos novos e antigos
+    private void criarCampanhaDeEncontroDemo() {
+        if (campanhaRepository.findAll().stream().anyMatch(Campaign::isMeeting)) {
+            return;
+        }
+        Organizer organizador = campanhaRepository.findAll().stream()
+                .map(Campaign::getOrganizer).findFirst().orElse(null);
+        if (organizador == null) {
+            return;
+        }
+        Location hemocentro = new Location();
+        hemocentro.setName("Hemocentro de Sorocaba - Colsan");
+        hemocentro.setStreet("Av. Comendador Camilo Julião");
+        hemocentro.setNumber("1000");
+        hemocentro.setNeighborhood("Vila Jardini");
+        hemocentro.setCity("Sorocaba");
+        hemocentro.setState("SP");
+        hemocentro.setLatitude(new BigDecimal("-23.4871000"));
+        hemocentro.setLongitude(new BigDecimal("-47.4586000"));
+        localizacaoRepository.save(hemocentro);
+
+        Campaign c = new Campaign();
+        c.setTitle("Encontro Solidário no Colsan");
+        c.setDescription("Doação de sangue sem transporte: você vai por conta própria e nos encontramos no hemocentro.");
+        c.setEventDate(LocalDate.now().plusDays(20));
+        c.setDonationTime(LocalTime.of(9, 0));
+        c.setSlots(30);
+        c.setStatus(CampaignStatus.OPEN);
+        c.setTransportMode(TransportMode.MEETING);
+        c.setDonationLocation(hemocentro);
+        c.setOrganizer(organizador);
+        campanhaRepository.save(c);
     }
 
     private User criarConta(String nome, String email, String telefone) {

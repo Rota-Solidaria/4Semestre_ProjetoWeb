@@ -3,7 +3,8 @@
  * É um formulário só: cada passo é uma seção mostrada por vez, e o servidor recebe tudo ao publicar.
  * - "Continuar" confere os campos do passo antes de avançar; ao publicar, confere todos.
  * - Numa campanha nova, o rascunho fica guardado neste navegador até publicar.
- * - O mapa (rota-editor.js) aparece do passo 2 em diante e destaca o ponto do passo. */
+ * - O mapa (rota-editor.js) aparece do passo 2 em diante e destaca o ponto do passo.
+ * - No modo Encontro (sem ônibus) os passos 2 e 3 somem: 1 Campanha · 4 Hemocentro · 5 Revisar. */
 (function () {
   'use strict';
 
@@ -11,7 +12,7 @@
   var form = document.getElementById('rota-form');
   if (!wizard || !form) { return; }
 
-  var TOTAL = 5;
+  var TOTAL = 5; // número do último passo (Revisar)
   var NOMES = ['Campanha', 'Partida', 'Paradas', 'Hemocentro', 'Revisar'];
   var novo = wizard.dataset.novo === 'true';
   var CHAVE_RASCUNHO = 'rs-rascunho-nova-campanha';
@@ -29,6 +30,26 @@
 
   var atual = parseInt(wizard.dataset.passoInicial, 10) || 1;
   var alcancado = novo ? atual : TOTAL; // editando, todos os passos ficam liberados
+
+  /* ---------- Modo: ônibus (5 passos) ou encontro (sem partida nem paradas) ---------- */
+
+  function encontro() {
+    var marcado = form.querySelector('input[name="modo"]:checked') || form.querySelector('input[type="hidden"][name="modo"]');
+    return !!marcado && marcado.value === 'MEETING';
+  }
+
+  /** Números dos passos que existem no modo atual, em ordem. */
+  function ativos() {
+    return encontro() ? [1, 4, 5] : [1, 2, 3, 4, 5];
+  }
+
+  /** Passo vizinho ao passo n (dir = 1 adiante, -1 atrás), ou o próprio n na ponta. */
+  function vizinho(n, dir) {
+    var lista = ativos();
+    var i = lista.indexOf(n);
+    if (i < 0) { return n; }
+    return lista[Math.max(0, Math.min(lista.length - 1, i + dir))];
+  }
 
   // Validação é feita por passo (os campos dos passos escondidos não podem receber foco)
   form.noValidate = true;
@@ -54,6 +75,8 @@
   function irPara(n, opcoes) {
     opcoes = opcoes || {};
     n = Math.max(1, Math.min(TOTAL, n));
+    var lista = ativos();
+    if (lista.indexOf(n) < 0) { n = lista.filter(function (a) { return a > n; })[0] || TOTAL; }
     var anterior = atual;
     atual = n;
     alcancado = Math.max(alcancado, n);
@@ -73,12 +96,12 @@
       var p = parseInt(item.dataset.ir, 10);
       item.classList.toggle('is-atual', p === n);
       item.classList.toggle('is-feito', p < n || (p !== n && p <= alcancado && passoCompleto(p)));
-      item.disabled = p > alcancado;
+      item.disabled = p > alcancado || lista.indexOf(p) < 0;
       if (p === n) { item.setAttribute('aria-current', 'step'); } else { item.removeAttribute('aria-current'); }
     });
 
-    barra.style.width = (n / TOTAL * 100) + '%';
-    textoProgresso.textContent = n + ' de ' + TOTAL;
+    barra.style.width = ((lista.indexOf(n) + 1) / lista.length * 100) + '%';
+    textoProgresso.textContent = (lista.indexOf(n) + 1) + ' de ' + lista.length;
 
     botaoVoltar.hidden = n === 1;
     botaoAvancar.hidden = n === TOTAL;
@@ -103,7 +126,7 @@
   function rotuloAvancar(n) {
     if (n >= TOTAL) { return ''; }
     if (n === 3) { return paradas().length ? 'Continuar: hemocentro' : 'Continuar sem paradas'; }
-    return 'Continuar: ' + NOMES[n].toLowerCase();
+    return 'Continuar: ' + NOMES[vizinho(n, 1) - 1].toLowerCase();
   }
 
   /** O mapa aparece do passo 2 em diante; ao entrar num passo de ponto, o pino dele salta. */
@@ -123,6 +146,50 @@
       }
     });
   }
+
+  /** Mostra ou esconde os passos de ônibus (2 e 3) e reescreve os textos que dependem do modo. */
+  function aplicarModo() {
+    var direto = encontro();
+    var lista = ativos();
+
+    [2, 3].forEach(function (n) {
+      var s = secao(n);
+      s.toggleAttribute('data-inativo', direto);
+      // Campos desabilitados não são validados nem enviados: o servidor recebe só o que vale no modo
+      Array.prototype.forEach.call(s.querySelectorAll('input, select, textarea'), function (c) { c.disabled = direto; });
+    });
+    itensPasso.forEach(function (item) {
+      var p = parseInt(item.dataset.ir, 10);
+      var ativo = lista.indexOf(p) >= 0;
+      var li = item.closest('li');
+      if (li && (p === 2 || p === 3)) { li.hidden = !ativo; }
+      item.querySelector('.wizard-passos__num').textContent = String(lista.indexOf(p) + 1 || p);
+    });
+    secoes.forEach(function (s, i) {
+      var k = s.querySelector('[data-kicker]');
+      if (k && lista.indexOf(i + 1) >= 0) { k.textContent = 'Passo ' + (lista.indexOf(i + 1) + 1) + ' de ' + lista.length; }
+    });
+
+    var titulo = secao(4).querySelector('h1');
+    titulo.textContent = direto ? titulo.dataset.tituloEncontro : titulo.dataset.tituloBus;
+    var rotuloVagas = form.querySelector('[data-rotulo-vagas]');
+    if (rotuloVagas) { rotuloVagas.textContent = direto ? 'Vagas' : 'Vagas no ônibus'; }
+    var dicaRota = form.querySelector('.previa-doador__dica');
+    if (dicaRota) {
+      dicaRota.textContent = direto ? 'Os doadores vão direto ao hemocentro, sem ônibus.'
+        : 'A rota aparece aqui quando você montar a partida e o hemocentro.';
+    }
+    var rota = form.querySelector('.previa-doador__rota');
+    if (rota) { rota.hidden = direto; }
+  }
+
+  form.addEventListener('change', function (e) {
+    if (!e.target.matches || !e.target.matches('input[name="modo"]')) { return; }
+    aplicarModo();
+    // Se o passo atual sumiu (ex.: estava na partida), irPara leva ao próximo passo que existe
+    irPara(atual, { semRolar: true, focar: false, inicial: true });
+    atualizarPrevia();
+  });
 
   /* ---------- Validação por passo ---------- */
 
@@ -146,9 +213,9 @@
   }
 
   botaoAvancar.addEventListener('click', function () {
-    if (validar(atual)) { irPara(atual + 1); }
+    if (validar(atual)) { irPara(vizinho(atual, 1)); }
   });
-  botaoVoltar.addEventListener('click', function () { irPara(atual - 1); });
+  botaoVoltar.addEventListener('click', function () { irPara(vizinho(atual, -1)); });
   itensPasso.forEach(function (item) {
     item.addEventListener('click', function () {
       var p = parseInt(item.dataset.ir, 10);
@@ -158,8 +225,9 @@
   });
 
   form.addEventListener('submit', function (e) {
-    for (var n = 1; n < TOTAL; n++) {
-      if (!validar(n)) {
+    var lista = ativos();
+    for (var i = 0; i < lista.length - 1; i++) {
+      if (!validar(lista[i])) {
         e.preventDefault();
         return;
       }
@@ -222,19 +290,21 @@
     textos.appendChild(el('strong', 'revisao__titulo', valor(form, 'titulo') || 'Sem título'));
     var data = valor(form, 'data');
     var vagas = valor(form, 'vagas');
-    textos.appendChild(el('span', null, [data ? dataBr(data) : 'Sem data', vagas ? vagas + ' vagas' : null,
+    textos.appendChild(el('span', null, [data ? dataBr(data) : 'Sem data', vagas ? vagas + ' vagas' : null, encontro() ? 'encontro no local' : null,
       novo ? 'inscrições abrem ao publicar' : null].filter(Boolean).join(' · ')));
     cartao.appendChild(textos);
     cartao.appendChild(linkEditar(1));
     revisao.appendChild(cartao);
 
     // Rota
+    var direto = encontro();
     var rota = el('div', 'revisao__cartao revisao__cartao--rota');
     var topo = el('div', 'revisao__topo');
-    topo.appendChild(el('strong', 'revisao__titulo', 'Rota do ônibus'));
+    topo.appendChild(el('strong', 'revisao__titulo', direto ? 'Local de encontro' : 'Rota do ônibus'));
     rota.appendChild(topo);
     var lista = el('ol', 'revisao__rota');
-    var pontos = [form.querySelector('[data-ponto][data-tipo="inicio"]')].concat(paradas(), [form.querySelector('[data-ponto][data-tipo="fim"]')]);
+    var fim = form.querySelector('[data-ponto][data-tipo="fim"]');
+    var pontos = direto ? [fim] : [form.querySelector('[data-ponto][data-tipo="inicio"]')].concat(paradas(), [fim]);
     pontos.forEach(function (bloco, i) {
       var tipo = bloco.dataset.tipo;
       var li = el('li', 'revisao__ponto revisao__ponto--' + tipo);
@@ -256,7 +326,10 @@
     var horarios = pontos.map(function (b) { return valor(b, 'horario'); }).filter(Boolean);
     var emOrdem = horarios.every(function (h, i) { return i === 0 || h > horarios[i - 1]; });
     var destino = pontos[pontos.length - 1];
-    var itens = [
+    var itens = direto ? [
+      { ok: semMapa === 0, texto: semMapa === 0 ? 'O local está no mapa (o Waze usa esse ponto)' : 'O local ainda não está no mapa', passo: 4 },
+      { ok: !!valor(destino, 'nome') && !!valor(destino, 'cidade'), texto: valor(destino, 'nome') ? 'Hemocentro definido' : 'Falta escolher o hemocentro', passo: 4 }
+    ] : [
       { ok: emOrdem, texto: emOrdem ? 'Horários seguem a ordem da rota' : 'Há um horário fora da ordem da rota', passo: 3 },
       { ok: semMapa === 0, texto: semMapa === 0 ? 'Todos os pontos estão no mapa'
         : semMapa + (semMapa === 1 ? ' ponto ainda não está no mapa' : ' pontos ainda não estão no mapa'), passo: 2 },
@@ -354,6 +427,7 @@
       });
     });
     restaurando = false;
+    aplicarModo();
     atualizarPrevia();
     if (editor()) { editor().atualizar(true); }
     irPara(Math.min(rascunho.passo || 1, TOTAL));
@@ -404,6 +478,7 @@
   });
   ajustarEcg();
 
+  aplicarModo();
   atualizarPrevia();
   irPara(atual, { semRolar: true, focar: false, inicial: true });
   oferecerRascunho();

@@ -6,6 +6,15 @@
       "runtimeExecutable": "./mvnw",
       "runtimeArgs": ["spring-boot:run"],
       "port": 8082
+    },
+    {
+      "name": "rotasolidaria-teste",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["MAIL_HOST=localhost", "MAIL_PORT=1025", "MAIL_SMTP_AUTH=false", "MAIL_STARTTLS_REQUIRED=false",
+                      "MAIL_USERNAME=", "MAIL_PASSWORD=", "MAIL_FROM=nao-responda@rotasolidaria.local",
+                      "GOOGLE_CLIENT_ID=teste-local.apps.googleusercontent.com", "GOOGLE_CLIENT_SECRET=teste-local",
+                      "./mvnw", "spring-boot:run"],
+      "port": 8082
     }
   ]
 }

@@ -6,6 +6,7 @@ import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Organizer;
 import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.RegistrationStatus;
+import com.rotasolidaria.models.enums.TransportMode;
 import com.rotasolidaria.repositories.CampanhaRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
 import com.rotasolidaria.repositories.OrganizerRepository;
@@ -59,6 +60,7 @@ public class OrganizadorCampanhaService {
         CampanhaForm form = new CampanhaForm();
         form.setVagas(40);
         form.setStatus(CampaignStatus.OPEN);
+        form.setModo(TransportMode.BUS);
         form.setImagemUrl(IMAGENS.get(0));
         return form;
     }
@@ -71,6 +73,7 @@ public class OrganizadorCampanhaService {
         form.setData(campaign.getEventDate());
         form.setVagas(campaign.getSlots());
         form.setStatus(campaign.getStatus());
+        form.setModo(campaign.getTransportMode());
         if (campaign.getImageUrl() == null || IMAGENS.contains(campaign.getImageUrl())) {
             form.setImagemUrl(campaign.getImageUrl() == null ? IMAGENS.get(0) : campaign.getImageUrl());
         } else {
@@ -127,7 +130,11 @@ public class OrganizadorCampanhaService {
             throw new BusinessException("Informe a data da campanha.");
         }
         if (form.getVagas() == null || form.getVagas() < 1) {
-            throw new BusinessException("Informe quantas vagas o ônibus tem.");
+            throw new BusinessException(form.getModo() == TransportMode.MEETING
+                    ? "Informe quantas vagas a campanha tem." : "Informe quantas vagas o ônibus tem.");
+        }
+        if (campaign.getId() != null && inscritos > 0 && campaign.getTransportMode() != form.getModo()) {
+            throw new BusinessException("Já há " + inscritos + " doadores inscritos: não dá para mudar entre ônibus e encontro.");
         }
         if (form.getVagas() < inscritos) {
             throw new BusinessException("Já há " + inscritos + " doadores inscritos: as vagas não podem ficar abaixo disso.");
@@ -138,6 +145,7 @@ public class OrganizadorCampanhaService {
         campaign.setDescription(descricao == null || descricao.isEmpty() ? null : descricao);
         campaign.setEventDate(form.getData());
         campaign.setSlots(form.getVagas());
+        campaign.setTransportMode(form.getModo());
         campaign.setImageUrl(imagem(form));
     }
 

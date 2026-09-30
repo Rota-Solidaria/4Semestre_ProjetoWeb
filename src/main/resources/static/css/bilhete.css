@@ -101,6 +101,8 @@ input,select,textarea{font:inherit;color:inherit}
 .ticket__stop{display:flex;flex-direction:column;gap:4px;min-width:0}
 .ticket__stop strong{font:800 clamp(20px,3vw,26px)/1.1 Archivo,sans-serif;letter-spacing:-.02em}
 .ticket__stop--end{align-items:flex-end;text-align:right}
+.ticket__route--encontro{justify-content:space-between}
+.ticket__route-icon{font-size:40px;color:var(--brand)}
 .ticket__path{flex:1;display:flex;align-items:center;gap:6px;color:var(--brand);min-width:48px}
 .ticket__path .line{flex:1;border-top:2px dashed var(--border2)}
 .ticket__path .icon{font-size:24px}

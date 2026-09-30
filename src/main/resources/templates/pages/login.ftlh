@@ -22,6 +22,8 @@
           </div>
           <button class="btn btn-primary" type="submit">Entrar</button>
         </form>
+        <#assign googleLabel = "Entrar com Google">
+        <#include "../includes/google-login.ftlh">
         <p class="login-foot">Ainda não possui cadastro? <a href="/cadastro">Criar conta</a></p>
       </div>
     </div>

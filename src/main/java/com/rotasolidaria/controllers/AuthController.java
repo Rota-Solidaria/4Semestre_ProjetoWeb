@@ -42,7 +42,9 @@ public class AuthController {
         if (principal != null) {
             return "redirect:/campanhas";
         }
-        if (erro != null) {
+        if ("google".equals(erro)) {
+            model.addAttribute("toast", Toast.error("Não foi possível entrar com o Google", "Tente novamente ou entre com e-mail e senha."));
+        } else if (erro != null) {
             model.addAttribute("toast", Toast.error("E-mail ou senha inválidos", "Confira os dados ou redefina sua senha.")
                     .withAction("Redefinir senha", "/esqueci-senha"));
         }

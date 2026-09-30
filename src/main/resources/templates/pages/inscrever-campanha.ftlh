@@ -20,7 +20,7 @@
         <div class="signup-intro">
           <span class="kicker">Inscrição</span>
           <h1>Reservar sua vaga</h1>
-          <p>Confira seus dados, escolha onde embarcar e pronto: o bilhete sai na hora.</p>
+          <p><#if campanha.meeting>Confira seus dados e pronto: o bilhete sai na hora.<#else>Confira seus dados, escolha onde embarcar e pronto: o bilhete sai na hora.</#if></p>
         </div>
 
         <section class="signup-section" aria-labelledby="sec-dados">
@@ -39,6 +39,29 @@
           </div>
         </section>
 
+        <#if campanha.meeting>
+          <#-- Modo Encontro: não há ônibus nem escolha de embarque, cada um chega ao hemocentro -->
+          <section class="signup-section" aria-labelledby="sec-encontro">
+            <h2 id="sec-encontro"><span class="signup-num" aria-hidden="true">2</span>Encontro no hemocentro</h2>
+            <div class="boarding-options">
+              <div class="boarding-card boarding-card--fixo">
+                <span class="boarding-card__text">
+                  <#if campanha.donationLocation??>
+                    <#assign dl = campanha.donationLocation>
+                    <#assign endereco = []>
+                    <#if dl.street??><#assign endereco += [dl.street + (dl.number??)?then(", " + dl.number!"", "")]></#if>
+                    <#if dl.neighborhood??><#assign endereco += [dl.neighborhood]></#if>
+                    <#if dl.city??><#assign endereco += [dl.city + (dl.state??)?then(" - " + dl.state!"", "")]></#if>
+                    <strong>${dl.name}</strong>
+                    <#if endereco?has_content><span>${endereco?join(" — ")}</span></#if>
+                  </#if>
+                  <span><#if campanha.donationTime??>Encontro às <span class="mono">${campanha.donationTime}</span> · <#else>Horário a confirmar · </#if>você chega por conta própria</span>
+                </span>
+                <span class="icon boarding-card__icon" aria-hidden="true">directions_car</span>
+              </div>
+            </div>
+          </section>
+        <#else>
         <fieldset class="signup-section">
           <legend><span class="signup-num" aria-hidden="true">2</span>Onde você vai embarcar?</legend>
           <div class="boarding-options">
@@ -60,6 +83,7 @@
             </#list>
           </div>
         </fieldset>
+        </#if>
 
         <section class="signup-section">
           <h2><span class="signup-num" aria-hidden="true">3</span><span class="signup-heading"><label for="rs-obs">Algo que o organizador precise saber?</label><span class="signup-optional">opcional</span></span></h2>
@@ -90,6 +114,7 @@
           </#if>
 
           <ol class="summary__route">
+            <#if !campanha.meeting>
             <li data-embarque="<#if campanha.departureLocation??>${campanha.departureLocation.id?c}<#else>cidade</#if>">
               <span class="summary__dot" aria-hidden="true"></span>
               <span class="summary__stop">
@@ -106,6 +131,7 @@
                 </span>
               </li>
             </#list>
+            </#if>
             <li data-embarque="proprio">
               <span class="summary__dot summary__dot--end" aria-hidden="true"></span>
               <span class="summary__stop">
@@ -121,7 +147,7 @@
           <button class="btn btn-primary btn-lg summary__cta" type="submit" form="inscricao-form"<#if vagasRestantes lte 0> disabled</#if>>
             Confirmar inscrição<span class="icon" aria-hidden="true">arrow_forward</span>
           </button>
-          <span class="summary__note"><span class="icon" aria-hidden="true">confirmation_number</span>Você recebe o bilhete de embarque na hora.</span>
+          <span class="summary__note"><span class="icon" aria-hidden="true">confirmation_number</span>Você recebe o bilhete <#if !campanha.meeting>de embarque </#if>na hora.</span>
         </div>
       </aside>
     </div>

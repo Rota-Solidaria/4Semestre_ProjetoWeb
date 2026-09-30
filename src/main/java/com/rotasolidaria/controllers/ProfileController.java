@@ -80,6 +80,8 @@ public class ProfileController {
         }
 
         model.addAttribute("usuario", user);
+        // Contas criadas pelo Google começam sem senha: o perfil oferece "Definir senha"
+        model.addAttribute("temSenha", user.hasPassword());
         model.addAttribute("isDonor", isDonor);
         model.addAttribute("donor", donor);
         model.addAttribute("inscricoes", inscricoes);
@@ -173,7 +175,8 @@ public class ProfileController {
         // Alteração de senha, se solicitada
         if (novaSenha != null && !novaSenha.isBlank()) {
             // Os demais dados já foram salvos acima; só a troca de senha é recusada
-            if (senhaAtual == null || !passwordEncoder.matches(senhaAtual, user.getPasswordHash())) {
+            // Quem entrou pelo Google e ainda não tem senha pode defini-la sem informar a atual
+            if (user.hasPassword() && (senhaAtual == null || !passwordEncoder.matches(senhaAtual, user.getPasswordHash()))) {
                 redirectAttributes.addFlashAttribute("toast",
                         Toast.error("Senha não alterada", "Seus dados foram salvos, mas a senha atual está incorreta."));
                 return "redirect:/perfil";

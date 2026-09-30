@@ -129,6 +129,8 @@ input,select,textarea{font:inherit;color:inherit}
 .boarding-card input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--brand-fill,var(--brand))}
 .boarding-card:has(input:checked){border:2px solid var(--brand);padding:15px;background:var(--brand-soft)}
 .boarding-card:has(input:focus-visible){outline:3px solid #B4232A59;outline-offset:2px}
+.boarding-card--fixo{grid-column:1 / -1;cursor:default}
+.boarding-card--fixo:hover{border-color:var(--border2)}
 .boarding-card__text{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 .boarding-card__text strong{font-size:15px}
 .boarding-card__text > span{font-size:14px;color:var(--text2)}

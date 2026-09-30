@@ -264,13 +264,17 @@
           <div class="password-section">
             <div class="password-toggle-title">
               <span class="icon">lock</span>
-              <span>Alterar Senha de Acesso</span>
+              <span><#if temSenha>Alterar Senha de Acesso<#else>Definir Senha de Acesso</#if></span>
             </div>
 
+            <#if temSenha>
             <div class="form-field">
               <label for="prof-senha-atual">Senha Atual</label>
               <input id="prof-senha-atual" name="senhaAtual" type="password" data-password autocomplete="current-password" placeholder="Digite apenas se desejar trocar">
             </div>
+            <#else>
+            <p class="password-hint">Você entra com o Google. Defina uma senha para entrar também com e-mail e senha.</p>
+            </#if>
 
             <div class="form-field">
               <label for="prof-nova-senha">Nova Senha</label>
