@@ -1,13 +1,27 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Detalhes da Campanha" css="/css/detalhes-campanha.css" currentNav="campanhas">
+<#-- Atributos do ponto usados pelo mapa (static/js/rota-mapa.js); ?c evita a vírgula decimal do pt-BR -->
+<#macro pontoMapa tipo local="" rotulo="" meu=false horario="">
+  <#if local?has_content && local.hasCoordinates()> data-lat="${local.latitude?c}" data-lng="${local.longitude?c}" data-nome="${local.name}" data-tipo="${tipo}" data-rotulo="${rotulo}"<#if horario?has_content> data-horario="${horario}"</#if><#if meu> data-meu="true"</#if></#if>
+</#macro>
+
+<#-- O doador logado embarca neste local? (meuEmbarqueId vem do CampaignController) -->
+<#function ehMeuEmbarque local>
+  <#return meuEmbarqueId?? && local?has_content && local.id?? && local.id == meuEmbarqueId>
+</#function>
+
+<#macro seloVoce texto="Você embarca aqui">
+  <span class="route__voce"><span class="icon" aria-hidden="true">person_pin_circle</span>${texto}</span>
+</#macro>
+
+<@main.layout title="Detalhes da Campanha" css="/css/detalhes-campanha.css" currentNav="campanhas" mapa=true>
   <main>
     <div class="container section detail-section">
       <a class="back-link" href="/campanhas"><span class="icon">arrow_back</span>Voltar para campanhas</a>
 
       <div class="detail-card">
         <div class="detail-img">
-          <img src="/images/doacaodesangue.jpeg" alt="${campanha.title}">
+          <img src="${campanha.imageUrl!"/images/doacaodesangue.jpeg"}" alt="${campanha.title}">
         </div>
         <div class="detail-body">
           <div class="detail-top">
@@ -46,11 +60,13 @@
                 <span class="icon-box"><span class="icon">place</span></span>
                 <div>
                   <div class="info-title">${campanha.donationLocation.name}</div>
-                  <div class="info-sub">
-                    ${campanha.donationLocation.street}, ${campanha.donationLocation.number}
-                    <#if campanha.donationLocation.neighborhood??> — ${campanha.donationLocation.neighborhood}</#if>,
-                    ${campanha.donationLocation.city} - ${campanha.donationLocation.state}
-                  </div>
+                  <#-- Rua, número e bairro são opcionais no cadastro da rota -->
+                  <#assign dl = campanha.donationLocation>
+                  <#assign endereco = []>
+                  <#if dl.street??><#assign endereco += [dl.street + (dl.number??)?then(", " + dl.number!"", "")]></#if>
+                  <#if dl.neighborhood??><#assign endereco += [dl.neighborhood]></#if>
+                  <#if dl.city??><#assign endereco += [dl.city + (dl.state??)?then(" - " + dl.state!"", "")]></#if>
+                  <div class="info-sub">${endereco?join(" — ")}</div>
                 </div>
               </div>
             </#if>
@@ -73,20 +89,39 @@
           <section class="route" aria-labelledby="route-title">
             <span class="kicker">Como chegar</span>
             <h2 id="route-title">O ônibus leva você até o hemocentro</h2>
-            <ol class="route__stops">
-              <li class="route__stop">
+            <#if meuEmbarqueNome??>
+              <p class="route__meu"><span class="icon" aria-hidden="true">confirmation_number</span><span>Seu embarque: <strong>${meuEmbarqueNome}</strong><#if meuEmbarqueHorario??> às <strong class="mono">${meuEmbarqueHorario}</strong></#if></span></p>
+            <#elseif vouDireto??>
+              <p class="route__meu"><span class="icon" aria-hidden="true">directions_car</span><span>Você vai por conta própria<#if campanha.donationTime??>: encontro no hemocentro às <strong class="mono">${campanha.donationTime}</strong></#if></span></p>
+            </#if>
+            <ol class="route__stops<#if campanha.stops?has_content> route__stops--multi</#if>">
+              <#assign meu = ehMeuEmbarque(campanha.departureLocation!)>
+              <li class="route__stop<#if meu> route__stop--meu</#if>"<@pontoMapa local=campanha.departureLocation! tipo="inicio" meu=meu horario=(campanha.departureTime?string)!""/>>
                 <span class="route__dot route__dot--start"><span class="icon" aria-hidden="true">directions_bus</span></span>
                 <div class="route__text">
                   <span class="route__time"><#if campanha.departureTime??>Saída ${campanha.departureTime}<#else>Horário a confirmar</#if></span>
-                  <strong>Embarque</strong>
+                  <strong>Partida</strong>
                   <#if campanha.departureLocation??>
                     <span>${campanha.departureLocation.name}<#if campanha.departureLocation.city??>, ${campanha.departureLocation.city}</#if></span>
                   <#else>
                     <span>Na sua cidade — o organizador confirma o ponto</span>
                   </#if>
+                  <#if meu><@seloVoce/></#if>
                 </div>
               </li>
-              <li class="route__stop route__stop--end">
+              <#list campanha.stops as parada>
+                <#assign meu = ehMeuEmbarque(parada.location)>
+                <li class="route__stop route__stop--mid<#if meu> route__stop--meu</#if>"<@pontoMapa local=parada.location tipo="parada" rotulo=parada?counter meu=meu horario=(parada.stopTime?string)!""/>>
+                  <span class="route__dot route__dot--stop" aria-hidden="true">${parada?counter}</span>
+                  <div class="route__text">
+                    <span class="route__time"><#if parada.stopTime??>${parada.stopTime}<#else>Horário a confirmar</#if></span>
+                    <strong>Parada ${parada?counter}</strong>
+                    <span>${parada.location.name}<#if parada.location.city??>, ${parada.location.city}</#if></span>
+                    <#if meu><@seloVoce/></#if>
+                  </div>
+                </li>
+              </#list>
+              <li class="route__stop route__stop--end<#if vouDireto??> route__stop--meu</#if>"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=vouDireto?? horario=(campanha.donationTime?string)!""/>>
                 <span class="route__dot route__dot--end"><span class="icon" aria-hidden="true">bloodtype</span></span>
                 <div class="route__text">
                   <span class="route__time"><#if campanha.donationTime??>Doação ${campanha.donationTime}<#else>Horário a confirmar</#if></span>
@@ -94,9 +129,24 @@
                   <#if campanha.donationLocation??>
                     <span>${campanha.donationLocation.name}<#if campanha.donationLocation.city??>, ${campanha.donationLocation.city}</#if></span>
                   </#if>
+                  <#if vouDireto??><@seloVoce texto="Você vai direto"/></#if>
                 </div>
               </li>
             </ol>
+            <div class="route__map" data-rota-mapa-bloco>
+              <div class="rota-mapa" data-rota-mapa=".route__stop[data-lat]" data-rota-resumo="#rota-resumo" role="region" aria-label="Mapa com o trajeto do ônibus e os hemocentros de SP"></div>
+              <div class="route__legenda">
+                <span class="rota-mapa-legenda" id="rota-resumo" aria-live="polite"></span>
+                <ul class="route__simbolos" aria-label="Legenda do mapa">
+                  <li><span class="simbolo simbolo--partida" aria-hidden="true"></span>Partida</li>
+                  <#if campanha.stops?has_content><li><span class="simbolo simbolo--parada" aria-hidden="true"></span>Parada</li></#if>
+                  <#if meuEmbarqueNome??><li><span class="simbolo simbolo--meu" aria-hidden="true"></span>Seu embarque</li></#if>
+                  <li><span class="simbolo simbolo--hemocentro" aria-hidden="true"></span>Hemocentro da campanha</li>
+                  <li><span class="simbolo simbolo--outros" aria-hidden="true"></span>Outros hemocentros</li>
+                  <#if meuEmbarqueNome?? && !(campanha.departureLocation?? && meuEmbarqueId?? && campanha.departureLocation.id == meuEmbarqueId)><li><span class="simbolo simbolo--antes" aria-hidden="true"></span>Antes do seu embarque</li></#if>
+                </ul>
+              </div>
+            </div>
           </section>
 
           <div class="notice-box">

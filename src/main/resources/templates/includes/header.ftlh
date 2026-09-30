@@ -27,6 +27,11 @@
             <a class="dropdown-item" href="/perfil#editar">
               <span class="icon">edit</span>Editar Perfil
             </a>
+            <#if ehOrganizador!false>
+              <a class="dropdown-item" href="/organizador/campanhas">
+                <span class="icon">route</span>Minhas campanhas
+              </a>
+            </#if>
             <div class="dropdown-divider"></div>
             <form class="logout-form" method="post" action="/logout">
               <#include "csrf.ftlh">

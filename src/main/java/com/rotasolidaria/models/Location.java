@@ -37,6 +37,13 @@ public class Location {
     
     @Column(name = "reference_point", length = 200)
     private String referencePoint;
+
+    // Coordenadas do ponto no mapa (preenchidas pela busca do endereço ou pelo pin)
+    @Column(precision = 10, scale = 7)
+    private BigDecimal latitude;
+
+    @Column(precision = 10, scale = 7)
+    private BigDecimal longitude;
     
     // Getters e Setters
     
@@ -118,6 +125,26 @@ public class Location {
 
     public void setReferencePoint(String referencePoint) {
         this.referencePoint = referencePoint;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
+    public boolean hasCoordinates() {
+        return latitude != null && longitude != null;
     }
 
 }

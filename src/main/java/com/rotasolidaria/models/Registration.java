@@ -37,6 +37,11 @@ public class Registration {
     @Column(name = "boarding_point", length = 160)
     private String boardingPoint;
 
+    // Ponto da rota escolhido para embarcar (partida ou parada); nulo = vai por conta própria
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "boarding_location_id")
+    private Location boardingLocation;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
@@ -93,6 +98,14 @@ public class Registration {
 
     public void setBoardingPoint(String boardingPoint) {
         this.boardingPoint = boardingPoint;
+    }
+
+    public Location getBoardingLocation() {
+        return boardingLocation;
+    }
+
+    public void setBoardingLocation(Location boardingLocation) {
+        this.boardingLocation = boardingLocation;
     }
 
     /** Código exibido no bilhete de embarque, ex.: RS-00042. */

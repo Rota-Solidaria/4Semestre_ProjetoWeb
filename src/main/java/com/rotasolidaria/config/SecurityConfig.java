@@ -15,6 +15,7 @@ public class SecurityConfig {
         http
                 // Rotas que exigem login; todo o resto é público
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/organizador/**").hasRole("ORGANIZER")
                         .requestMatchers("/perfil/**", "/campanhas/*/inscrever", "/inscricoes/**").authenticated()
                         .anyRequest().permitAll())
                 // O Spring Security processa o POST /login do formulário em pages/login.ftlh

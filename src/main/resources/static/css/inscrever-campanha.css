@@ -154,7 +154,12 @@ input,select,textarea{font:inherit;color:inherit}
 .summary__route li{position:relative;display:flex;gap:12px}
 .summary__dot{width:14px;height:14px;margin-top:3px;flex:none;box-sizing:border-box;border-radius:50%;background:var(--brand-fill,var(--brand))}
 .summary__dot--end{background:var(--surface);border:3px solid var(--brand)}
+.summary__dot--stop{width:10px;height:10px;margin:5px 2px 0;background:var(--surface);border:2px solid var(--text2)}
 .summary__stop{display:flex;flex-direction:column;gap:2px;font-size:14px}
+.summary__route li.is-escolhido .summary__dot{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--brand)}
+.summary__route li.is-escolhido .summary__stop .mono{color:var(--brand);font-weight:600}
+.summary__route li.is-escolhido .summary__stop .mono::after{content:" · seu embarque"}
+.summary__route li.is-escolhido[data-embarque="proprio"] .summary__stop .mono::after{content:" · você vai direto"}
 .summary__stop span:last-child{color:var(--text2)}
 .summary__divider{border-top:1px solid var(--border)}
 .summary__cta{width:100%}

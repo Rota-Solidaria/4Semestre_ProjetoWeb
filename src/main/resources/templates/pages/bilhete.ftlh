@@ -5,7 +5,7 @@
     <div class="ticket-page">
       <div class="ticket-intro">
         <span class="ticket-status"><span class="icon" aria-hidden="true">check_circle</span>Inscrição confirmada</span>
-        <#if (inscricao.boardingPoint!"") == "Vou por conta própria">
+        <#if !vaiDeOnibus>
           <h1>Sua inscrição está confirmada</h1>
           <p>Mostre este bilhete no hemocentro. Ele também fica salvo em Minhas inscrições.</p>
         <#else>
@@ -34,8 +34,8 @@
 
           <dl class="ticket__data">
             <div><dt>Data</dt><dd class="mono">${dataBr}</dd></div>
-            <#if campanha.departureTime?? && (inscricao.boardingPoint!"") != "Vou por conta própria">
-              <div><dt>Saída do ônibus</dt><dd class="mono">${campanha.departureTime}</dd></div>
+            <#if horarioEmbarque??>
+              <div><dt>Embarque</dt><dd class="mono">${horarioEmbarque}</dd></div>
             </#if>
             <div><dt>Doação</dt><dd class="mono"><#if campanha.donationTime??>${campanha.donationTime}<#else>A definir</#if></dd></div>
             <div class="span-all"><dt>Ponto de embarque</dt><dd>${inscricao.boardingPoint!"A confirmar com o organizador"}</dd></div>

@@ -3,6 +3,8 @@ package com.rotasolidaria.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.rotasolidaria.models.enums.CampaignStatus;
 
@@ -48,6 +50,11 @@ public class Campaign {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
     private Organizer organizer;
+
+    // Paradas intermediárias da rota, entre a partida (departureLocation) e o destino (donationLocation)
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position ASC")
+    private List<RouteStop> stops = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -145,5 +152,12 @@ public class Campaign {
         this.organizer = organizer;
     }
 
-    
+    public List<RouteStop> getStops() {
+        return stops;
+    }
+
+    public void setStops(List<RouteStop> stops) {
+        this.stops = stops;
+    }
+
 }

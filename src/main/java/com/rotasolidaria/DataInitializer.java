@@ -1,16 +1,20 @@
 package com.rotasolidaria;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.EducationalContent;
 import com.rotasolidaria.models.Location;
 import com.rotasolidaria.models.Organizer;
+import com.rotasolidaria.models.RouteStop;
 import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.ContentType;
 import com.rotasolidaria.repositories.CampanhaRepository;
@@ -33,19 +37,22 @@ public class DataInitializer implements CommandLineRunner {
     private final ConteudoEducativoRepository conteudoEducativoRepository;
     private final InscricaoRepository inscricaoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TransactionTemplate transactionTemplate;
 
     public DataInitializer(CampanhaRepository campanhaRepository,
             LocalizacaoRepository localizacaoRepository,
             UserRepository usuarioRepository,
             ConteudoEducativoRepository conteudoEducativoRepository,
             InscricaoRepository inscricaoRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            PlatformTransactionManager transactionManager) {
         this.campanhaRepository = campanhaRepository;
         this.localizacaoRepository = localizacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.conteudoEducativoRepository = conteudoEducativoRepository;
         this.inscricaoRepository = inscricaoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     @Override
@@ -71,6 +78,8 @@ public class DataInitializer implements CommandLineRunner {
             hemocentro.setCity("São Paulo");
             hemocentro.setState("SP");
             hemocentro.setZipCode("05403000");
+            hemocentro.setLatitude(new BigDecimal("-23.5573000"));
+            hemocentro.setLongitude(new BigDecimal("-46.6697000"));
             localizacaoRepository.save(hemocentro);
 
             // 3. Criar uma Campanha Ativa
@@ -147,6 +156,54 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         completarEmbarqueDaCampanhaDemo();
+        transactionTemplate.executeWithoutResult(status -> completarRotaDaCampanhaDemo());
+    }
+
+    // Bancos criados antes das paradas e do mapa: coordenadas e duas paradas na campanha de demonstração
+    private void completarRotaDaCampanhaDemo() {
+        campanhaRepository.findAll().stream()
+                .filter(c -> "Campanha Sangue Solidário 2026".equals(c.getTitle()))
+                .forEach(c -> {
+                    Location saida = c.getDepartureLocation();
+                    if (saida != null && !saida.hasCoordinates() && "Praça Matriz".equals(saida.getName())) {
+                        saida.setLatitude(new BigDecimal("-23.4897000"));
+                        saida.setLongitude(new BigDecimal("-48.4128000"));
+                    }
+                    Location destino = c.getDonationLocation();
+                    if (destino != null && !destino.hasCoordinates() && destino.getName() != null
+                            && destino.getName().startsWith("Posto Clínicas")) {
+                        destino.setLatitude(new BigDecimal("-23.5573000"));
+                        destino.setLongitude(new BigDecimal("-46.6697000"));
+                    }
+                    if (c.getStops().isEmpty()) {
+                        c.getStops().add(criarParada(c, 0, "Rodoviária de Itapetininga", "Itapetininga",
+                                "-23.5886000", "-48.0483000", LocalTime.of(7, 0)));
+                        c.getStops().add(criarParada(c, 1, "Rodoviária de Sorocaba", "Sorocaba",
+                                "-23.4886000", "-47.4455000", LocalTime.of(7, 45)));
+                    }
+                    // Inscrições antigas só guardavam o texto do ponto de embarque
+                    if (saida != null) {
+                        inscricaoRepository.findByCampaign(c).stream()
+                                .filter(r -> r.getBoardingLocation() == null && "Praça Matriz, Angatuba".equals(r.getBoardingPoint()))
+                                .forEach(r -> r.setBoardingLocation(saida));
+                    }
+                });
+    }
+
+    private RouteStop criarParada(Campaign campanha, int posicao, String nome, String cidade,
+            String lat, String lng, LocalTime horario) {
+        Location local = new Location();
+        local.setName(nome);
+        local.setCity(cidade);
+        local.setState("SP");
+        local.setLatitude(new BigDecimal(lat));
+        local.setLongitude(new BigDecimal(lng));
+        RouteStop parada = new RouteStop();
+        parada.setCampaign(campanha);
+        parada.setLocation(localizacaoRepository.save(local));
+        parada.setPosition(posicao);
+        parada.setStopTime(horario);
+        return parada;
     }
 
     // Bancos criados antes do campo de embarque existir: completa a campanha de demonstração
@@ -173,6 +230,8 @@ public class DataInitializer implements CommandLineRunner {
         pracaMatriz.setName("Praça Matriz");
         pracaMatriz.setCity("Angatuba");
         pracaMatriz.setState("SP");
+        pracaMatriz.setLatitude(new BigDecimal("-23.4897000"));
+        pracaMatriz.setLongitude(new BigDecimal("-48.4128000"));
         return localizacaoRepository.save(pracaMatriz);
     }
 }

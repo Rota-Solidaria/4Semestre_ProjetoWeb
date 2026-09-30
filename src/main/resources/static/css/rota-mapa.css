@@ -1,0 +1,267 @@
+/* =========== Mapas de rota (MapLibre) — static/js/rota-mapa.js ===========
+   Direção A (tema claro) e B (tema escuro): pinos, ônibus, controles, balões e animações.
+   Tudo animado some com "Reduzir movimento" (data-motion="reduce") ou a preferência do sistema. */
+
+.rota-mapa {
+  --rp-marca: #B4232A;
+  --rp-marca-escura: #8F1821;
+  --rp-marca-suave: #FBE3E4;
+  --rp-verde: #0E7A4F;
+  --rp-borda: #FFFFFF;
+  --rp-disco: #FFFFFF;
+  --rp-disco-borda: #1A1817;
+  --rp-texto: #1A1817;
+  --rp-sombra: rgba(26, 24, 23, .35);
+  --rp-cartao: #FFFFFF;
+  --rp-cartao-borda: #E4E0DC;
+  --rp-cartao-texto2: #57514E;
+  --rp-controle: #FFFFFF;
+  --rp-controle-borda: #E4E0DC;
+  position: relative;
+  height: 340px;
+  border-radius: var(--radius-lg, 18px);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: #F4F0EB;
+  z-index: 0;
+  isolation: isolate;
+}
+
+:root[data-theme="dark"] .rota-mapa {
+  --rp-marca: #C0333A;
+  --rp-marca-escura: #F2969B;
+  --rp-marca-suave: #2A1416;
+  --rp-verde: #1F9D69;
+  --rp-borda: #1A1918;
+  --rp-disco: #232120;
+  --rp-disco-borda: #B7B0AC;
+  --rp-texto: #F6F4F2;
+  --rp-sombra: rgba(0, 0, 0, .6);
+  --rp-cartao: #232120;
+  --rp-cartao-borda: #46423F;
+  --rp-cartao-texto2: #B7B0AC;
+  --rp-controle: #232120;
+  --rp-controle-borda: #46423F;
+  background: #181615;
+}
+
+.rota-mapa-legenda { display: block; margin-top: 10px; font: 500 13px/1.4 'IBM Plex Mono', monospace; color: var(--text2); min-height: 1.4em; }
+
+/* Carregando: um brilho que atravessa o fundo até o mapa aparecer */
+.rota-mapa--carregando::after {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, .45) 50%, transparent 80%);
+  background-size: 200% 100%;
+  animation: rm-brilho 1.4s linear infinite;
+}
+:root[data-theme="dark"] .rota-mapa--carregando::after { background-image: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, .06) 50%, transparent 80%); }
+@keyframes rm-brilho { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.rota-mapa .maplibregl-canvas { outline: none; }
+.rota-mapa--marcando .maplibregl-canvas { cursor: crosshair; }
+
+/* ---------- Controles (zoom, "Hemocentros de SP", créditos) ---------- */
+.rota-mapa .maplibregl-ctrl-group {
+  border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(26, 24, 23, .12);
+  border: 1px solid var(--rp-controle-borda); background: var(--rp-controle);
+}
+.rota-mapa .maplibregl-ctrl-group button { width: 40px; height: 40px; background-color: var(--rp-controle); }
+.rota-mapa .maplibregl-ctrl-group button + button { border-top: 1px solid var(--rp-controle-borda); }
+.rota-mapa .maplibregl-ctrl-group button:hover { background-color: var(--rp-marca-suave); }
+:root[data-theme="dark"] .rota-mapa .maplibregl-ctrl-icon { filter: invert(1) brightness(.95); }
+.rota-mapa .maplibregl-ctrl-top-left, .rota-mapa .maplibregl-ctrl-top-right { padding: 6px; }
+
+.rm-ctrl__hemocentros {
+  display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px;
+  border: 1px solid var(--rp-controle-borda); background: var(--rp-controle); color: var(--rp-texto);
+  font: 600 13px/1 'IBM Plex Sans', sans-serif; cursor: pointer; box-shadow: 0 1px 3px rgba(26, 24, 23, .12);
+  transition: background .15s, color .15s, border-color .15s;
+}
+.rm-ctrl__gota { display: inline-flex; width: 16px; height: 16px; color: var(--rp-marca); transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
+:root[data-theme="dark"] .rm-ctrl__gota { color: #F2969B; }
+.rm-ctrl__gota svg { width: 100%; height: 100%; }
+.rm-ctrl__hemocentros[aria-pressed="true"] { border-color: var(--rp-marca); background: var(--rp-marca-suave); }
+.rm-ctrl__hemocentros[aria-pressed="true"] .rm-ctrl__gota { transform: scale(1.15); }
+.rm-ctrl__hemocentros:focus-visible { outline: 3px solid #B4232A59; outline-offset: 2px; }
+@media (max-width: 620px) { .rm-ctrl__hemocentros span:last-child { display: none; } .rm-ctrl__hemocentros { width: 40px; justify-content: center; padding: 0; } }
+
+.rota-mapa .maplibregl-ctrl-attrib { background: color-mix(in srgb, var(--rp-controle) 85%, transparent); color: var(--rp-cartao-texto2); font-size: 11px; }
+.rota-mapa .maplibregl-ctrl-attrib a { color: var(--rp-cartao-texto2); }
+.rota-mapa .maplibregl-ctrl-attrib-button { background-color: var(--rp-controle); }
+:root[data-theme="dark"] .rota-mapa .maplibregl-ctrl-attrib-button { filter: invert(1); }
+.rota-mapa .maplibregl-cooperative-gesture-screen { font: 600 15px/1.4 'IBM Plex Sans', sans-serif; background: rgba(26, 24, 23, .55); }
+
+/* ---------- Balão dos hemocentros ---------- */
+.rm-popup .maplibregl-popup-content {
+  padding: 10px 12px; border-radius: 12px; background: var(--rp-cartao); color: var(--rp-texto);
+  border: 1px solid var(--rp-cartao-borda); box-shadow: 0 8px 24px rgba(26, 24, 23, .18);
+  font: 400 13px/1.35 'IBM Plex Sans', sans-serif;
+  animation: rm-balao .22s cubic-bezier(.3, 1.3, .5, 1) both; transform-origin: 50% 100%;
+}
+.rm-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: var(--rp-cartao); }
+.rm-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: var(--rp-cartao); }
+.rm-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--rp-cartao); }
+.rm-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--rp-cartao); }
+.rm-popup__conteudo { display: grid; gap: 3px; }
+.rm-popup__conteudo span { color: var(--rp-cartao-texto2); }
+.rm-popup__linha { font: 500 10px/1.2 'IBM Plex Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--rp-marca) !important; }
+:root[data-theme="dark"] .rm-popup__linha { color: #F2969B !important; }
+.rm-popup__botao {
+  margin-top: 6px; height: 36px; border: 0; border-radius: 9px; background: var(--rp-marca); color: #FFFFFF;
+  font: 600 12px/1 'IBM Plex Sans', sans-serif; cursor: pointer;
+}
+.rm-popup__botao:hover { background: var(--rp-marca-escura); }
+:root[data-theme="dark"] .rm-popup__botao:hover { background: #D4454C; }
+@keyframes rm-balao { from { opacity: 0; transform: translateY(6px) scale(.92); } to { opacity: 1; transform: none; } }
+
+/* ---------- Pinos ----------
+   .rp tem tamanho zero, bem na coordenada; os filhos se centralizam nela.
+   .rp__corpo recebe as animações de entrada/arrasto; .rp__batida, as de "vida" (pulso). */
+.rp { position: relative; width: 0; height: 0; cursor: pointer; --t: 34px; }
+.rp--inicio { --t: 36px; }
+.rp--parada { --t: 32px; }
+.rp--meu { --t: 40px; z-index: 3; }
+.rp--fim { --t: 44px; z-index: 2; }
+.maplibregl-marker:has(.rp--meu), .maplibregl-marker:has(.rp--fim) { z-index: 2; }
+
+.rp__corpo { position: absolute; left: calc(var(--t) / -2); top: calc(var(--t) / -2); width: var(--t); height: var(--t); transform-origin: 50% 100%; }
+.rp--fim .rp__corpo { top: calc(var(--t) * -1.2); } /* a ponta da gota fica na coordenada */
+.rp__batida { width: 100%; height: 100%; }
+
+.rp__disco {
+  width: 100%; height: 100%; box-sizing: border-box; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 14px/1 'IBM Plex Sans', sans-serif; box-shadow: 0 2px 6px var(--rp-sombra);
+  transition: transform .2s, box-shadow .2s;
+}
+.rp--inicio .rp__disco { background: var(--rp-verde); color: #FFFFFF; border: 3px solid var(--rp-borda); }
+:root[data-theme="dark"] .rp--inicio .rp__disco { box-shadow: 0 0 0 2px #8FE3B8, 0 2px 8px var(--rp-sombra); }
+.rp--inicio .rp__disco svg { width: 18px; height: 18px; }
+.rp--parada .rp__disco { background: var(--rp-disco); color: var(--rp-texto); border: 3px solid var(--rp-disco-borda); }
+.rp--meu .rp__disco { border-color: var(--rp-marca); color: var(--rp-marca); font-size: 16px; box-shadow: 0 0 0 3px var(--rp-borda), 0 3px 10px var(--rp-sombra); }
+:root[data-theme="dark"] .rp--meu .rp__disco { border-color: #F2969B; color: #F2969B; box-shadow: 0 0 0 3px var(--rp-borda), 0 0 18px rgba(242, 150, 155, .55); }
+.rp:hover .rp__disco { transform: scale(1.08); }
+
+.rp__gota {
+  position: absolute; inset: 0; box-sizing: border-box; border-radius: 50% 50% 50% 5px; transform: rotate(-45deg);
+  background: var(--rp-marca); border: 3px solid #FFFFFF; box-shadow: 0 4px 12px rgba(143, 24, 33, .45);
+  display: flex; align-items: center; justify-content: center;
+}
+:root[data-theme="dark"] .rp__gota { border-color: #F6F4F2; box-shadow: 0 0 26px rgba(192, 51, 58, .65); }
+.rp__gota-icone { display: flex; width: 20px; height: 20px; color: #FFFFFF; transform: rotate(45deg); }
+.rp__gota-icone svg { width: 100%; height: 100%; }
+
+/* Sombra no chão (só a gota, que "fica em pé") e onda de pouso */
+.rp__sombra {
+  position: absolute; left: -12px; top: -4px; width: 24px; height: 8px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(26, 24, 23, .35), transparent); pointer-events: none;
+}
+.rp__onda {
+  position: absolute; left: -16px; top: -16px; width: 32px; height: 32px; box-sizing: border-box;
+  border-radius: 50%; border: 2px solid var(--rp-marca); opacity: 0; pointer-events: none;
+}
+.rp--inicio .rp__onda { border-color: var(--rp-verde); }
+.rp--parada:not(.rp--meu) .rp__onda { border-color: var(--rp-disco-borda); }
+
+/* Anel do "seu embarque" */
+.rp__halo { display: none; }
+.rp--meu .rp__halo {
+  display: block; position: absolute; left: -32px; top: -32px; width: 64px; height: 64px; box-sizing: border-box;
+  border-radius: 50%; border: 2px solid rgba(180, 35, 42, .45); background: rgba(180, 35, 42, .08); pointer-events: none;
+  animation: rp-halo 2.2s ease-out infinite;
+}
+:root[data-theme="dark"] .rp--meu .rp__halo { border-color: rgba(242, 150, 155, .5); background: rgba(242, 150, 155, .1); }
+@keyframes rp-halo { 0% { transform: scale(.55); opacity: .9; } 100% { transform: scale(1.5); opacity: 0; } }
+
+/* Etiquetas fixas: "Seu embarque · 07:45" e o cartão do hemocentro */
+.rp__etiqueta {
+  position: absolute; left: 0; bottom: calc(var(--t) / 2 + 12px); transform: translateX(-50%);
+  padding: 7px 10px; border-radius: 8px; background: var(--rp-marca); color: #FFFFFF; white-space: nowrap;
+  font: 600 12px/1.2 'IBM Plex Sans', sans-serif; box-shadow: 0 2px 8px var(--rp-sombra); pointer-events: none;
+  animation: rp-etiqueta .4s cubic-bezier(.3, 1.3, .5, 1) both; animation-delay: calc(var(--atraso, 0ms) + 520ms);
+}
+.rp__etiqueta--cartao {
+  bottom: auto; top: 10px; left: 0; transform: translateX(-50%); display: grid; gap: 3px; min-width: 150px; max-width: 220px; white-space: normal;
+  background: var(--rp-cartao); color: var(--rp-texto); border: 1px solid var(--rp-cartao-borda); padding: 9px 11px; border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(26, 24, 23, .16); text-align: left;
+}
+.rp__etiqueta--cartao strong { font-size: 13px; line-height: 1.3; }
+.rp__etiqueta-linha { font: 500 10px/1.2 'IBM Plex Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--rp-marca); }
+:root[data-theme="dark"] .rp__etiqueta-linha { color: #F2969B; }
+@keyframes rp-etiqueta { from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(.9); } to { opacity: 1; transform: translateX(-50%); } }
+
+/* ---------- Animações dos pinos ---------- */
+
+/* 1. Cair: o pino desce, amassa ao tocar o chão e se ajeita */
+.rp--entrando .rp__corpo { animation: rp-cair .68s cubic-bezier(.3, .8, .4, 1) both; animation-delay: var(--atraso, 0ms); }
+.rp--entrando .rp__onda { animation: rp-onda .75s ease-out both; animation-delay: calc(var(--atraso, 0ms) + 360ms); }
+.rp--entrando .rp__sombra { animation: rp-sombra .68s cubic-bezier(.3, .8, .4, 1) both; animation-delay: var(--atraso, 0ms); }
+@keyframes rp-cair {
+  0% { transform: translateY(-64px) scale(.6); opacity: 0; }
+  30% { opacity: 1; }
+  54% { transform: translateY(0) scale(1.14, .84); }
+  70% { transform: translateY(-8px) scale(.95, 1.06); }
+  84% { transform: translateY(0) scale(1.03, .97); }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes rp-onda { 0% { transform: scale(.3); opacity: .75; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes rp-sombra { 0% { transform: scale(.3); opacity: 0; } 54% { transform: scale(1.15); opacity: 1; } 100% { transform: none; opacity: 1; } }
+
+/* 2. Levantar ao arrastar, com um alvo pulsando onde ele vai pousar */
+.rp--levantado .rp__corpo { transform: translateY(-14px) scale(1.12); transition: transform .18s cubic-bezier(.3, 1.4, .5, 1); filter: drop-shadow(0 12px 8px rgba(26, 24, 23, .28)); }
+.rp--levantado .rp__onda { animation: rp-alvo 1s ease-in-out infinite; }
+.rp--levantado .rp__sombra { transform: scale(.7); opacity: .5; transition: transform .18s, opacity .18s; }
+.rp--levantado { cursor: grabbing; }
+@keyframes rp-alvo { 0%, 100% { transform: scale(.55); opacity: .55; } 50% { transform: scale(.85); opacity: .9; } }
+
+/* 3. Pousar: depois de arrastar ou deslizar */
+.rp--pousando .rp__corpo { animation: rp-pousar .5s cubic-bezier(.3, .8, .4, 1) both; }
+.rp--pousando .rp__onda { animation: rp-onda .7s ease-out both; animation-delay: .12s; }
+@keyframes rp-pousar {
+  0% { transform: translateY(-14px) scale(1.12); }
+  40% { transform: translateY(0) scale(1.12, .86); }
+  65% { transform: translateY(-4px) scale(.97, 1.04); }
+  100% { transform: none; }
+}
+
+/* 4. Deslizar: o endereço mudou e o pino "voa" até o novo lugar */
+.rp--voando .rp__corpo { transform: translateY(-12px) scale(1.08); transition: transform .2s ease-out; filter: drop-shadow(0 10px 8px rgba(26, 24, 23, .25)); }
+
+/* 5. Sair: encolhe e some */
+.rp--saindo .rp__corpo { animation: rp-sair .3s cubic-bezier(.5, 0, .75, 0) forwards; }
+.rp--saindo .rp__etiqueta, .rp--saindo .rp__halo, .rp--saindo .rp__sombra { opacity: 0; transition: opacity .2s; }
+@keyframes rp-sair { to { transform: translateY(-10px) scale(.2); opacity: 0; } }
+
+/* 6. Renumerar: a parada mudou de ordem */
+.rp--renumerado .rp__num { display: inline-block; animation: rp-numero .5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes rp-numero { 0% { transform: scale(.4) rotate(-20deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+/* 7. Batimento: o hemocentro da campanha pulsa como um coração */
+.rp--fim .rp__batida { animation: rp-batida 2.6s ease-in-out infinite; animation-delay: calc(var(--atraso, 0ms) + 900ms); transform-origin: 50% 90%; }
+@keyframes rp-batida {
+  0%, 36%, 100% { transform: scale(1); }
+  8% { transform: scale(1.13); }
+  16% { transform: scale(.98); }
+  24% { transform: scale(1.08); }
+}
+
+/* ---------- Ônibus que percorre a rota ---------- */
+.rp-onibus { width: 0; height: 0; pointer-events: none; }
+.rp-onibus__corpo {
+  position: absolute; left: -15px; top: -15px; width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; background: var(--rp-marca); color: #FFFFFF;
+  border: 3px solid #FFFFFF; box-shadow: 0 3px 10px rgba(143, 24, 33, .45);
+  animation: rp-onibus-entra .3s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+:root[data-theme="dark"] .rp-onibus__corpo { border-color: #F6F4F2; box-shadow: 0 0 18px rgba(242, 150, 155, .6); }
+.rp-onibus__corpo svg { width: 15px; height: 15px; }
+.rp-onibus--saindo .rp-onibus__corpo { animation: rp-onibus-sai .35s ease-in forwards; }
+@keyframes rp-onibus-entra { from { transform: scale(0); } to { transform: none; } }
+@keyframes rp-onibus-sai { to { transform: scale(0); opacity: 0; } }
+
+/* ---------- Sem animação ---------- */
+:root[data-motion="reduce"] .rota-mapa *, :root[data-motion="reduce"] .rota-mapa *::after, :root[data-motion="reduce"] .rota-mapa::after {
+  animation: none !important; transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rota-mapa *, .rota-mapa *::after, .rota-mapa::after { animation: none !important; transition: none !important; }
+}

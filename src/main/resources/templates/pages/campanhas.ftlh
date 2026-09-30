@@ -22,7 +22,7 @@
         <#if campanhas?? && campanhas?size gt 0>
           <#list campanhas as c>
             <a class="list-row" href="/campanhas/${c.id}">
-              <img src="/images/doacaodesangue.jpeg" alt="${c.title}">
+              <img src="${c.imageUrl!"/images/doacaodesangue.jpeg"}" alt="${c.title}">
               <div>
                 <div class="row-top">
                   <span class="badge badge-open"><span class="dot"></span>${c.status}</span>

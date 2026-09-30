@@ -44,16 +44,18 @@
           <div class="boarding-options">
             <#list opcoesEmbarque as opcao>
               <label class="boarding-card">
-                <input type="radio" name="embarque" value="${opcao}" required<#if opcao?is_first> checked</#if>>
+                <input type="radio" name="embarque" value="${opcao.key}" required<#if opcao?is_first> checked</#if>>
                 <span class="boarding-card__text">
-                  <strong>${opcao}</strong>
-                  <#if opcao == transporteProprio>
-                    <span><#if campanha.donationTime??>Encontro no hemocentro às <span class="mono">${campanha.donationTime}</span><#else>Encontro direto no hemocentro</#if></span>
+                  <strong>${opcao.label}</strong>
+                  <#if !opcao.bus>
+                    <span><#if opcao.time??>Encontro no hemocentro às <span class="mono">${opcao.time}</span><#else>Encontro direto no hemocentro</#if></span>
+                  <#elseif opcao?is_first>
+                    <span><#if opcao.time??>Ônibus sai às <span class="mono">${opcao.time}</span> · gratuito<#else>Transporte gratuito · horário a confirmar</#if></span>
                   <#else>
-                    <span><#if campanha.departureTime??>Ônibus sai às <span class="mono">${campanha.departureTime}</span> · gratuito<#else>Transporte gratuito · horário a confirmar</#if></span>
+                    <span><#if opcao.time??>Ônibus passa às <span class="mono">${opcao.time}</span> · gratuito<#else>Parada da rota · horário a confirmar</#if></span>
                   </#if>
                 </span>
-                <span class="icon boarding-card__icon" aria-hidden="true"><#if opcao == transporteProprio>directions_car<#else>directions_bus</#if></span>
+                <span class="icon boarding-card__icon" aria-hidden="true"><#if opcao.bus>directions_bus<#else>directions_car</#if></span>
               </label>
             </#list>
           </div>
@@ -88,14 +90,23 @@
           </#if>
 
           <ol class="summary__route">
-            <li>
+            <li data-embarque="<#if campanha.departureLocation??>${campanha.departureLocation.id?c}<#else>cidade</#if>">
               <span class="summary__dot" aria-hidden="true"></span>
               <span class="summary__stop">
-                <span class="mono"><#if campanha.departureTime??>${campanha.departureTime} · </#if>Embarque</span>
+                <span class="mono"><#if campanha.departureTime??>${campanha.departureTime} · </#if>Partida</span>
                 <span><#if campanha.departureLocation??>${campanha.departureLocation.name}<#if campanha.departureLocation.city??>, ${campanha.departureLocation.city}</#if><#else>Na sua cidade</#if></span>
               </span>
             </li>
-            <li>
+            <#list campanha.stops as parada>
+              <li data-embarque="${parada.location.id?c}">
+                <span class="summary__dot summary__dot--stop" aria-hidden="true"></span>
+                <span class="summary__stop">
+                  <span class="mono"><#if parada.stopTime??>${parada.stopTime} · </#if>Parada</span>
+                  <span>${parada.location.name}<#if parada.location.city??>, ${parada.location.city}</#if></span>
+                </span>
+              </li>
+            </#list>
+            <li data-embarque="proprio">
               <span class="summary__dot summary__dot--end" aria-hidden="true"></span>
               <span class="summary__stop">
                 <span class="mono"><#if campanha.donationTime??>${campanha.donationTime} · </#if>Doação</span>
@@ -115,4 +126,19 @@
       </aside>
     </div>
   </main>
+
+  <script>
+    // Destaca no resumo da rota o ponto escolhido em "Onde você vai embarcar?"
+    (function () {
+      var form = document.getElementById('inscricao-form');
+      function destacar() {
+        var escolhido = form.querySelector('input[name="embarque"]:checked');
+        document.querySelectorAll('.summary__route [data-embarque]').forEach(function (li) {
+          li.classList.toggle('is-escolhido', !!escolhido && li.dataset.embarque === escolhido.value);
+        });
+      }
+      form.addEventListener('change', destacar);
+      destacar();
+    })();
+  </script>
 </@main.layout>

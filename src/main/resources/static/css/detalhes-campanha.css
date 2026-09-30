@@ -145,3 +145,43 @@ input,select,textarea{font:inherit;color:inherit}
   .route__stops::after{display:none}
   .route__stop,.route__stop--end{flex-direction:row;align-items:flex-start;text-align:left;flex-basis:auto}
 }
+/* Rota com paradas intermediárias: as paradas ficam no meio da linha */
+.route__stops--multi::after{display:none}
+.route__stops--multi .route__stop{flex:1 1 0}
+.route__stop--mid{align-items:center;text-align:center}
+.route__dot--stop{background:var(--surface);border:2px solid var(--border2);color:var(--text);font:700 16px/1 'IBM Plex Sans',sans-serif}
+.route__map{margin-top:24px}
+/* Ponto onde o doador logado embarca (ou o hemocentro, se vai por conta própria) */
+.route__meu{display:flex;gap:10px;align-items:center;margin:-8px 0 22px;padding:12px 14px;border-radius:12px;background:var(--brand-soft);border:1px solid var(--brand-soft-border);color:var(--brand-soft-text);font-size:15px}
+.route__meu .icon{font-size:20px;flex:none}
+/* span.route__voce: vence .route__text span:last-child */
+.route__text span.route__voce{display:inline-flex;align-items:center;gap:5px;width:fit-content;margin-top:6px;padding:5px 10px;border-radius:999px;background:var(--brand-fill,var(--brand));color:#fff;font:600 12px/1 'IBM Plex Sans',sans-serif}
+.route__text .route__voce .icon{font-size:15px;color:#fff}
+.route__text > span:has(+ .route__voce){font-size:14px;color:var(--text2);line-height:1.45}
+.route__stop--mid .route__text span.route__voce{margin-inline:auto}
+.route__stop--end .route__text span.route__voce{margin-left:auto}
+.route__stop--meu .route__dot{box-shadow:0 0 0 4px var(--surface),0 0 0 7px var(--brand-fill,var(--brand))}
+.route__stop--meu .route__dot--stop{border-color:var(--brand);color:var(--brand)}
+.route__stop--meu .route__text strong{color:var(--brand)}
+.route__map[hidden]{display:none}
+@media(max-width:620px){
+  .route__stops--multi .route__stop{flex:none}
+  .route__stop--mid{flex-direction:row;align-items:flex-start;text-align:left}
+  .route__stop--mid .route__text span.route__voce,.route__stop--end .route__text span.route__voce{margin:6px 0 0}
+}
+/* Legenda do mapa da rota (mesmos símbolos dos pinos em rota-mapa.css) */
+.route__legenda{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;margin-top:10px}
+.route__legenda .rota-mapa-legenda{margin:0}
+.route__simbolos{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--text2)}
+.route__simbolos li{display:flex;align-items:center;gap:8px}
+.simbolo{width:14px;height:14px;box-sizing:border-box;border-radius:50%;flex:none}
+.simbolo--partida{background:#0E7A4F;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--border2)}
+.simbolo--parada{background:var(--surface);border:2px solid var(--text)}
+.simbolo--meu{background:var(--surface);border:2px solid var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.simbolo--hemocentro{border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:var(--brand-fill,var(--brand))}
+.simbolo--outros{background:var(--surface);border:2px solid var(--brand)}
+.simbolo--antes{width:22px;height:0;border-radius:0;border-top:3px dotted var(--brand);opacity:.6}
+:root[data-theme="dark"] .simbolo--partida{background:#1F9D69}
+:root[data-theme="dark"] .simbolo--outros{background:#C0333A;border-color:rgba(242,150,155,.5)}
+.route__map .rota-mapa{height:420px}
+@media(max-width:620px){.route__map .rota-mapa{height:320px}}

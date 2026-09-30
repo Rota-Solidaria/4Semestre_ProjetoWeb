@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Donor;
+import com.rotasolidaria.models.Location;
 import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 
@@ -22,4 +23,6 @@ public interface InscricaoRepository extends JpaRepository<Registration, Long> {
     Optional<Registration> findByCampaignAndDonor(Campaign campaign, Donor donor);
 
     long countByCampaignAndStatusNot(Campaign campaign, RegistrationStatus status);
+
+    long countByBoardingLocationAndStatusNot(Location location, RegistrationStatus status);
 }

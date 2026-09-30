@@ -24,4 +24,11 @@ public class GlobalControllerAdvice {
         }
         return userRepository.findById(principal.getId()).orElse(null);
     }
+
+    // Mostra no menu do usuário o atalho para a área do organizador
+    @ModelAttribute("ehOrganizador")
+    public boolean isOrganizador(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return principal != null && principal.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ORGANIZER".equals(a.getAuthority()));
+    }
 }

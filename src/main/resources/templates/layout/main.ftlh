@@ -1,4 +1,6 @@
-<#macro layout title="Rota Solidária" css="/css/index.css" currentNav="">
+<#-- mapa=true carrega o MapLibre (mapas vetoriais do OpenFreeMap/OpenStreetMap, gratuito) e o estilo dos mapas de rota;
+     scripts lista arquivos JS da página, carregados no fim do <body>. -->
+<#macro layout title="Rota Solidária" css="/css/index.css" currentNav="" mapa=false scripts=[]>
 <!doctype html>
 <html lang="pt-BR">
 
@@ -17,8 +19,14 @@
     rel="stylesheet">
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/toast.css">
+  <#if mapa>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+  </#if>
   <link rel="stylesheet" href="${css}">
   <link rel="stylesheet" href="/css/components.css">
+  <#if mapa>
+    <link rel="stylesheet" href="/css/rota-mapa.css">
+  </#if>
   <link rel="stylesheet" href="/css/theme.css">
 </head>
 
@@ -32,6 +40,13 @@
   <#include "../includes/footer.ftlh">
   <#include "../includes/tabbar.ftlh">
   <#include "../includes/scripts.ftlh">
+  <#if mapa>
+    <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+    <script src="/js/rota-mapa.js"></script>
+  </#if>
+  <#list scripts as script>
+    <script src="${script}"></script>
+  </#list>
 </body>
 
 </html>

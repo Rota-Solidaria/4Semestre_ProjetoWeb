@@ -3,7 +3,9 @@ package com.rotasolidaria.services;
 import com.rotasolidaria.exception.BusinessException;
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Donor;
+import com.rotasolidaria.models.Location;
 import com.rotasolidaria.models.Registration;
+import com.rotasolidaria.models.RouteStop;
 import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.repositories.DonorRepository;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +26,8 @@ import java.util.Optional;
 public class InscricaoService {
 
     public static final String OWN_TRANSPORT = "Vou por conta própria";
+    /** Valor do formulário para "Vou por conta própria". */
+    public static final String OWN_TRANSPORT_KEY = "proprio";
 
     private final InscricaoRepository inscricaoRepository;
     private final DonorRepository donorRepository;
@@ -31,13 +37,43 @@ public class InscricaoService {
         this.donorRepository = donorRepository;
     }
 
-    /** Opções de embarque da campanha: o ponto cadastrado (se houver) ou ir por conta própria. */
-    public List<String> boardingOptions(Campaign campaign) {
-        if (campaign.getDepartureLocation() != null) {
-            return List.of(describe(campaign.getDepartureLocation().getName(), campaign.getDepartureLocation().getCity()),
-                    OWN_TRANSPORT);
+    /** Opções de embarque da campanha: a partida, cada parada da rota (em ordem) e ir por conta própria. */
+    public List<BoardingOption> boardingOptions(Campaign campaign) {
+        List<BoardingOption> options = new ArrayList<>();
+        Location departure = campaign.getDepartureLocation();
+        if (departure != null) {
+            options.add(busOption(departure, campaign.getDepartureTime()));
+            for (RouteStop stop : campaign.getStops()) {
+                options.add(busOption(stop.getLocation(), stop.getStopTime()));
+            }
+        } else {
+            options.add(new BoardingOption("cidade", "Embarque na minha cidade (o organizador confirma o ponto)",
+                    campaign.getDepartureTime(), null, true));
         }
-        return List.of("Embarque na minha cidade (o organizador confirma o ponto)", OWN_TRANSPORT);
+        options.add(new BoardingOption(OWN_TRANSPORT_KEY, OWN_TRANSPORT, campaign.getDonationTime(), null, false));
+        return options;
+    }
+
+    /** Vai de ônibus? Inscrições antigas só têm o texto do ponto de embarque. */
+    public static boolean goesByBus(Registration registration) {
+        return !OWN_TRANSPORT.equals(registration.getBoardingPoint());
+    }
+
+    /** Horário em que o ônibus passa no ponto escolhido pelo doador (nulo se vai por conta própria). */
+    public static LocalTime boardingTime(Registration registration) {
+        if (!goesByBus(registration)) {
+            return null;
+        }
+        Campaign campaign = registration.getCampaign();
+        Location chosen = registration.getBoardingLocation();
+        if (chosen != null) {
+            for (RouteStop stop : campaign.getStops()) {
+                if (stop.getLocation().getId().equals(chosen.getId())) {
+                    return stop.getStopTime();
+                }
+            }
+        }
+        return campaign.getDepartureTime();
     }
 
     public Optional<Registration> findForDonor(Campaign campaign, Long userId) {
@@ -57,7 +93,7 @@ public class InscricaoService {
     }
 
     @Transactional
-    public Registration register(Campaign campaign, Long userId, String boardingPoint, String notes, boolean lgpdAccepted) {
+    public Registration register(Campaign campaign, Long userId, String boardingKey, String notes, boolean lgpdAccepted) {
         Donor donor = donorRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("Apenas doadores podem se inscrever nas campanhas."));
 
@@ -74,20 +110,27 @@ public class InscricaoService {
         if (!lgpdAccepted) {
             throw new BusinessException("É preciso autorizar o envio dos seus dados ao organizador.");
         }
-        if (boardingPoint == null || !boardingOptions(campaign).contains(boardingPoint)) {
-            throw new BusinessException("Escolha um local de embarque.");
-        }
+        BoardingOption boarding = boardingOptions(campaign).stream()
+                .filter(o -> o.getKey().equals(boardingKey))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("Escolha um local de embarque."));
 
         Registration registration = new Registration();
         registration.setCampaign(campaign);
         registration.setDonor(donor);
         registration.setStatus(RegistrationStatus.CONFIRMED);
-        registration.setBoardingPoint(boardingPoint);
+        String label = boarding.getLabel();
+        registration.setBoardingPoint(label.length() > 160 ? label.substring(0, 160) : label);
+        registration.setBoardingLocation(boarding.getLocation());
         registration.setNotes(notes == null || notes.isBlank() ? null : notes.trim());
         return inscricaoRepository.save(registration);
     }
 
-    private static String describe(String name, String city) {
+    private static BoardingOption busOption(Location location, LocalTime time) {
+        return new BoardingOption(location.getId().toString(), describe(location.getName(), location.getCity()), time, location, true);
+    }
+
+    public static String describe(String name, String city) {
         return city == null || city.isBlank() ? name : name + ", " + city;
     }
 }

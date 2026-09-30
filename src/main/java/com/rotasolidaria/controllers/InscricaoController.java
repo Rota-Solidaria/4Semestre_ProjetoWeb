@@ -77,7 +77,6 @@ public class InscricaoController {
         model.addAttribute("opcoesEmbarque", inscricaoService.boardingOptions(campanha));
         model.addAttribute("vagasRestantes", inscricaoService.slotsLeft(campanha));
         model.addAttribute("dataExtenso", campanha.getEventDate() == null ? null : campanha.getEventDate().format(DATA_EXTENSO));
-        model.addAttribute("transporteProprio", InscricaoService.OWN_TRANSPORT);
         return "pages/inscrever-campanha"; // -> templates/pages/inscrever-campanha.ftlh
     }
 
@@ -124,6 +123,11 @@ public class InscricaoController {
         model.addAttribute("campanha", campanha);
         model.addAttribute("dataBr", dataBr);
         model.addAttribute("origem", origem(inscricao));
+        model.addAttribute("vaiDeOnibus", InscricaoService.goesByBus(inscricao));
+        LocalTime horarioEmbarque = InscricaoService.boardingTime(inscricao);
+        if (horarioEmbarque != null) {
+            model.addAttribute("horarioEmbarque", horarioEmbarque);
+        }
         model.addAttribute("whatsappUrl", "https://wa.me/?text=" + UriUtils.encodeQueryParam(mensagem, StandardCharsets.UTF_8));
         return "pages/bilhete"; // -> templates/pages/bilhete.ftlh
     }
@@ -138,8 +142,8 @@ public class InscricaoController {
         Registration inscricao = inscricaoOpt.get();
         Campaign campanha = inscricao.getCampaign();
 
-        boolean vaiDeOnibus = !InscricaoService.OWN_TRANSPORT.equals(inscricao.getBoardingPoint());
-        LocalTime inicio = vaiDeOnibus && campanha.getDepartureTime() != null ? campanha.getDepartureTime() : campanha.getDonationTime();
+        LocalTime embarque = InscricaoService.boardingTime(inscricao);
+        LocalTime inicio = embarque != null ? embarque : campanha.getDonationTime();
 
         StringBuilder ics = new StringBuilder()
                 .append("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Rota Solidaria//PT-BR\r\nCALSCALE:GREGORIAN\r\n")
@@ -170,12 +174,14 @@ public class InscricaoController {
                 .body(ics.toString());
     }
 
-    /** Cidade de embarque para o bilhete: a do ponto de saída, ou "Sua cidade" quando não há. */
+    /** Cidade de embarque para o bilhete: a do ponto escolhido (ou da partida), ou "Sua cidade" quando não há. */
     private static String origem(Registration inscricao) {
-        if (InscricaoService.OWN_TRANSPORT.equals(inscricao.getBoardingPoint())) {
+        if (!InscricaoService.goesByBus(inscricao)) {
             return "Por conta própria";
         }
-        Location saida = inscricao.getCampaign().getDepartureLocation();
+        Location saida = inscricao.getBoardingLocation() != null
+                ? inscricao.getBoardingLocation()
+                : inscricao.getCampaign().getDepartureLocation();
         return saida != null && saida.getCity() != null ? saida.getCity() : "Sua cidade";
     }
 

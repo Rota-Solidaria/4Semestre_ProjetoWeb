@@ -12,4 +12,5 @@ import java.util.List;
 public interface CampanhaRepository extends JpaRepository<Campaign, Long> { 
     List<Campaign> findByStatus(CampaignStatus status);
     List<Campaign> findTop6ByStatus(CampaignStatus status);
+    List<Campaign> findByOrganizerIdOrderByEventDateDesc(Long organizerId);
 }
