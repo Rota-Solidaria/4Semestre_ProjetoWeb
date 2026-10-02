@@ -96,99 +96,88 @@ input,select,textarea{font:inherit;color:inherit}
 .detail-body h1{font:800 clamp(1.7rem,3.4vw,2.2rem)/1.1 Archivo,sans-serif;margin:0 0 8px}
 .detail-org{font-size:15px;color:var(--text3);margin:0 0 24px}
 
-.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
-.info-box{display:flex;gap:12px;border:1px solid var(--border);border-radius:14px;padding:16px}
-.info-box .icon-box{width:38px;height:38px;border-radius:11px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex:none}
-.info-box .icon-box .icon{font-size:20px}
-.info-box .info-title{font:600 15px/1.3 'IBM Plex Sans',sans-serif}
-.info-box .info-sub{font-size:13px;color:var(--text2)}
+/* Container agrupado: Data, Local, Embarque + Rota do Transporte */
+.campaign-itinerary-card{border:1px solid var(--border);border-radius:var(--radius-xl);background:var(--surface);margin:4px 0 28px;overflow:hidden}
+.itinerary-summary{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface)}
+.itinerary-item{display:flex;flex-direction:column;gap:3px;padding:18px 22px}
+.itinerary-item + .itinerary-item{border-left:1px solid var(--border)}
+.itinerary-label{font:600 11px/1 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.itinerary-item .info-title{font:600 15px/1.3 'IBM Plex Sans',sans-serif;color:var(--text);margin-bottom:2px}
+.itinerary-item .info-sub{font-size:13px;color:var(--text2);line-height:1.4}
 
-.notice-box{display:flex;gap:12px;background:var(--info-soft);border:1px solid var(--info-border);border-radius:12px;padding:14px;margin-bottom:24px}
-.notice-box .icon{font-size:20px;color:var(--info-text);flex:none}
-.notice-box p{font-size:14px;color:var(--info-text);margin:0}
+.notice-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:24px}
+.notice-box p{font-size:13px;color:var(--text2);margin:0}
 
-.checklist-title{font:700 20px/1.3 Archivo,sans-serif;margin-bottom:14px}
-.checklist{display:grid;gap:10px;font-size:15px;color:var(--text2);margin:0 0 26px;padding:0;list-style:none}
-.checklist li{display:flex;gap:10px;align-items:flex-start}
-.checklist .icon{font-size:19px;color:var(--ok-dot);flex:none}
+.checklist-title{font:700 18px/1.3 Archivo,sans-serif;margin-bottom:12px}
+.checklist{display:grid;gap:8px;font-size:14px;color:var(--text2);margin:0 0 26px;padding:0;list-style:none}
+.checklist li{display:flex;gap:10px;align-items:baseline}
+.checklist li::before{content:"•";color:var(--brand);font-size:16px;line-height:1}
 
 .detail-actions{display:flex;gap:12px;flex-wrap:wrap}
 .more-link{text-align:center;color:var(--text2);font-size:15px;margin:22px 0 0}
 .more-link a{color:var(--brand);font-weight:700}
 
-@media(max-width:700px){.info-grid{grid-template-columns:1fr}.detail-body{padding:20px}}
+@media(max-width:768px){
+  .itinerary-summary{grid-template-columns:1fr}
+  .itinerary-item + .itinerary-item{border-left:0;border-top:1px solid var(--border)}
+  .detail-body{padding:20px}
+}
 .detail-section{padding-top:0}
 .row-vagas.detail-vagas-count{font-weight:600;color:var(--text2)}
 .detail-description{color:var(--text2);line-height:1.6;margin-bottom:1.5rem}
-/* Rota da campanha: embarque → hemocentro (horizontal no desktop, vertical no celular) */
-.route{margin:4px 0 28px;padding:24px;border:1px solid var(--border);border-radius:var(--radius-xl);background:var(--surface)}
-.route h2{font:700 22px/1.25 Archivo,sans-serif;letter-spacing:-.015em;margin:8px 0 22px}
-.route__stops{position:relative;list-style:none;margin:0;padding:0;display:flex;justify-content:space-between;gap:24px}
-.route__stops::before{content:"";position:absolute;left:52px;right:52px;top:21px;border-top:2px dashed var(--border2)}
-.route__stops::after{content:"TRANSPORTE GRATUITO";position:absolute;left:50%;top:13px;transform:translateX(-50%);padding:0 10px;background:var(--surface);font:500 11px/16px 'IBM Plex Mono',monospace;letter-spacing:.12em;color:var(--text2);white-space:nowrap}
-.route__stop{position:relative;z-index:1;flex:0 1 260px;display:flex;flex-direction:column;gap:12px}
-.route__stop--end{align-items:flex-end;text-align:right}
-.route__dot{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none}
-.route__dot .icon{font-size:22px}
-.route__dot--start{background:var(--brand-fill,var(--brand));color:#fff}
-.route__dot--end{background:var(--brand-soft);color:var(--brand)}
-.route__text{display:flex;flex-direction:column;gap:3px}
-.route__time{font:500 15px/1.2 'IBM Plex Mono',monospace}
-.route__text strong{font-size:16px}
-.route__text span:last-child{font-size:14px;color:var(--text2);line-height:1.45}
+
+/* Rota dentro do mesmo container (abaixo da divisão) */
+.route{margin:0;padding:22px;border:0;border-top:1px solid var(--border);border-radius:0;background:var(--surface)}
+.route h2{font:700 18px/1.25 Archivo,sans-serif;letter-spacing:-.01em;margin:0 0 18px;color:var(--text)}
+.route__stops{position:relative;list-style:none;margin:0;padding:0;display:flex;justify-content:space-between;gap:16px}
+.route__stops::before{content:"";position:absolute;left:16px;right:16px;top:15px;border-top:2px solid var(--border)}
+.route__stops::after{display:none}
+.route__stop{position:relative;z-index:1;flex:1 1 0;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;min-width:0}
+.route__dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;font:600 13px/1 'IBM Plex Mono',monospace;transition:transform .2s,box-shadow .2s}
+.route__dot .icon{font-size:17px}
+.route__dot--start{background:var(--surface2);border:2px solid var(--border2);color:var(--text)}
+.route__dot--stop{background:var(--surface);border:2px solid var(--border2);color:var(--text2)}
+.route__dot--end{background:var(--brand-soft);border:2px solid var(--brand-soft-border);color:var(--brand)}
+.route__text{display:flex;flex-direction:column;gap:2px;width:100%}
+.route__time{font:600 12px/1.2 'IBM Plex Mono',monospace;color:var(--text3)}
+.route__text strong{font:600 14px/1.25 'IBM Plex Sans',sans-serif;color:var(--text)}
+.route__text span:last-child{font-size:12px;color:var(--text2);line-height:1.35}
 .btn-disabled{pointer-events:none}
-@media(max-width:620px){
-  .route{padding:20px}
-  .route__stops{flex-direction:column;gap:28px}
-  .route__stops::before{left:21px;right:auto;top:44px;bottom:44px;border-top:0;border-left:2px dashed var(--border2)}
-  .route__stops::after{display:none}
-  .route__stop,.route__stop--end{flex-direction:row;align-items:flex-start;text-align:left;flex-basis:auto}
-}
-/* Rota com paradas intermediárias: as paradas ficam no meio da linha */
-.route__stops--multi::after{display:none}
-.route__stops--multi .route__stop{flex:1 1 0}
-.route__stop--mid{align-items:center;text-align:center}
-.route__dot--stop{background:var(--surface);border:2px solid var(--border2);color:var(--text);font:700 16px/1 'IBM Plex Sans',sans-serif}
-.route__map{margin-top:24px}
-/* Ponto onde o doador logado embarca (ou o hemocentro, se vai por conta própria) */
-.route__nota{display:flex;gap:8px;align-items:center;margin:-6px 0 18px;font-size:13px;color:var(--text2)}
-.route__nota .icon{font-size:16px}
-.route__meu{display:flex;gap:10px;align-items:center;margin:-8px 0 22px;padding:12px 14px;border-radius:12px;background:var(--brand-soft);border:1px solid var(--brand-soft-border);color:var(--brand-soft-text);font-size:15px}
-.route__meu .icon{font-size:20px;flex:none}
-/* span.route__voce: vence .route__text span:last-child */
-.route__text span.route__voce{display:inline-flex;align-items:center;gap:5px;width:fit-content;margin-top:6px;padding:5px 10px;border-radius:999px;background:var(--brand-fill,var(--brand));color:#fff;font:600 12px/1 'IBM Plex Sans',sans-serif}
-.route__text .route__voce .icon{font-size:15px;color:#fff}
-.route__text > span:has(+ .route__voce){font-size:14px;color:var(--text2);line-height:1.45}
-.route__stop--mid .route__text span.route__voce{margin-inline:auto}
-.route__stop--end .route__text span.route__voce{margin-left:auto}
-.route__stop--meu .route__dot{box-shadow:0 0 0 4px var(--surface),0 0 0 7px var(--brand-fill,var(--brand))}
-.route__stop--meu .route__dot--stop{border-color:var(--brand);color:var(--brand)}
+
+/* Ponto onde o doador logado embarca */
+.route__nota{display:flex;gap:8px;align-items:center;margin:16px 0 0;font-size:12px;color:var(--text3)}
+.route__nota .icon{font-size:15px}
+.route__meu{display:flex;gap:8px;align-items:center;margin:-4px 0 16px;padding:8px 12px;border-radius:8px;background:var(--brand-soft);border:1px solid var(--brand-soft-border);color:var(--brand-soft-text);font-size:13px}
+.route__meu .icon{font-size:18px;flex:none}
+.route__text span.route__voce{display:inline-flex;align-items:center;gap:4px;width:fit-content;margin-top:4px;padding:3px 8px;border-radius:999px;background:var(--brand);color:#fff;font:600 11px/1 'IBM Plex Sans',sans-serif}
+.route__text .route__voce .icon{font-size:13px;color:#fff}
+.route__stop--meu .route__dot{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
 .route__stop--meu .route__text strong{color:var(--brand)}
+
+.route__map{margin-top:20px}
 .route__map[hidden]{display:none}
+.route__map .rota-mapa{height:360px;border-radius:var(--radius-md)}
+.route__legenda{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:10px}
+.route__simbolos{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0;padding:0;list-style:none;font-size:12px;color:var(--text2)}
+.route__simbolos li{display:flex;align-items:center;gap:6px}
+.simbolo{width:8px;height:8px;box-sizing:border-box;border-radius:50%;flex:none}
+.simbolo--partida{background:var(--text2)}
+.simbolo--parada{background:var(--surface);border:1.5px solid var(--text2)}
+.simbolo--meu{background:var(--brand)}
+.simbolo--hemocentro{background:var(--brand)}
+.simbolo--outros{background:var(--surface);border:1.5px solid var(--brand)}
+.simbolo--antes{width:16px;height:0;border-radius:0;border-top:2px dotted var(--brand);opacity:.6}
+
 @media(max-width:620px){
-  .route__stops--multi .route__stop{flex:none}
-  .route__stop--mid{flex-direction:row;align-items:flex-start;text-align:left}
-  .route__stop--mid .route__text span.route__voce,.route__stop--end .route__text span.route__voce{margin:6px 0 0}
+  .route{padding:16px}
+  .route__stops{flex-direction:column;gap:18px}
+  .route__stops::before{left:15px;right:auto;top:16px;bottom:16px;border-top:0;border-left:2px solid var(--border)}
+  .route__stop{flex-direction:row;align-items:flex-start;text-align:left;gap:12px;flex:none}
+  .route__map .rota-mapa{height:280px}
 }
-/* Legenda do mapa da rota (mesmos símbolos dos pinos em rota-mapa.css) */
-.route__legenda{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px;margin-top:10px}
-.route__legenda .rota-mapa-legenda{margin:0}
-.route__simbolos{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--text2)}
-.route__simbolos li{display:flex;align-items:center;gap:8px}
-.simbolo{width:14px;height:14px;box-sizing:border-box;border-radius:50%;flex:none}
-.simbolo--partida{background:#0E7A4F;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--border2)}
-.simbolo--parada{background:var(--surface);border:2px solid var(--text)}
-.simbolo--meu{background:var(--surface);border:2px solid var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.simbolo--hemocentro{border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:var(--brand-fill,var(--brand))}
-.simbolo--outros{background:var(--surface);border:2px solid var(--brand)}
-.simbolo--antes{width:22px;height:0;border-radius:0;border-top:3px dotted var(--brand);opacity:.6}
-:root[data-theme="dark"] .simbolo--partida{background:#1F9D69}
-:root[data-theme="dark"] .simbolo--outros{background:#C0333A;border-color:rgba(242,150,155,.5)}
-.route__map .rota-mapa{height:420px}
-@media(max-width:620px){.route__map .rota-mapa{height:320px}}
-/* Linha do tempo ↔ mapa: o item cujo pino está sob o mouse */
+
+/* Hover interativo */
 .route__stop[data-ponto-id]{cursor:default}
-.route__stop .route__dot{transition:transform .25s cubic-bezier(.3,1.6,.5,1),box-shadow .25s}
-.route__stop.is-destacado .route__dot{transform:scale(1.14);box-shadow:0 0 0 4px var(--surface),0 0 0 7px var(--brand-soft)}
+.route__stop.is-destacado .route__dot{transform:scale(1.15);box-shadow:0 0 0 3px var(--brand-soft)}
 .route__stop.is-destacado .route__text strong{color:var(--brand)}
 :root[data-motion="reduce"] .route__stop .route__dot{transition:none}

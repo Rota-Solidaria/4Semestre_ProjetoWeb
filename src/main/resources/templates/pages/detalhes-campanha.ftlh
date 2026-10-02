@@ -11,7 +11,7 @@
 </#function>
 
 <#macro seloVoce texto="Você embarca aqui">
-  <span class="route__voce"><span class="icon" aria-hidden="true">person_pin_circle</span>${texto}</span>
+  <span class="route__voce">${texto}</span>
 </#macro>
 
 <@main.layout title="Detalhes da Campanha" css="/css/detalhes-campanha.css" currentNav="campanhas" mapa=true>
@@ -41,10 +41,10 @@
             <p class="detail-description">${campanha.description}</p>
           </#if>
 
-          <div class="info-grid">
-            <div class="info-box">
-              <span class="icon-box"><span class="icon">schedule</span></span>
-              <div>
+          <div class="campaign-itinerary-card">
+            <div class="itinerary-summary">
+              <div class="itinerary-item">
+                <span class="itinerary-label">Data e horários</span>
                 <div class="info-title">
                   <#if campanha.eventDate??>${campanha.eventDateBr}</#if>
                 </div>
@@ -53,12 +53,10 @@
                   <#if campanha.donationTime??>Doação ${campanha.donationTimeTexto}h</#if>
                 </div>
               </div>
-            </div>
 
-            <#if campanha.donationLocation??>
-              <div class="info-box">
-                <span class="icon-box"><span class="icon">place</span></span>
-                <div>
+              <#if campanha.donationLocation??>
+                <div class="itinerary-item">
+                  <span class="itinerary-label">Local da doação</span>
                   <div class="info-title">${campanha.donationLocation.name}</div>
                   <#-- Rua, número e bairro são opcionais no cadastro da rota -->
                   <#assign dl = campanha.donationLocation>
@@ -68,89 +66,84 @@
                   <#if dl.city??><#assign endereco += [dl.city + (dl.state??)?then(" - " + dl.state!"", "")]></#if>
                   <div class="info-sub">${endereco?join(" — ")}</div>
                 </div>
-              </div>
-            </#if>
+              </#if>
 
-            <div class="info-box">
-              <span class="icon-box"><span class="icon">directions_bus</span></span>
-              <div>
-                <div class="info-title">Transporte gratuito</div>
-                <div class="info-sub">
+              <div class="itinerary-item">
+                <span class="itinerary-label">Embarque</span>
+                <div class="info-title">
                   <#if campanha.departureLocation??>
-                    Embarque em: ${campanha.departureLocation.name}
+                    ${campanha.departureLocation.name}
                   <#else>
-                    Embarque na cidade de partida
+                    Cidade de partida
                   </#if>
                 </div>
+                <div class="info-sub">Ponto inicial da viagem</div>
               </div>
             </div>
-          </div>
 
-          <section class="route" aria-labelledby="route-title">
-            <span class="kicker">Como chegar</span>
-            <h2 id="route-title">O transporte leva você até o hemocentro</h2>
-            <#if meuEmbarqueNome??>
-              <p class="route__meu"><span class="icon" aria-hidden="true">assignment</span><span>Seu embarque: <strong>${meuEmbarqueNome}</strong><#if meuEmbarqueHorario??> às <strong class="mono">${meuEmbarqueHorario}</strong></#if></span></p>
-            </#if>
-            <ol class="route__stops<#if campanha.stops?has_content> route__stops--multi</#if>">
-              <#assign meu = ehMeuEmbarque(campanha.departureLocation!)>
-              <li class="route__stop<#if meu> route__stop--meu</#if>"<@pontoMapa local=campanha.departureLocation! tipo="inicio" meu=meu horario=(campanha.departureTime?string)!""/>>
-                <span class="route__dot route__dot--start"><span class="icon" aria-hidden="true">directions_bus</span></span>
-                <div class="route__text">
-                  <span class="route__time"><#if campanha.departureTime??>Saída ${campanha.departureTime}<#else>Horário a confirmar</#if></span>
-                  <strong>Partida</strong>
-                  <#if campanha.departureLocation??>
-                    <span>${campanha.departureLocation.name}<#if campanha.departureLocation.city??>, ${campanha.departureLocation.city}</#if></span>
-                  <#else>
-                    <span>Na sua cidade — o organizador confirma o ponto</span>
-                  </#if>
-                  <#if meu><@seloVoce/></#if>
-                </div>
-              </li>
-              <#list campanha.stops as parada>
-                <#assign meu = ehMeuEmbarque(parada.location)>
-                <li class="route__stop route__stop--mid<#if meu> route__stop--meu</#if>"<@pontoMapa local=parada.location tipo="parada" rotulo=parada?counter meu=meu horario=(parada.stopTimeTexto)!""/>>
-                  <span class="route__dot route__dot--stop" aria-hidden="true">${parada?counter}</span>
+            <section class="route" aria-labelledby="route-title">
+              <h2 id="route-title">Rota do transporte</h2>
+              <#if meuEmbarqueNome??>
+                <p class="route__meu"><span>Seu embarque: <strong>${meuEmbarqueNome}</strong><#if meuEmbarqueHorario??> às <strong class="mono">${meuEmbarqueHorario}</strong></#if></span></p>
+              </#if>
+              <ol class="route__stops<#if campanha.stops?has_content> route__stops--multi</#if>">
+                <#assign meu = ehMeuEmbarque(campanha.departureLocation!)>
+                <li class="route__stop<#if meu> route__stop--meu</#if>"<@pontoMapa local=campanha.departureLocation! tipo="inicio" meu=meu horario=(campanha.departureTime?string)!""/>>
+                  <span class="route__dot route__dot--start"><span class="icon" aria-hidden="true">directions_bus</span></span>
                   <div class="route__text">
-                    <span class="route__time"><#if parada.stopTime??>${parada.stopTimeTexto}<#else>Horário a confirmar</#if></span>
-                    <strong>Parada ${parada?counter}</strong>
-                    <span>${parada.location.name}<#if parada.location.city??>, ${parada.location.city}</#if></span>
+                    <span class="route__time"><#if campanha.departureTime??>${campanha.departureTime}<#else>A confirmar</#if></span>
+                    <strong>${(campanha.departureLocation.city)!((campanha.departureLocation.name)!"Partida")}</strong>
+                    <#if campanha.departureLocation?? && campanha.departureLocation.name != (campanha.departureLocation.city!"")>
+                      <span>${campanha.departureLocation.name}</span>
+                    </#if>
                     <#if meu><@seloVoce/></#if>
                   </div>
                 </li>
-              </#list>
-              <li class="route__stop route__stop--end"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=false horario=(campanha.donationTimeTexto)!""/>>
-                <span class="route__dot route__dot--end"><span class="icon" aria-hidden="true">bloodtype</span></span>
-                <div class="route__text">
-                  <span class="route__time"><#if campanha.donationTime??>Doação ${campanha.donationTimeTexto}<#else>Horário a confirmar</#if></span>
-                  <strong>Hemocentro</strong>
-                  <#if campanha.donationLocation??>
-                    <span>${campanha.donationLocation.name}<#if campanha.donationLocation.city??>, ${campanha.donationLocation.city}</#if></span>
-                  </#if>
+                <#list campanha.stops as parada>
+                  <#assign meu = ehMeuEmbarque(parada.location)>
+                  <li class="route__stop route__stop--mid<#if meu> route__stop--meu</#if>"<@pontoMapa local=parada.location tipo="parada" rotulo=parada?counter meu=meu horario=(parada.stopTimeTexto)!""/>>
+                    <span class="route__dot route__dot--stop" aria-hidden="true">${parada?counter}</span>
+                    <div class="route__text">
+                      <span class="route__time"><#if parada.stopTime??>${parada.stopTimeTexto}<#else>A confirmar</#if></span>
+                      <strong>${(parada.location.city)!(parada.location.name)}</strong>
+                      <#if parada.location.name != (parada.location.city!"")>
+                        <span>${parada.location.name}</span>
+                      </#if>
+                      <#if meu><@seloVoce/></#if>
+                    </div>
+                  </li>
+                </#list>
+                <li class="route__stop route__stop--end"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=false horario=(campanha.donationTimeTexto)!""/>>
+                  <span class="route__dot route__dot--end"><span class="icon" aria-hidden="true">bloodtype</span></span>
+                  <div class="route__text">
+                    <span class="route__time"><#if campanha.donationTime??>${campanha.donationTimeTexto}<#else>A confirmar</#if></span>
+                    <strong>${(campanha.donationLocation.city)!((campanha.donationLocation.name)!"Hemocentro")}</strong>
+                    <#if campanha.donationLocation?? && campanha.donationLocation.name != (campanha.donationLocation.city!"")>
+                      <span>${campanha.donationLocation.name}</span>
+                    </#if>
+                  </div>
+                </li>
+              </ol>
+              <#if campanha.algumHorarioEstimado>
+                <p class="route__nota">Horários com ≈ são estimados pela rota; confirme com o organizador.</p>
+              </#if>
+              <div class="route__map" data-rota-mapa-bloco>
+                <div class="rota-mapa" data-rota-mapa=".route__stop[data-lat]" role="region" aria-label="Mapa com o trajeto do ônibus e os hemocentros de SP"></div>
+                <div class="route__legenda">
+                  <ul class="route__simbolos" aria-label="Legenda do mapa">
+                    <li><span class="simbolo simbolo--partida" aria-hidden="true"></span>Partida</li>
+                    <#if campanha.stops?has_content><li><span class="simbolo simbolo--parada" aria-hidden="true"></span>Parada</li></#if>
+                    <#if meuEmbarqueNome??><li><span class="simbolo simbolo--meu" aria-hidden="true"></span>Seu embarque</li></#if>
+                    <li><span class="simbolo simbolo--hemocentro" aria-hidden="true"></span>Hemocentro da campanha</li>
+                    <li><span class="simbolo simbolo--outros" aria-hidden="true"></span>Outros hemocentros</li>
+                    <#if meuEmbarqueNome?? && !(campanha.departureLocation?? && meuEmbarqueId?? && campanha.departureLocation.id == meuEmbarqueId)><li><span class="simbolo simbolo--antes" aria-hidden="true"></span>Antes do seu embarque</li></#if>
+                  </ul>
                 </div>
-              </li>
-            </ol>
-            <#if campanha.algumHorarioEstimado>
-              <p class="route__nota"><span class="icon" aria-hidden="true">schedule</span>Horários com ≈ são estimados pela rota; confirme com o organizador.</p>
-            </#if>
-            <div class="route__map" data-rota-mapa-bloco>
-              <div class="rota-mapa" data-rota-mapa=".route__stop[data-lat]" data-rota-resumo="#rota-resumo" role="region" aria-label="Mapa com o trajeto do ônibus e os hemocentros de SP"></div>
-              <div class="route__legenda">
-                <span class="rota-mapa-legenda" id="rota-resumo" aria-live="polite"></span>
-                <ul class="route__simbolos" aria-label="Legenda do mapa">
-                  <li><span class="simbolo simbolo--partida" aria-hidden="true"></span>Partida</li>
-                  <#if campanha.stops?has_content><li><span class="simbolo simbolo--parada" aria-hidden="true"></span>Parada</li></#if>
-                  <#if meuEmbarqueNome??><li><span class="simbolo simbolo--meu" aria-hidden="true"></span>Seu embarque</li></#if>
-                  <li><span class="simbolo simbolo--hemocentro" aria-hidden="true"></span>Hemocentro da campanha</li>
-                  <li><span class="simbolo simbolo--outros" aria-hidden="true"></span>Outros hemocentros</li>
-                  <#if meuEmbarqueNome?? && !(campanha.departureLocation?? && meuEmbarqueId?? && campanha.departureLocation.id == meuEmbarqueId)><li><span class="simbolo simbolo--antes" aria-hidden="true"></span>Antes do seu embarque</li></#if>
-                </ul>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
 
           <div class="notice-box">
-            <span class="icon">info</span>
             <p><strong>Organizado por:</strong>
               <#if campanha.organizer??>${campanha.organizer.institution!"Organizador"} (${campanha.organizer.name})<#else>Organizador Regional</#if>.
             </p>
@@ -158,19 +151,19 @@
 
           <div class="checklist-title">Antes de embarcar</div>
           <ul class="checklist">
-            <li><span class="icon">check_circle</span>Documento oficial com foto, original</li>
-            <li><span class="icon">check_circle</span>Alimentação leve até 4 horas antes</li>
-            <li><span class="icon">check_circle</span>Mínimo de 6 horas de sono</li>
-            <li><span class="icon">check_circle</span>Entre 16 e 69 anos e acima de 50 kg</li>
+            <li>Documento oficial com foto, original</li>
+            <li>Alimentação leve até 4 horas antes</li>
+            <li>Mínimo de 6 horas de sono</li>
+            <li>Entre 16 e 69 anos e acima de 50 kg</li>
           </ul>
 
           <div class="detail-actions">
             <#if minhaInscricao??>
-              <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}"><span class="icon">assignment</span>Ver inscrição</a>
+              <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}">Ver inscrição</a>
             <#elseif campanha.status != "OPEN" || vagasRestantes lte 0>
               <span class="btn btn-primary btn-lg btn-disabled" aria-disabled="true"><#if vagasRestantes lte 0>Vagas esgotadas<#else>Inscrições encerradas</#if></span>
             <#else>
-              <a class="btn btn-primary btn-lg" href="/campanhas/${campanha.id}/inscrever">Fazer inscrição<span class="icon">arrow_forward</span></a>
+              <a class="btn btn-primary btn-lg" href="/campanhas/${campanha.id}/inscrever">Fazer inscrição</a>
             </#if>
             <a class="btn btn-secondary btn-lg" href="/campanhas">Ver outras campanhas</a>
           </div>

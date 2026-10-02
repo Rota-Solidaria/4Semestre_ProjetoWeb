@@ -159,6 +159,8 @@ public class ProfileController {
                     donor.setBloodType(BloodType.valueOf(bloodType));
                 } catch (IllegalArgumentException ignored) {
                 }
+            } else {
+                donor.setBloodType(null);
             }
             if (weight != null) {
                 donor.setWeight(weight);

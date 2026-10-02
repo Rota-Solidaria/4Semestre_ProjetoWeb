@@ -119,7 +119,7 @@ public class InscricaoController {
 
         String dataBr = campanha.getEventDate() == null ? "a definir" : campanha.getEventDate().format(Datas.DATA_BR);
         String mensagem = "Vou doar sangue na " + campanha.getTitle() + " em " + dataBr
-                + ", com o transporte gratuito do Rota Solidária. Vamos juntos? "
+                + ", com o transporte do Rota Solidária. Vamos juntos? "
                 + baseUrl + "/campanhas/" + campanha.getId();
 
         model.addAttribute("inscricao", inscricao);

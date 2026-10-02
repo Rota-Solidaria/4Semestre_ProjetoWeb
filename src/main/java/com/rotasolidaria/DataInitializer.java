@@ -183,7 +183,7 @@ public class DataInitializer implements CommandLineRunner {
 
         Campaign c2 = new Campaign();
         c2.setTitle("Caravana Regional para Sorocaba");
-        c2.setDescription("Transporte gratuito saindo de Itapetininga com paradas até o Hemocentro de Sorocaba.");
+        c2.setDescription("Transporte saindo de Itapetininga com paradas até o Hemocentro de Sorocaba.");
         c2.setEventDate(LocalDate.now().plusDays(20));
         c2.setDepartureLocation(partida);
         c2.setDepartureTime(LocalTime.of(7, 0));
