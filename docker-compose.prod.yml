@@ -1,0 +1,59 @@
+name: rotasolidaria
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rotasolidaria_mysql
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      TZ: America/Sao_Paulo
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASS}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  app:
+    build: .
+    container_name: rotasolidaria_app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      TZ: America/Sao_Paulo
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+      SPRING_MAIL_HOST: ${MAIL_HOST}
+      SPRING_MAIL_PORT: ${MAIL_PORT}
+      SPRING_MAIL_USERNAME: ${MAIL_USER}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASS}
+    ports:
+      - "127.0.0.1:8081:8080"
+    restart: unless-stopped
+
+  # Opcional: só sobe com --profile admin
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest   # troque por uma versão fixa depois de testar
+    container_name: rotasolidaria_cloudbeaver
+    profiles: ["admin"]
+    ports:
+      - "127.0.0.1:8978:8978"
+    volumes:
+      - cloudbeaver_data:/opt/cloudbeaver/workspace
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  cloudbeaver_data:
