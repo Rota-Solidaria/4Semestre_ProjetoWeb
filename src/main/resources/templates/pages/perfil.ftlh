@@ -7,7 +7,11 @@
         <div class="profile-avatar-large">
           <span>${(usuario.initials)!"US"}</span>
           <#if isDonor && donor?? && donor.bloodType??>
-            <span class="blood-type-pill">${donor.bloodType.displayName}</span>
+            <#if donor.bloodType.name() != "UNKNOWN">
+              <span class="blood-type-pill">${donor.bloodType.displayName}</span>
+            <#else>
+              <span class="blood-type-pill" title="Tipo sanguíneo não informado">?</span>
+            </#if>
           </#if>
         </div>
         <div class="profile-name-area">
@@ -34,7 +38,7 @@
             </div>
             <div class="donor-card__type">
               <span class="donor-card__label">Tipo</span>
-              <strong><#if donor?? && donor.bloodType??>${donor.bloodType.displayName}<#else>?</#if></strong>
+              <strong><#if donor?? && donor.bloodType?? && donor.bloodType.name() != "UNKNOWN">${donor.bloodType.displayName}<#else>?</#if></strong>
             </div>
           </div>
           <dl class="donor-card__stats">
@@ -43,6 +47,8 @@
           </dl>
           <#if !(donor?? && donor.bloodType??)>
             <a class="donor-card__hint" href="#editar">Informe seu tipo sanguíneo</a>
+          <#elseif donor.bloodType.name() == "UNKNOWN">
+            <span class="donor-card__hint" style="text-decoration:none;cursor:default">Tipo a definir na triagem</span>
           </#if>
         </section>
       </#if>
@@ -121,7 +127,11 @@
                   <#if reg.campaign.donationLocation??>
                     <span><span class="icon">place</span>${reg.campaign.donationLocation.name} (${reg.campaign.donationLocation.city})</span>
                   </#if>
-                  <span><span class="icon">directions_bus</span>Transporte gratuito</span>
+                  <#if reg.boardingLocation??>
+                    <span><span class="icon">directions_bus</span>Embarque: ${reg.boardingLocation.name}</span>
+                  <#elseif reg.boardingPoint?has_content>
+                    <span><span class="icon">directions_bus</span>Embarque: ${reg.boardingPoint}</span>
+                  </#if>
                 </div>
               </div>
               <div class="reg-card-actions">
@@ -140,7 +150,7 @@
             </div>
             <div class="reg-empty-text">
               <h3>Você ainda não tem inscrições</h3>
-              <p>Escolha uma campanha perto de você e garanta sua vaga no ônibus. O transporte é gratuito.</p>
+              <p>Escolha uma campanha perto de você e garanta sua vaga no transporte.</p>
               <div class="reg-empty-actions">
                 <a class="btn btn-primary" href="/campanhas">Ver campanhas<span class="icon" aria-hidden="true">arrow_forward</span></a>
                 <a class="btn btn-ghost" href="/educativo">Como funciona a doação</a>

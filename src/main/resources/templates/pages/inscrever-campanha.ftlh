@@ -48,9 +48,9 @@
                 <span class="boarding-card__text">
                   <strong>${opcao.label}</strong>
                   <#if opcao?is_first>
-                    <span><#if opcao.time??>Saída do transporte às <span class="mono">${opcao.time}</span> · gratuito<#else>Transporte gratuito · horário a confirmar</#if></span>
+                    <span><#if opcao.time??>Saída do transporte às <span class="mono">${opcao.time}</span><#else>Saída do transporte · horário a confirmar</#if></span>
                   <#else>
-                    <span><#if opcao.time??>Parada da rota às <span class="mono">${opcao.time}</span> · gratuito<#else>Parada da rota · horário a confirmar</#if></span>
+                    <span><#if opcao.time??>Parada da rota às <span class="mono">${opcao.time}</span><#else>Parada da rota · horário a confirmar</#if></span>
                   </#if>
                 </span>
                 <span class="icon boarding-card__icon" aria-hidden="true">directions_bus</span>

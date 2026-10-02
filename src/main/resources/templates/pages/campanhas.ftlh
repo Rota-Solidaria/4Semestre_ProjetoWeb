@@ -62,8 +62,8 @@
                   </#if>
                   <#if minha?has_content>
                     <span class="row-meta__meu"><span class="icon">directions_bus</span>${minhasChegadas[c.id?c]}</span>
-                  <#else>
-                    <span><span class="icon">directions_bus</span>Transporte gratuito</span>
+                  <#elseif c.departureLocation??>
+                    <span><span class="icon">directions_bus</span>Saída: ${c.departureLocation.city}</span>
                   </#if>
                 </div>
               </div>

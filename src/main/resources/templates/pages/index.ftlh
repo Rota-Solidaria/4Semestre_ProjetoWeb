@@ -7,7 +7,7 @@
         <div>
           <span class="kicker">Doação de sangue · Angatuba e região</span>
           <h1>Doe sangue, salve vidas perto de você.</h1>
-          <p>Encontre a próxima coleta na sua região, veja se há transporte gratuito e garanta sua vaga em poucos minutos.</p>
+          <p>Encontre a próxima coleta na sua região e garanta sua vaga em poucos minutos.</p>
         </div>
 
         <div class="hero-image">
@@ -46,7 +46,9 @@
                         <#if c.donationLocation??>
                           <span><span class="icon">place</span>${c.donationLocation.name}<#if c.donationLocation.city??> — ${c.donationLocation.city}</#if></span>
                         </#if>
-                        <span><span class="icon">directions_bus</span>Transporte gratuito</span>
+                        <#if c.departureLocation??>
+                          <span><span class="icon">directions_bus</span>Saída: ${c.departureLocation.city}</span>
+                        </#if>
                       </div>
                       <span class="card-cta cta-primary">Inscrever-se</span>
                     </div>
@@ -64,7 +66,9 @@
                         <#if c.donationLocation??>
                           <span><span class="icon">place</span>${c.donationLocation.name}<#if c.donationLocation.city??> — ${c.donationLocation.city}</#if></span>
                         </#if>
-                        <span><span class="icon">directions_bus</span>Transporte gratuito</span>
+                        <#if c.departureLocation??>
+                          <span><span class="icon">directions_bus</span>Saída: ${c.departureLocation.city}</span>
+                        </#if>
                       </div>
                       <span class="card-cta cta-disabled">Encerrada</span>
                     </div>

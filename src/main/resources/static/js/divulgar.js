@@ -157,7 +157,7 @@
   }
 
   function textoParadas() {
-    return dados.paradas ? 'Passa por ' + dados.paradas + ' · ônibus gratuito' : 'Ônibus gratuito até o hemocentro';
+    return dados.paradas ? 'Passa por ' + dados.paradas : 'Ônibus até o hemocentro';
   }
 
   /** Mede o bilhete (cartão branco) antes de desenhar. */
@@ -417,7 +417,7 @@
   /* ---------- Compartilhar ---------- */
 
   function mensagem(curta) {
-    var partes = [dados.titulo + ': ônibus gratuito de ' + dados.partida + ' até o hemocentro em ' + dados.destino];
+    var partes = [dados.titulo + ': transporte de ' + dados.partida + ' até o hemocentro em ' + dados.destino];
     if (dados.data) { partes[0] += ', ' + dados.data + (dados.saida ? ' às ' + dados.saida : ''); }
     if (!curta && dados.paradas) { partes.push('Passa por ' + dados.paradas + '.'); }
     partes.push(curta ? 'Doe sangue, a gente leva você.' : 'Doe sangue, a gente leva você. Inscreva-se:');
