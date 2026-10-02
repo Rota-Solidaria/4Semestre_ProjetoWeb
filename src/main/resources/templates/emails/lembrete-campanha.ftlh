@@ -13,9 +13,9 @@
     <@e.dado rotulo="Data" valor=data/>
     <@e.dado rotulo="Horário" valor=hora/>
     <@e.dado rotulo=rotuloLocal valor=local/>
-    <@e.dado rotulo="Bilhete" valor=codigo/>
+    <@e.dado rotulo="Inscrição" valor=codigo/>
   </@e.secao>
-  <@e.botao href=linkBilhete rotulo="Ver meu bilhete"/>
+  <@e.botao href=linkBilhete rotulo="Ver inscrição"/>
   <@e.secao titulo="Antes de ir">
     <@e.item forte="Leve um documento oficial com foto.">Ele é pedido na triagem do hemocentro.</@e.item>
     <@e.item forte="Durma bem e alimente-se.">Evite comidas gordurosas nas horas anteriores.</@e.item>

@@ -33,16 +33,15 @@
   var atual = parseInt(wizard.dataset.passoInicial, 10) || 1;
   var alcancado = novo ? atual : TOTAL; // editando, todos os passos ficam liberados
 
-  /* ---------- Modo: ônibus (5 passos) ou encontro (sem partida nem paradas) ---------- */
+  /* ---------- Rota obrigatória em 5 passos ---------- */
 
   function encontro() {
-    var marcado = form.querySelector('input[name="modo"]:checked') || form.querySelector('input[type="hidden"][name="modo"]');
-    return !!marcado && marcado.value === 'MEETING';
+    return false;
   }
 
-  /** Números dos passos que existem no modo atual, em ordem. */
+  /** Todas as campanhas têm rota de transporte em 5 passos. */
   function ativos() {
-    return encontro() ? [1, 4, 5] : [1, 2, 3, 4, 5];
+    return [1, 2, 3, 4, 5];
   }
 
   /** Passo vizinho ao passo n (dir = 1 adiante, -1 atrás), ou o próprio n na ponta. */
@@ -296,21 +295,20 @@
     textos.appendChild(el('strong', 'revisao__titulo', valor(form, 'titulo') || 'Sem título'));
     var data = valor(form, 'data');
     var vagas = valor(form, 'vagas');
-    textos.appendChild(el('span', null, [data ? dataBr(data) : 'Sem data', vagas ? vagas + ' vagas' : null, encontro() ? 'encontro no local' : null,
+    textos.appendChild(el('span', null, [data ? dataBr(data) : 'Sem data', vagas ? vagas + ' vagas no transporte' : null,
       novo ? 'inscrições abrem ao publicar' : null].filter(Boolean).join(' · ')));
     cartao.appendChild(textos);
     cartao.appendChild(linkEditar(1));
     revisao.appendChild(cartao);
 
     // Rota
-    var direto = encontro();
     var rota = el('div', 'revisao__cartao revisao__cartao--rota');
     var topo = el('div', 'revisao__topo');
-    topo.appendChild(el('strong', 'revisao__titulo', direto ? 'Local de encontro' : 'Rota do ônibus'));
+    topo.appendChild(el('strong', 'revisao__titulo', 'Rota do transporte'));
     rota.appendChild(topo);
     var lista = el('ol', 'revisao__rota');
     var fim = form.querySelector('[data-ponto][data-tipo="fim"]');
-    var pontos = direto ? [fim] : [form.querySelector('[data-ponto][data-tipo="inicio"]')].concat(paradas(), [fim]);
+    var pontos = [form.querySelector('[data-ponto][data-tipo="inicio"]')].concat(paradas(), [fim]);
     pontos.forEach(function (bloco, i) {
       var tipo = bloco.dataset.tipo;
       var li = el('li', 'revisao__ponto revisao__ponto--' + tipo);

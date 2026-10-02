@@ -148,12 +148,13 @@ public class DataInitializer implements CommandLineRunner {
 
         completarEmbarqueDaCampanhaDemo();
         transactionTemplate.executeWithoutResult(status -> completarRotaDaCampanhaDemo());
-        transactionTemplate.executeWithoutResult(status -> criarCampanhaDeEncontroDemo());
+        transactionTemplate.executeWithoutResult(status -> removerCampanhasSemTransporte());
+        transactionTemplate.executeWithoutResult(status -> garantirSegundaCampanhaComRota());
     }
 
-    // Campanha de demonstração no modo Encontro (sem ônibus), para bancos novos e antigos
-    private void criarCampanhaDeEncontroDemo() {
-        if (campanhaRepository.findAll().stream().anyMatch(Campaign::isMeeting)) {
+    // Garante que exista uma segunda campanha de demonstração com rota completa de transporte
+    private void garantirSegundaCampanhaComRota() {
+        if (campanhaRepository.findAll().stream().anyMatch(c -> "Caravana Regional para Sorocaba".equals(c.getTitle()))) {
             return;
         }
         Organizer organizador = campanhaRepository.findAll().stream()
@@ -172,17 +173,55 @@ public class DataInitializer implements CommandLineRunner {
         hemocentro.setLongitude(new BigDecimal("-47.4586000"));
         localizacaoRepository.save(hemocentro);
 
-        Campaign c = new Campaign();
-        c.setTitle("Encontro Solidário no Colsan");
-        c.setDescription("Doação de sangue sem transporte: você vai por conta própria e nos encontramos no hemocentro.");
-        c.setEventDate(LocalDate.now().plusDays(20));
-        c.setDonationTime(LocalTime.of(9, 0));
-        c.setSlots(30);
-        c.setStatus(CampaignStatus.OPEN);
-        c.setTransportMode(TransportMode.MEETING);
-        c.setDonationLocation(hemocentro);
-        c.setOrganizer(organizador);
-        campanhaRepository.save(c);
+        Location partida = new Location();
+        partida.setName("Terminal Rodoviário");
+        partida.setCity("Itapetininga");
+        partida.setState("SP");
+        partida.setLatitude(new BigDecimal("-23.5886000"));
+        partida.setLongitude(new BigDecimal("-48.0483000"));
+        localizacaoRepository.save(partida);
+
+        Campaign c2 = new Campaign();
+        c2.setTitle("Caravana Regional para Sorocaba");
+        c2.setDescription("Transporte gratuito saindo de Itapetininga com paradas até o Hemocentro de Sorocaba.");
+        c2.setEventDate(LocalDate.now().plusDays(20));
+        c2.setDepartureLocation(partida);
+        c2.setDepartureTime(LocalTime.of(7, 0));
+        c2.setDonationTime(LocalTime.of(9, 30));
+        c2.setSlots(30);
+        c2.setStatus(CampaignStatus.OPEN);
+        c2.setTransportMode(TransportMode.BUS);
+        c2.setDonationLocation(hemocentro);
+        c2.setOrganizer(organizador);
+        campanhaRepository.save(c2);
+
+        RouteStop stop1 = criarParada(c2, 0, "Praça Central", "Alambari", "-23.5512000", "-47.8967000", LocalTime.of(7, 30));
+        c2.getStops().add(stop1);
+        campanhaRepository.save(c2);
+
+        // Se João existir, inscreve ele na campanha 2 para ter a inscrição #2
+        donorRepository.findAll().stream().findFirst().ifPresent(doador -> {
+            if (!inscricaoRepository.existsByCampaignAndDonor(c2, doador)) {
+                Registration inscricao2 = new Registration();
+                inscricao2.setCampaign(c2);
+                inscricao2.setDonor(doador);
+                inscricao2.setStatus(RegistrationStatus.CONFIRMED);
+                inscricao2.setBoardingPoint("Terminal Rodoviário, Itapetininga");
+                inscricao2.setBoardingLocation(partida);
+                inscricaoRepository.save(inscricao2);
+            }
+        });
+    }
+
+    // Remove eventuais campanhas antigas cadastradas no modo sem transporte
+    private void removerCampanhasSemTransporte() {
+        var semTransporte = campanhaRepository.findAll().stream()
+                .filter(c -> c.getDepartureLocation() == null)
+                .toList();
+        for (Campaign c : semTransporte) {
+            inscricaoRepository.deleteAll(inscricaoRepository.findByCampaign(c));
+            campanhaRepository.delete(c);
+        }
     }
 
     private User criarConta(String nome, String email, String telefone) {

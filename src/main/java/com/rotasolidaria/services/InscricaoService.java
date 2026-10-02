@@ -30,11 +30,8 @@ import java.util.Optional;
 public class InscricaoService {
 
     public static final String OWN_TRANSPORT = "Vou por conta própria";
-    /** Valor do formulário para "Vou por conta própria". */
+    /** Valor do formulário para "Vou por conta própria" (legado). */
     public static final String OWN_TRANSPORT_KEY = "proprio";
-    /** Ponto de embarque gravado nas inscrições do modo Encontro (não há ônibus). */
-    public static final String MEETING_POINT = "Encontro no local da doação";
-    public static final String MEETING_KEY = "encontro";
 
     private final InscricaoRepository inscricaoRepository;
     private final DonorRepository donorRepository;
@@ -48,15 +45,11 @@ public class InscricaoService {
     }
 
     /**
-     * Opções de embarque da campanha: a partida, cada parada da rota (em ordem) e ir por conta própria.
-     * No modo Encontro só existe o encontro no local da doação.
+     * Opções de embarque da campanha: ponto de partida e paradas da rota.
+     * Toda campanha do Rota Solidária agora possui transporte obrigatório com rota definida.
      */
     public List<BoardingOption> boardingOptions(Campaign campaign) {
         List<BoardingOption> options = new ArrayList<>();
-        if (campaign.isMeeting()) {
-            options.add(new BoardingOption(MEETING_KEY, MEETING_POINT, campaign.getDonationTime(), null, false));
-            return options;
-        }
         Location departure = campaign.getDepartureLocation();
         if (departure != null) {
             options.add(busOption(departure, campaign.getDepartureTime()));
@@ -64,10 +57,9 @@ public class InscricaoService {
                 options.add(busOption(stop.getLocation(), stop.getStopTime()));
             }
         } else {
-            options.add(new BoardingOption("cidade", "Embarque na minha cidade (o organizador confirma o ponto)",
+            options.add(new BoardingOption("cidade", "Embarque na cidade de partida (o organizador confirma o ponto)",
                     campaign.getDepartureTime(), null, true));
         }
-        options.add(new BoardingOption(OWN_TRANSPORT_KEY, OWN_TRANSPORT, campaign.getDonationTime(), null, false));
         return options;
     }
 
@@ -130,16 +122,10 @@ public class InscricaoService {
 
     /** Resumo de como o doador chega, para a lista de campanhas: "Seu embarque: Angatuba às 06:30". */
     public static String arrivalSummary(Registration registration) {
-        if (registration.getCampaign().isMeeting()) {
-            return "Encontro no local, por conta própria";
-        }
-        if (!goesByBus(registration)) {
-            return "Você vai por conta própria";
-        }
         Location boarding = registration.getBoardingLocation() != null
                 ? registration.getBoardingLocation()
                 : registration.getCampaign().getDepartureLocation();
-        String where = boarding == null ? "na sua cidade"
+        String where = boarding == null ? "no ponto de encontro"
                 : boarding.getCity() != null && !boarding.getCity().isBlank() ? boarding.getCity() : boarding.getName();
         String time = boardingTimeTexto(registration);
         return "Seu embarque: " + where + (time == null ? "" : " às " + time);
@@ -174,17 +160,15 @@ public class InscricaoService {
             throw new BusinessException("As inscrições desta campanha estão encerradas.");
         }
         if (slotsLeft(campaign) <= 0) {
-            throw new BusinessException(campaign.isMeeting() ? "Não há mais vagas nesta campanha."
-                    : "Não há mais vagas no ônibus desta campanha.");
+            throw new BusinessException("Não há mais vagas no transporte desta campanha.");
         }
         if (!lgpdAccepted) {
             throw new BusinessException("É preciso autorizar o envio dos seus dados ao organizador.");
         }
-        // No modo Encontro só há um jeito de chegar, então o formulário nem pergunta
         BoardingOption boarding = boardingOptions(campaign).stream()
-                .filter(o -> campaign.isMeeting() || o.getKey().equals(boardingKey))
+                .filter(o -> o.getKey().equals(boardingKey))
                 .findFirst()
-                .orElseThrow(() -> new BusinessException("Escolha um local de embarque."));
+                .orElseThrow(() -> new BusinessException("Escolha onde você vai embarcar na rota do transporte."));
 
         Registration registration = new Registration();
         registration.setCampaign(campaign);

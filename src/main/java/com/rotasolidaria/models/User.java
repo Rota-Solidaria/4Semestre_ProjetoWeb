@@ -113,4 +113,26 @@ public class User {
     public boolean hasPassword() {
         return passwordHash != null && !passwordHash.isBlank();
     }
+
+    public String getFirstName() {
+        if (name == null || name.isBlank()) {
+            return "Usuário";
+        }
+        return name.trim().split("\\s+")[0];
+    }
+
+    public String getInitials() {
+        if (name == null || name.isBlank()) {
+            return "US";
+        }
+        String[] parts = name.trim().split("\\s+");
+        if (parts.length >= 2) {
+            String first = parts[0];
+            String last = parts[parts.length - 1];
+            return (first.substring(0, 1) + last.substring(0, 1)).toUpperCase();
+        } else if (parts.length == 1 && !parts[0].isEmpty()) {
+            return parts[0].substring(0, 1).toUpperCase();
+        }
+        return "US";
+    }
 }

@@ -72,38 +72,27 @@
             </#if>
 
             <div class="info-box">
-              <#if campanha.meeting>
-                <span class="icon-box"><span class="icon">directions_car</span></span>
-                <div>
-                  <div class="info-title">Encontro no local</div>
-                  <div class="info-sub">Sem transporte: você vai por conta própria</div>
+              <span class="icon-box"><span class="icon">directions_bus</span></span>
+              <div>
+                <div class="info-title">Transporte gratuito</div>
+                <div class="info-sub">
+                  <#if campanha.departureLocation??>
+                    Embarque em: ${campanha.departureLocation.name}
+                  <#else>
+                    Embarque na cidade de partida
+                  </#if>
                 </div>
-              <#else>
-                <span class="icon-box"><span class="icon">directions_bus</span></span>
-                <div>
-                  <div class="info-title">Transporte gratuito</div>
-                  <div class="info-sub">
-                    <#if campanha.departureLocation??>
-                      Embarque em: ${campanha.departureLocation.name}
-                    <#else>
-                      Embarque na sua cidade
-                    </#if>
-                  </div>
-                </div>
-              </#if>
+              </div>
             </div>
           </div>
 
           <section class="route" aria-labelledby="route-title">
             <span class="kicker">Como chegar</span>
-            <h2 id="route-title"><#if campanha.meeting>Encontro no hemocentro<#else>O ônibus leva você até o hemocentro</#if></h2>
+            <h2 id="route-title">O transporte leva você até o hemocentro</h2>
             <#if meuEmbarqueNome??>
-              <p class="route__meu"><span class="icon" aria-hidden="true">confirmation_number</span><span>Seu embarque: <strong>${meuEmbarqueNome}</strong><#if meuEmbarqueHorario??> às <strong class="mono">${meuEmbarqueHorario}</strong></#if></span></p>
-            <#elseif vouDireto??>
-              <p class="route__meu"><span class="icon" aria-hidden="true">directions_car</span><span>Você vai por conta própria<#if campanha.donationTime??>: encontro no hemocentro às <strong class="mono">${campanha.donationTimeTexto}</strong></#if></span></p>
+              <p class="route__meu"><span class="icon" aria-hidden="true">assignment</span><span>Seu embarque: <strong>${meuEmbarqueNome}</strong><#if meuEmbarqueHorario??> às <strong class="mono">${meuEmbarqueHorario}</strong></#if></span></p>
             </#if>
             <ol class="route__stops<#if campanha.stops?has_content> route__stops--multi</#if>">
-              <#if !campanha.meeting>
               <#assign meu = ehMeuEmbarque(campanha.departureLocation!)>
               <li class="route__stop<#if meu> route__stop--meu</#if>"<@pontoMapa local=campanha.departureLocation! tipo="inicio" meu=meu horario=(campanha.departureTime?string)!""/>>
                 <span class="route__dot route__dot--start"><span class="icon" aria-hidden="true">directions_bus</span></span>
@@ -130,8 +119,7 @@
                   </div>
                 </li>
               </#list>
-              </#if>
-              <li class="route__stop route__stop--end<#if vouDireto??> route__stop--meu</#if>"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=vouDireto?? horario=(campanha.donationTimeTexto)!""/>>
+              <li class="route__stop route__stop--end"<@pontoMapa local=campanha.donationLocation! tipo="fim" meu=false horario=(campanha.donationTimeTexto)!""/>>
                 <span class="route__dot route__dot--end"><span class="icon" aria-hidden="true">bloodtype</span></span>
                 <div class="route__text">
                   <span class="route__time"><#if campanha.donationTime??>Doação ${campanha.donationTimeTexto}<#else>Horário a confirmar</#if></span>
@@ -139,7 +127,6 @@
                   <#if campanha.donationLocation??>
                     <span>${campanha.donationLocation.name}<#if campanha.donationLocation.city??>, ${campanha.donationLocation.city}</#if></span>
                   </#if>
-                  <#if vouDireto??><@seloVoce texto="Você vai direto"/></#if>
                 </div>
               </li>
             </ol>
@@ -169,7 +156,7 @@
             </p>
           </div>
 
-          <div class="checklist-title"><#if campanha.meeting>Antes de ir<#else>Antes de embarcar</#if></div>
+          <div class="checklist-title">Antes de embarcar</div>
           <ul class="checklist">
             <li><span class="icon">check_circle</span>Documento oficial com foto, original</li>
             <li><span class="icon">check_circle</span>Alimentação leve até 4 horas antes</li>
@@ -179,7 +166,7 @@
 
           <div class="detail-actions">
             <#if minhaInscricao??>
-              <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}"><span class="icon">confirmation_number</span>Ver meu bilhete</a>
+              <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}"><span class="icon">assignment</span>Ver inscrição</a>
             <#elseif campanha.status != "OPEN" || vagasRestantes lte 0>
               <span class="btn btn-primary btn-lg btn-disabled" aria-disabled="true"><#if vagasRestantes lte 0>Vagas esgotadas<#else>Inscrições encerradas</#if></span>
             <#else>

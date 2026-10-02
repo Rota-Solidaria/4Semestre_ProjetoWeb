@@ -6,16 +6,19 @@
     </a>
     <#include "navbar.ftlh">
     <div class="header-actions">
-      <button type="button" class="icon-btn a11y-toggle" aria-label="Acessibilidade" aria-expanded="false" aria-controls="a11y-panel" data-a11y-toggle><span
-          class="icon" aria-hidden="true">accessibility_new</span></button>
+      <button type="button" class="icon-btn a11y-toggle" aria-label="Acessibilidade" aria-expanded="false"
+        aria-controls="a11y-panel" data-a11y-toggle><span class="icon"
+          aria-hidden="true">accessibility_new</span></button>
       <#if ehOrganizador!false>
-        <a class="header-cta" href="/organizador/campanhas/nova"><span class="icon" aria-hidden="true">add</span>Nova campanha</a>
+        <a class="header-cta" href="/organizador/campanhas/nova"><span class="icon" aria-hidden="true">add</span>Nova
+          campanha</a>
       </#if>
       <#if usuarioLogado??>
         <div class="user-dropdown-wrapper" id="userDropdownWrapper">
-          <button type="button" class="profile-chip dropdown-toggle" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">
-            <span class="avatar">${(usuarioLogado.name?keep_before(" ")?substring(0, 1))!"U"}${(usuarioLogado.name?keep_after(" ")?substring(0, 1))!"S"}</span>
-            <span>${usuarioLogado.name?keep_before(" ")}</span>
+          <button type="button" class="profile-chip dropdown-toggle" id="userMenuBtn" aria-haspopup="true"
+            aria-expanded="false">
+            <span class="avatar">${usuarioLogado.initials}</span>
+            <span>${usuarioLogado.firstName}</span>
             <span class="icon dropdown-caret">expand_more</span>
           </button>
           <div class="user-dropdown-menu" id="userMenuDropdown">
@@ -45,7 +48,8 @@
           </div>
         </div>
       <#else>
-        <a class="profile-chip profile-chip--login" href="/login"><span class="icon" aria-hidden="true">login</span>Entrar</a>
+        <a class="profile-chip profile-chip--login" href="/login"><span class="icon"
+            aria-hidden="true">login</span>Entrar</a>
       </#if>
     </div>
   </div>

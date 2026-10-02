@@ -20,13 +20,13 @@
         <div class="signup-intro">
           <span class="kicker">Inscrição</span>
           <h1>Reservar sua vaga</h1>
-          <p><#if campanha.meeting>Confira seus dados e pronto: o bilhete sai na hora.<#else>Confira seus dados, escolha onde embarcar e pronto: o bilhete sai na hora.</#if></p>
+          <p>Confira seus dados, escolha onde embarcar e confirme sua participação.</p>
         </div>
 
         <section class="signup-section" aria-labelledby="sec-dados">
           <h2 id="sec-dados"><span class="signup-num" aria-hidden="true">1</span>Seus dados</h2>
           <div class="account-row">
-            <span class="account-avatar" aria-hidden="true">${(usuario.name?keep_before(" ")?substring(0, 1))!"U"}${(usuario.name?keep_after(" ")?substring(0, 1))!""}</span>
+            <span class="account-avatar" aria-hidden="true">${(usuario.initials)!"US"}</span>
             <div class="account-info">
               <strong>${usuario.name}</strong>
               <#if usuario.phone?? && usuario.phone?has_content>
@@ -39,29 +39,6 @@
           </div>
         </section>
 
-        <#if campanha.meeting>
-          <#-- Modo Encontro: não há ônibus nem escolha de embarque, cada um chega ao hemocentro -->
-          <section class="signup-section" aria-labelledby="sec-encontro">
-            <h2 id="sec-encontro"><span class="signup-num" aria-hidden="true">2</span>Encontro no hemocentro</h2>
-            <div class="boarding-options">
-              <div class="boarding-card boarding-card--fixo">
-                <span class="boarding-card__text">
-                  <#if campanha.donationLocation??>
-                    <#assign dl = campanha.donationLocation>
-                    <#assign endereco = []>
-                    <#if dl.street??><#assign endereco += [dl.street + (dl.number??)?then(", " + dl.number!"", "")]></#if>
-                    <#if dl.neighborhood??><#assign endereco += [dl.neighborhood]></#if>
-                    <#if dl.city??><#assign endereco += [dl.city + (dl.state??)?then(" - " + dl.state!"", "")]></#if>
-                    <strong>${dl.name}</strong>
-                    <#if endereco?has_content><span>${endereco?join(" — ")}</span></#if>
-                  </#if>
-                  <span><#if campanha.donationTime??>Encontro às <span class="mono">${campanha.donationTimeTexto}</span> · <#else>Horário a confirmar · </#if>você chega por conta própria</span>
-                </span>
-                <span class="icon boarding-card__icon" aria-hidden="true">directions_car</span>
-              </div>
-            </div>
-          </section>
-        <#else>
         <fieldset class="signup-section">
           <legend><span class="signup-num" aria-hidden="true">2</span>Onde você vai embarcar?</legend>
           <div class="boarding-options">
@@ -70,20 +47,17 @@
                 <input type="radio" name="embarque" value="${opcao.key}" required<#if opcao?is_first> checked</#if>>
                 <span class="boarding-card__text">
                   <strong>${opcao.label}</strong>
-                  <#if !opcao.bus>
-                    <span><#if opcao.time??>Encontro no hemocentro às <span class="mono">${opcao.time}</span><#else>Encontro direto no hemocentro</#if></span>
-                  <#elseif opcao?is_first>
-                    <span><#if opcao.time??>Ônibus sai às <span class="mono">${opcao.time}</span> · gratuito<#else>Transporte gratuito · horário a confirmar</#if></span>
+                  <#if opcao?is_first>
+                    <span><#if opcao.time??>Saída do transporte às <span class="mono">${opcao.time}</span> · gratuito<#else>Transporte gratuito · horário a confirmar</#if></span>
                   <#else>
-                    <span><#if opcao.time??>Ônibus passa às <span class="mono">${opcao.time}</span> · gratuito<#else>Parada da rota · horário a confirmar</#if></span>
+                    <span><#if opcao.time??>Parada da rota às <span class="mono">${opcao.time}</span> · gratuito<#else>Parada da rota · horário a confirmar</#if></span>
                   </#if>
                 </span>
-                <span class="icon boarding-card__icon" aria-hidden="true"><#if opcao.bus>directions_bus<#else>directions_car</#if></span>
+                <span class="icon boarding-card__icon" aria-hidden="true">directions_bus</span>
               </label>
             </#list>
           </div>
         </fieldset>
-        </#if>
 
         <section class="signup-section">
           <h2><span class="signup-num" aria-hidden="true">3</span><span class="signup-heading"><label for="rs-obs">Algo que o organizador precise saber?</label><span class="signup-optional">opcional</span></span></h2>
@@ -114,7 +88,6 @@
           </#if>
 
           <ol class="summary__route">
-            <#if !campanha.meeting>
             <li data-embarque="<#if campanha.departureLocation??>${campanha.departureLocation.id?c}<#else>cidade</#if>">
               <span class="summary__dot" aria-hidden="true"></span>
               <span class="summary__stop">
@@ -131,8 +104,7 @@
                 </span>
               </li>
             </#list>
-            </#if>
-            <li data-embarque="proprio">
+            <li>
               <span class="summary__dot summary__dot--end" aria-hidden="true"></span>
               <span class="summary__stop">
                 <span class="mono"><#if campanha.donationTime??>${campanha.donationTimeTexto} · </#if>Doação</span>
@@ -147,7 +119,7 @@
           <button class="btn btn-primary btn-lg summary__cta" type="submit" form="inscricao-form"<#if vagasRestantes lte 0> disabled</#if>>
             Confirmar inscrição<span class="icon" aria-hidden="true">arrow_forward</span>
           </button>
-          <span class="summary__note"><span class="icon" aria-hidden="true">confirmation_number</span>Você recebe o bilhete <#if !campanha.meeting>de embarque </#if>na hora.</span>
+          <span class="summary__note"><span class="icon" aria-hidden="true">check_circle</span>Sua inscrição é confirmada na hora.</span>
         </div>
       </aside>
     </div>

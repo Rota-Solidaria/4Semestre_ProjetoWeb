@@ -13,6 +13,6 @@
   <@e.secao titulo="Seus próximos passos">
     <@e.item forte="Conte um pouco sobre você.">Tipo sanguíneo, peso e data de nascimento deixam a inscrição mais rápida.</@e.item>
     <@e.item forte="Encontre uma caravana.">Saídas de Angatuba e região para os hemocentros. <@e.link href=linkCampanhas>Ver campanhas</@e.link></@e.item>
-    <@e.item forte="Garanta seu lugar.">Escolha o ponto de embarque e receba seu bilhete.</@e.item>
+    <@e.item forte="Garanta seu lugar.">Escolha o ponto de embarque e confirme sua inscrição.</@e.item>
   </@e.secao>
 </@e.layout>

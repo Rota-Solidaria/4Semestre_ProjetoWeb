@@ -139,11 +139,7 @@ public class OrganizadorCampanhaService {
             throw new BusinessException("Informe a data da campanha.");
         }
         if (form.getVagas() == null || form.getVagas() < 1) {
-            throw new BusinessException(form.getModo() == TransportMode.MEETING
-                    ? "Informe quantas vagas a campanha tem." : "Informe quantas vagas o ônibus tem.");
-        }
-        if (campaign.getId() != null && inscritos > 0 && campaign.getTransportMode() != form.getModo()) {
-            throw new BusinessException("Já há " + inscritos + " doadores inscritos: não dá para mudar entre ônibus e encontro.");
+            throw new BusinessException("Informe quantas vagas o transporte tem.");
         }
         if (form.getVagas() < inscritos) {
             throw new BusinessException("Já há " + inscritos + " doadores inscritos: as vagas não podem ficar abaixo disso.");
@@ -154,7 +150,7 @@ public class OrganizadorCampanhaService {
         campaign.setDescription(descricao == null || descricao.isEmpty() ? null : descricao);
         campaign.setEventDate(form.getData());
         campaign.setSlots(form.getVagas());
-        campaign.setTransportMode(form.getModo());
+        campaign.setTransportMode(TransportMode.BUS);
         campaign.setImageUrl(imagem(form));
     }
 

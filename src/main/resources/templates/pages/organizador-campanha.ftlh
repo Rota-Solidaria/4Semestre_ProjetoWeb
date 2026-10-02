@@ -110,11 +110,8 @@
      É um formulário só: o servidor recebe tudo junto ao publicar e valida como antes. -->
 <#assign passoInicial = (novo && !(form.titulo?has_content))?then(1, 5)>
 <#assign passos = ["Campanha", "Partida", "Paradas", "Hemocentro", "Revisar e publicar"]>
-<#-- O modo já sai do servidor com o layout certo (passos visíveis, numeração, textos): assim a tela
-     não se reorganiza quando o campanha-wizard.js termina de carregar, depois do MapLibre -->
-<#assign encontro = ((form.modo!"BUS")?string == "MEETING")>
-<#assign ativos = encontro?then([1, 4, 5], [1, 2, 3, 4, 5])>
-<#function kicker n><#return "Passo " + (ativos?seq_index_of(n) + 1) + " de " + ativos?size></#function>
+<#assign ativos = [1, 2, 3, 4, 5]>
+<#function kicker n><#return "Passo " + n + " de 5"></#function>
 
 <@main.layout title="${novo?then('Nova campanha', 'Editar campanha')} - Rota Solidária" css="/css/organizador.css" currentNav="organizador" mapa=true scripts=["/js/rota-editor.js", "/js/campanha-wizard.js"]>
   <main class="container wizard" id="wizard" data-passo-inicial="${passoInicial}" data-passo="${passoInicial}" data-novo="${novo?c}">
@@ -169,54 +166,7 @@
             <p class="wizard-passo__sub">O que os doadores vão ver na lista de campanhas.</p>
             <div class="passo1">
           <div class="form-card">
-            <#assign modoAtual = (form.modo!"BUS")?string>
-            <#-- Modo da campanha: muda o assistente inteiro (Encontro esconde Partida e Paradas), por isso vem primeiro
-                 e cada opção mostra o trajeto e quantos passos terá -->
-            <fieldset class="modo" aria-describedby="modo-sub">
-              <legend class="modo__titulo">Como os doadores chegam ao hemocentro?</legend>
-              <p class="modo__sub" id="modo-sub">Isso define o que você preenche nos próximos passos.</p>
-              <div class="modo__opcoes">
-                <label class="modo__opcao">
-                  <input type="radio" name="modo" value="BUS"<#if modoAtual == "BUS"> checked</#if><#if form.inscritos gt 0> disabled</#if>>
-                  <span class="modo__check" aria-hidden="true"><span class="icon">check</span></span>
-                  <span class="modo__trajeto modo__trajeto--onibus" aria-hidden="true">
-                    <span class="modo__ponto"></span><span class="modo__linha"></span>
-                    <span class="modo__parada">1</span><span class="modo__linha"></span>
-                    <span class="modo__onibus"><span class="icon">directions_bus</span></span><span class="modo__linha"></span>
-                    <span class="modo__gota"></span>
-                  </span>
-                  <span class="modo__texto">
-                    <strong>Ônibus com rota</strong>
-                    <span>Você leva os doadores: define a partida, as paradas e o hemocentro.</span>
-                  </span>
-                  <span class="modo__passos">5 passos · com mapa da rota</span>
-                </label>
-                <label class="modo__opcao">
-                  <input type="radio" name="modo" value="MEETING"<#if modoAtual == "MEETING"> checked</#if><#if form.inscritos gt 0> disabled</#if>>
-                  <span class="modo__check" aria-hidden="true"><span class="icon">check</span></span>
-                  <span class="modo__trajeto modo__trajeto--encontro" aria-hidden="true">
-                    <span class="modo__lado">
-                      <span class="modo__chega"><span class="modo__pessoa"></span><span class="modo__linha" style="width:30px"></span></span>
-                      <span class="modo__chega"><span class="modo__pessoa"></span><span class="modo__linha" style="width:48px"></span></span>
-                    </span>
-                    <span class="modo__gota modo__gota--grande"></span>
-                    <span class="modo__lado modo__lado--dir">
-                      <span class="modo__chega"><span class="modo__linha" style="width:42px"></span><span class="modo__pessoa"></span></span>
-                      <span class="modo__chega"><span class="modo__linha" style="width:24px"></span><span class="modo__pessoa"></span></span>
-                    </span>
-                  </span>
-                  <span class="modo__texto">
-                    <strong>Encontro no local</strong>
-                    <span>Sem transporte: cada doador vai por conta própria até o hemocentro.</span>
-                  </span>
-                  <span class="modo__passos">3 passos · só o hemocentro</span>
-                </label>
-              </div>
-              <#if form.inscritos gt 0>
-                <input type="hidden" name="modo" value="${modoAtual}">
-                <span class="campo__dica"><span class="icon" aria-hidden="true">lock</span>Já há doadores inscritos: não dá para mudar entre ônibus e encontro.</span>
-              </#if>
-            </fieldset>
+            <input type="hidden" name="modo" value="BUS">
 
             <div class="campos">
               <label class="campo">
@@ -232,7 +182,7 @@
                 <input type="date" name="data" value="<#if form.data??>${form.data}</#if>" required<#if novo> min="${.now?string('yyyy-MM-dd')}"</#if>>
               </label>
               <label class="campo campo--2">
-                <span class="campo__rotulo" data-rotulo-vagas><#if encontro>Vagas<#else>Vagas no ônibus</#if></span>
+                <span class="campo__rotulo" data-rotulo-vagas>Vagas no transporte</span>
                 <input type="number" name="vagas" value="<#if form.vagas??>${form.vagas?c}</#if>" min="${(form.inscritos gt 0)?then(form.inscritos?c, '1')}" max="999" required>
                 <#if form.inscritos gt 0><span class="campo__dica">${form.inscritos} <#if form.inscritos == 1>doador inscrito<#else>doadores inscritos</#if></span></#if>
               </label>
@@ -278,8 +228,8 @@
                     <strong class="previa-doador__titulo" data-previa="titulo">${form.titulo!"Título da campanha"}</strong>
                     <span class="previa-doador__meta"><span class="icon" aria-hidden="true">calendar_month</span><span data-previa="data">Data a definir</span> · <span data-previa="vagas">${(form.vagas!40)?c}</span> vagas</span>
                     <p class="previa-doador__descricao" data-previa="descricao"></p>
-                    <div class="previa-doador__rota" aria-hidden="true"<#if encontro> hidden</#if>><span class="previa-doador__ponto"></span><span class="previa-doador__linha"></span><span class="previa-doador__gota"></span></div>
-                    <span class="previa-doador__dica"><#if encontro>Os doadores vão direto ao hemocentro, sem ônibus.<#else>A rota aparece aqui quando você montar a partida e o hemocentro.</#if></span>
+                    <div class="previa-doador__rota" aria-hidden="true"><span class="previa-doador__ponto"></span><span class="previa-doador__linha"></span><span class="previa-doador__gota"></span></div>
+                    <span class="previa-doador__dica">A rota aparece aqui quando você montar a partida e o hemocentro.</span>
                   </div>
                 </article>
               </aside>
@@ -303,7 +253,7 @@
 
           <section class="wizard-passo" data-passo="4" aria-labelledby="passo-4-titulo" hidden>
             <span class="kicker" data-kicker>${kicker(4)}</span>
-            <h1 id="passo-4-titulo" data-titulo-bus="Onde acontece a doação?" data-titulo-encontro="Onde as pessoas vão se encontrar?"><#if encontro>Onde as pessoas vão se encontrar?<#else>Onde acontece a doação?</#if></h1>
+            <h1 id="passo-4-titulo">Onde acontece a doação?</h1>
             <p class="wizard-passo__sub">Escolha um hemocentro de SP na lista (ou clicando na gota do mapa), ou digite o endereço.</p>
             <@ponto p=form.destino prefixo="destino" tipo="fim" titulo="Hemocentro" sub="Onde acontece a doação" horarioRotulo="Doação às"/>
           </section>

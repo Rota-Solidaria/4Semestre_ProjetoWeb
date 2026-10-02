@@ -35,7 +35,7 @@ public class WelcomeEmailService {
         userRepository.findById(event.userId()).ifPresent(user -> {
             String linkPerfil = UriComponentsBuilder.fromUriString(baseUrl).path("/perfil").fragment("editar").toUriString();
             String linkCampanhas = UriComponentsBuilder.fromUriString(baseUrl).path("/campanhas").toUriString();
-            String firstName = user.getName().trim().split("\\s+")[0];
+            String firstName = user.getFirstName();
 
             String plainText = """
                     Olá, %s!

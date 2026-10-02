@@ -61,9 +61,7 @@
                     <span><span class="icon">place</span>${c.donationLocation.name} — ${c.donationLocation.city}</span>
                   </#if>
                   <#if minha?has_content>
-                    <span class="row-meta__meu"><span class="icon"><#if c.meeting>pin_drop<#else>directions_bus</#if></span>${minhasChegadas[c.id?c]}</span>
-                  <#elseif c.meeting>
-                    <span><span class="icon">pin_drop</span>Encontro no local</span>
+                    <span class="row-meta__meu"><span class="icon">directions_bus</span>${minhasChegadas[c.id?c]}</span>
                   <#else>
                     <span><span class="icon">directions_bus</span>Transporte gratuito</span>
                   </#if>
@@ -71,7 +69,7 @@
               </div>
             <#if minha?has_content>
                 <div class="row-ctas">
-                  <a class="row-cta cta-primary" href="/inscricoes/${minha.id?c}"><span class="icon" aria-hidden="true">confirmation_number</span>Ver meu bilhete</a>
+                  <a class="row-cta cta-primary" href="/inscricoes/${minha.id?c}"><span class="icon" aria-hidden="true">assignment</span>Ver inscrição</a>
                   <a class="row-cta cta-secondary" href="/campanhas/${c.id?c}">Ver campanha</a>
                 </div>
               </div>

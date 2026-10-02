@@ -529,14 +529,19 @@ input,select,textarea{font:inherit;color:inherit}
 .donor-card {
   position: relative;
   overflow: hidden;
-  background: var(--brand-fill, var(--brand));
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #fff;
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 6px 20px #1A181714;
+  gap: 16px;
+  width: min(100%, 390px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
 }
 
 .donor-card::before {
@@ -588,7 +593,7 @@ input,select,textarea{font:inherit;color:inherit}
   position: relative;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.22);
@@ -695,8 +700,13 @@ input,select,textarea{font:inherit;color:inherit}
   align-self: flex-start;
 }
 
-@media (max-width: 760px) {
-  .donor-row {
-    grid-template-columns: 1fr;
+@media (max-width: 860px) {
+  .profile-hero-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .donor-card {
+    width: 100%;
   }
 }
+

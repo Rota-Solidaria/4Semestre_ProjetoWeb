@@ -169,16 +169,16 @@ public class Campaign {
     }
 
     public TransportMode getTransportMode() {
-        return transportMode == null ? TransportMode.BUS : transportMode;
+        return TransportMode.BUS;
     }
 
     public void setTransportMode(TransportMode transportMode) {
-        this.transportMode = transportMode;
+        this.transportMode = TransportMode.BUS;
     }
 
-    /** Modo Encontro: sem ônibus nem rota, cada doador vai por conta própria até o local da doação. */
+    /** Todas as campanhas agora utilizam transporte com rota definida. */
     public boolean isMeeting() {
-        return getTransportMode() == TransportMode.MEETING;
+        return false;
     }
 
     public String getImageUrl() {

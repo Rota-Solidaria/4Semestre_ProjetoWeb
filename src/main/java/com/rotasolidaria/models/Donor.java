@@ -51,6 +51,14 @@ public class Donor {
         return user.getPhone();
     }
 
+    public String getFirstName() {
+        return user != null ? user.getFirstName() : "Doador";
+    }
+
+    public String getInitials() {
+        return user != null ? user.getInitials() : "US";
+    }
+
     // Getters and Setters
 
     public Long getId() {

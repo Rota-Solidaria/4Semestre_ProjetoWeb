@@ -63,20 +63,15 @@ public class RotaService {
      */
     @Transactional
     public void aplicar(Campaign campaign, RotaForm form) {
-        // Modo Encontro: não há ônibus, então a "rota" é só o local da doação
-        boolean encontro = campaign.isMeeting();
-        List<PontoForm> paradas = encontro ? List.of()
-                : form.getParadas().stream().filter(p -> p != null && !p.isVazio()).toList();
-        if (!encontro) {
-            exigirNomeECidade(form.getPartida(), "a partida");
-            for (int i = 0; i < paradas.size(); i++) {
-                exigirNomeECidade(paradas.get(i), "a parada " + (i + 1));
-            }
+        List<PontoForm> paradas = form.getParadas().stream()
+                .filter(p -> p != null && !p.isVazio()).toList();
+
+        exigirNomeECidade(form.getPartida(), "a partida");
+        for (int i = 0; i < paradas.size(); i++) {
+            exigirNomeECidade(paradas.get(i), "a parada " + (i + 1));
         }
         exigirNomeECidade(form.getDestino(), "o hemocentro");
-        if (!encontro) {
-            exigirHorariosEmOrdem(form.getPartida(), paradas, form.getDestino());
-        }
+        exigirHorariosEmOrdem(form.getPartida(), paradas, form.getDestino());
 
         // Locais que já fazem parte desta rota: só eles podem ser editados pelo id vindo do formulário
         Map<Long, Location> atuais = new HashMap<>();
@@ -84,7 +79,7 @@ public class RotaService {
         guardar(atuais, campaign.getDonationLocation());
         campaign.getStops().forEach(s -> guardar(atuais, s.getLocation()));
 
-        Location partida = encontro ? null : aplicar(form.getPartida(), atuais);
+        Location partida = aplicar(form.getPartida(), atuais);
         List<Location> locaisDasParadas = paradas.stream().map(p -> aplicar(p, atuais)).toList();
         Location destino = aplicar(form.getDestino(), atuais);
 
@@ -102,11 +97,11 @@ public class RotaService {
             }
         }
 
-        campaign.setDepartureLocation(partida == null ? null : localizacaoRepository.save(partida));
-        campaign.setDepartureTime(encontro ? null : form.getPartida().getHorario());
+        campaign.setDepartureLocation(localizacaoRepository.save(partida));
+        campaign.setDepartureTime(form.getPartida().getHorario());
         campaign.setDonationLocation(localizacaoRepository.save(destino));
         campaign.setDonationTime(form.getDestino().getHorario());
-        campaign.setDonationTimeEstimated(!encontro && estimado(form.getDestino()));
+        campaign.setDonationTimeEstimated(estimado(form.getDestino()));
 
         campaign.getStops().clear();
         for (int i = 0; i < paradas.size(); i++) {

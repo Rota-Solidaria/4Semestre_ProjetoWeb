@@ -117,7 +117,7 @@ public class PasswordResetService {
                 .path("/redefinir-senha")
                 .queryParam("token", rawToken)
                 .toUriString();
-        String firstName = user.getName().trim().split("\\s+")[0];
+        String firstName = user.getFirstName();
 
         String plainText = """
                 Olá, %s!
