@@ -17,12 +17,15 @@
     </section>
 
     <div class="container section">
-      <div class="filter-panel">
+      <form method="get" action="/campanhas" class="filter-panel" role="search">
         <label class="search-field">
-          <span class="icon">search</span>
-          <input placeholder="Buscar por cidade, local ou organizador" aria-label="Buscar">
+          <span class="icon" aria-hidden="true">search</span>
+          <input type="search" name="q" value="${busca!}" placeholder="Buscar por cidade, local ou organizador" aria-label="Buscar campanhas">
         </label>
-      </div>
+        <#if (limite?? && limite != 6)>
+          <input type="hidden" name="limite" value="${limite}">
+        </#if>
+      </form>
 
       <div class="list">
         <#if campanhas?? && campanhas?size gt 0>
@@ -83,10 +86,70 @@
         </#if>
       </div>
 
-      <div class="pagination">
-        <span class="page-btn current">1</span>
-        <span class="page-btn">2</span>
-      </div>
+      <#if (totalPaginas!0) gt 1>
+        <nav class="pagination" aria-label="Paginação das campanhas">
+          <#if temAnterior!false>
+            <a class="page-btn" href="/campanhas?pagina=${paginaAtual - 1}<#if busca?has_content>&q=${busca?url}</#if><#if (limite?? && limite != 6)>&limite=${limite}</#if>" aria-label="Página anterior">
+              <span class="icon" aria-hidden="true">chevron_left</span>
+            </a>
+          </#if>
+
+          <#if totalPaginas lte 7>
+            <#list 1..totalPaginas as p>
+              <#if p == paginaAtual>
+                <span class="page-btn current" aria-current="page">${p}</span>
+              <#else>
+                <a class="page-btn" href="/campanhas?pagina=${p}<#if busca?has_content>&q=${busca?url}</#if><#if (limite?? && limite != 6)>&limite=${limite}</#if>" aria-label="Página ${p}">${p}</a>
+              </#if>
+            </#list>
+          <#else>
+            <#if paginaAtual == 1>
+              <span class="page-btn current" aria-current="page">1</span>
+            <#else>
+              <a class="page-btn" href="/campanhas?pagina=1<#if busca?has_content>&q=${busca?url}</#if><#if (limite?? && limite != 6)>&limite=${limite}</#if>" aria-label="Página 1">1</a>
+            </#if>
+
+            <#if paginaAtual gt 3>
+              <span class="page-ellipsis" aria-hidden="true">…</span>
+            </#if>
+
+            <#assign pInicio = (paginaAtual - 1)>
+            <#if pInicio lt 2><#assign pInicio = 2></#if>
+            <#assign pFim = (paginaAtual + 1)>
+            <#if pFim gt (totalPaginas - 1)><#assign pFim = (totalPaginas - 1)></#if>
+
+            <#if pInicio lte pFim>
+              <#list pInicio..pFim as p>
+                <#if p == paginaAtual>
+                  <span class="page-btn current" aria-current="page">${p}</span>
+                <#else>
+                  <a class="page-btn" href="/campanhas?pagina=${p}<#if busca?has_content>&q=${busca?url}</#if><#if (limite?? && limite != 6)>&limite=${limite}</#if>" aria-label="Página ${p}">${p}</a>
+                </#if>
+              </#list>
+            </#if>
+
+            <#if paginaAtual lt (totalPaginas - 2)>
+              <span class="page-ellipsis" aria-hidden="true">…</span>
+            </#if>
+
+            <#if paginaAtual == totalPaginas>
+              <span class="page-btn current" aria-current="page">${totalPaginas}</span>
+            <#else>
+              <a class="page-btn" href="/campanhas?pagina=${totalPaginas}<#if busca?has_content>&q=${busca?url}</#if><#if (limite?? && limite != 6)>&limite=${limite}</#if>" aria-label="Página ${totalPaginas}">${totalPaginas}</a>
+            </#if>
+          </#if>
+
+          <#if temProxima!false>
+            <a class="page-btn" href="/campanhas?pagina=${paginaAtual + 1}<#if busca?has_content>&q=${busca?url}</#if><#if (limite?? && limite != 6)>&limite=${limite}</#if>" aria-label="Próxima página">
+              <span class="icon" aria-hidden="true">chevron_right</span>
+            </a>
+          </#if>
+        </nav>
+      <#elseif (totalElementos!0) gt 0>
+        <nav class="pagination" aria-label="Paginação das campanhas">
+          <span class="page-btn current" aria-current="page">1</span>
+        </nav>
+      </#if>
     </div>
   </main>
 </@main.layout>
