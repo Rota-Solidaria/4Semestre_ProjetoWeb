@@ -34,3 +34,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### macOS ###
+.DS_Store
+
+### Python (loadtest) ###
+__pycache__/
+*.pyc
+
+### Vídeo da banca (material de apresentação, fora da parte técnica) ###
+video/
+docs/video/
