@@ -710,3 +710,9 @@ input,select,textarea{font:inherit;color:inherit}
   }
 }
 
+.profile-single-column {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+

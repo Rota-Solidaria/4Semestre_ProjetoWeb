@@ -1,12 +1,14 @@
 package com.rotasolidaria.controllers;
 
 import com.rotasolidaria.models.Donor;
+import com.rotasolidaria.models.Organizer;
 import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.User;
 import com.rotasolidaria.models.enums.BloodType;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
+import com.rotasolidaria.repositories.OrganizerRepository;
 import com.rotasolidaria.repositories.UserRepository;
 import com.rotasolidaria.exception.BusinessException;
 import com.rotasolidaria.security.AuthenticatedUser;
@@ -35,17 +37,20 @@ public class ProfileController {
 
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
+    private final OrganizerRepository organizerRepository;
     private final InscricaoRepository inscricaoRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
     public ProfileController(UserRepository userRepository,
                              DonorRepository donorRepository,
+                             OrganizerRepository organizerRepository,
                              InscricaoRepository inscricaoRepository,
                              PasswordEncoder passwordEncoder,
                              AuthService authService) {
         this.userRepository = userRepository;
         this.donorRepository = donorRepository;
+        this.organizerRepository = organizerRepository;
         this.inscricaoRepository = inscricaoRepository;
         this.passwordEncoder = passwordEncoder;
         this.authService = authService;
@@ -79,11 +84,15 @@ public class ProfileController {
             addDonorCard(inscricoes, model);
         }
 
+        Optional<Organizer> organizerOpt = organizerRepository.findById(user.getId());
+        Organizer organizer = organizerOpt.orElse(null);
+
         model.addAttribute("usuario", user);
         // Contas criadas pelo Google começam sem senha: o perfil oferece "Definir senha"
         model.addAttribute("temSenha", user.hasPassword());
         model.addAttribute("isDonor", isDonor);
         model.addAttribute("donor", donor);
+        model.addAttribute("organizer", organizer);
         model.addAttribute("inscricoes", inscricoes);
         model.addAttribute("bloodTypes", BloodType.values());
 
@@ -130,6 +139,7 @@ public class ProfileController {
     @PostMapping("/perfil/editar")
     public String editarPerfil(@RequestParam String name,
                                @RequestParam(required = false) String phone,
+                               @RequestParam(required = false) String institution,
                                @RequestParam(required = false) String bloodType,
                                @RequestParam(required = false) Double weight,
                                @RequestParam(required = false) String birthDate,
@@ -149,6 +159,14 @@ public class ProfileController {
         user.setPhone(phone);
 
         userRepository.save(user);
+
+        // Se for organizador, atualiza os dados específicos da instituição
+        Optional<Organizer> organizerOpt = organizerRepository.findById(user.getId());
+        if (organizerOpt.isPresent() && institution != null) {
+            Organizer organizer = organizerOpt.get();
+            organizer.setInstitution(institution.trim());
+            organizerRepository.save(organizer);
+        }
 
         // Se a conta tiver perfil de doador, atualiza os campos específicos
         Optional<Donor> donorOpt = donorRepository.findById(user.getId());

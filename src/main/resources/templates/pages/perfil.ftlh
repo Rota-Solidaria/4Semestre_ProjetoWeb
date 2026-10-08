@@ -1,12 +1,12 @@
 <#import "../layout/main.ftlh" as main>
 
-<@main.layout title="Meu Perfil - Rota Solidária" css="/css/perfil.css" currentNav="perfil">
+<@main.layout title="<#if ehOrganizador!false>Perfil do Hemocentro<#else>Meu Perfil</#if> - Rota Solidária" css="/css/perfil.css" currentNav="perfil">
   <section class="profile-hero">
     <div class="container profile-hero-inner">
       <div class="profile-user-info">
         <div class="profile-avatar-large">
           <span>${(usuario.initials)!"US"}</span>
-          <#if isDonor && donor?? && donor.bloodType??>
+          <#if !ehOrganizador!false && isDonor && donor?? && donor.bloodType??>
             <#if donor.bloodType.name() != "UNKNOWN">
               <span class="blood-type-pill">${donor.bloodType.displayName}</span>
             <#else>
@@ -15,21 +15,23 @@
           </#if>
         </div>
         <div class="profile-name-area">
-          <span class="kicker" style="color:#FBE3E4">Painel do Doador</span>
+          <span class="kicker" style="color:#FBE3E4"><#if ehOrganizador!false>Hemocentro<#else>Painel do Doador</#if></span>
           <h1>${usuario.name}</h1>
           <div class="profile-meta-row">
             <span><span class="icon">mail</span>${usuario.email}</span>
             <#if usuario.phone?? && usuario.phone?has_content>
               <span><span class="icon">call</span>${usuario.phone}</span>
             </#if>
-            <#if isDonor && donor?? && donor.birthDate??>
+            <#if ehOrganizador!false && (organizer.institution)?has_content>
+              <span><span class="icon">domain</span>${organizer.institution}</span>
+            <#elseif !ehOrganizador!false && isDonor && donor?? && donor.birthDate??>
               <span><span class="icon">cake</span>${donor.birthDateBr}</span>
             </#if>
           </div>
         </div>
       </div>
 
-      <#if isDonor>
+      <#if !ehOrganizador!false && isDonor>
         <section class="donor-card" aria-label="Carteirinha do doador">
           <div class="donor-card__top">
             <div>
@@ -56,7 +58,7 @@
   </section>
 
   <main class="container section">
-    <#if !isDonor>
+    <#if !ehOrganizador!false && !isDonor>
       <!-- Indicadores / Estatísticas do Perfil -->
       <div class="stats-grid">
         <div class="stat-card">
@@ -101,6 +103,69 @@
       </div>
     </#if>
 
+    <#if ehOrganizador!false>
+      <!-- Visualização do Hemocentro: Apenas informações do usuário -->
+      <div class="profile-single-column">
+        <aside class="edit-card" id="editar">
+          <h2>Informações do Usuário</h2>
+          <p class="subtitle">Atualize suas informações de contato e acesso.</p>
+
+          <form method="post" action="/perfil/editar">
+            <#include "../includes/csrf.ftlh">
+            <div class="form-field">
+              <label for="prof-name">Nome Completo</label>
+              <input id="prof-name" name="name" type="text" required value="${usuario.name}">
+            </div>
+
+            <#if organizer??>
+              <div class="form-field">
+                <label for="prof-institution">Instituição / Hemocentro</label>
+                <input id="prof-institution" name="institution" type="text" value="${(organizer.institution)!""}" placeholder="ex: Fundação Pró-Sangue">
+              </div>
+            </#if>
+
+            <div class="form-field">
+              <label for="prof-email">E-mail Cadastrado</label>
+              <input id="prof-email" type="email" readonly value="${usuario.email}">
+              <span class="field-hint">O e-mail é a sua chave de acesso e não pode ser alterado.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prof-phone">WhatsApp / Telefone</label>
+              <input id="prof-phone" name="phone" type="text" placeholder="(15) 99999-9999" value="${usuario.phone!""}">
+            </div>
+
+            <div class="password-section">
+              <div class="password-toggle-title">
+                <span class="icon">lock</span>
+                <span><#if temSenha>Alterar Senha de Acesso<#else>Definir Senha de Acesso</#if></span>
+              </div>
+
+              <#if temSenha>
+              <div class="form-field">
+                <label for="prof-senha-atual">Senha Atual</label>
+                <input id="prof-senha-atual" name="senhaAtual" type="password" data-password autocomplete="current-password" placeholder="Digite apenas se desejar trocar">
+              </div>
+              <#else>
+              <p class="password-hint">Você entra com o Google. Defina uma senha para entrar também com e-mail e senha.</p>
+              </#if>
+
+              <div class="form-field">
+                <label for="prof-nova-senha">Nova Senha</label>
+                <input id="prof-nova-senha" name="novaSenha" type="password" data-password data-password-strength autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+              </div>
+            </div>
+
+            <div style="margin-top:22px">
+              <button class="btn btn-primary btn-block" type="submit">
+                <span class="icon">save</span>
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </aside>
+      </div>
+    <#else>
     <!-- Layout 2 Colunas -->
     <div class="profile-main-grid">
 
@@ -239,5 +304,6 @@
       </aside>
 
     </div>
+    </#if>
   </main>
 </@main.layout>

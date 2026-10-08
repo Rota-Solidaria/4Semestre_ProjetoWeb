@@ -211,6 +211,69 @@ public class DataInitializer implements CommandLineRunner {
                 inscricaoRepository.save(inscricao2);
             }
         });
+
+        garantirCampanhasExemploParaPaginacao();
+    }
+
+    private void garantirCampanhasExemploParaPaginacao() {
+        if (campanhaRepository.count() >= 20) {
+            return;
+        }
+
+        Organizer organizador = organizerRepository.findAll().stream().findFirst().orElse(null);
+        Location hemocentro = localizacaoRepository.findAll().stream().findFirst().orElse(null);
+        if (organizador == null || hemocentro == null) {
+            return;
+        }
+
+        String[][] dadosExemplo = {
+            {"Caravana da Esperança - Tatuí", "Saída da Rodoviária de Tatuí com transporte gratuito até o Hemocentro.", "Tatuí", "-23.3556000", "-47.8569000", "5", "35"},
+            {"Doadores de Votorantim", "Transporte e acompanhamento para doadores da região de Votorantim.", "Votorantim", "-23.5419000", "-47.4389000", "8", "40"},
+            {"Caravana Solidária Botucatu", "Condução organizada para abastecer os bancos de sangue da região.", "Botucatu", "-22.8858000", "-48.4450000", "11", "30"},
+            {"Coleta Regional Campinas", "Caravana especial de doadores saindo do Centro de Campinas.", "Campinas", "-22.9099000", "-47.0626000", "14", "45"},
+            {"Amigos do Sangue - São Roque", "Transporte seguro e lanche no retorno para os voluntários de São Roque.", "São Roque", "-23.5298000", "-47.1353000", "17", "32"},
+            {"Caravana Itapetininga II", "Segunda saída do mês com paradas estratégicas pelo centro.", "Itapetininga", "-23.5886000", "-48.0483000", "20", "28"},
+            {"Coleta de Sangue Boituva", "Voluntários de Boituva unidos para salvar vidas em Sorocaba.", "Boituva", "-23.2847000", "-47.6789000", "23", "36"},
+            {"Caravana Porto Feliz", "Transporte ida e volta saindo da Praça Matriz de Porto Feliz.", "Porto Feliz", "-23.2158000", "-47.5239000", "26", "30"},
+            {"Doação Coletiva Itu", "Grupo de doação de sangue organizado para voluntários de Itu.", "Itu", "-23.2642000", "-47.2992000", "29", "40"},
+            {"Unidos pela Vida - Salto", "Ônibus executivo gratuito para doadores de Salto.", "Salto", "-23.2003000", "-47.2869000", "32", "34"},
+            {"Caravana Cerquilho", "Caravana regional saindo da prefeitura municipal de Cerquilho.", "Cerquilho", "-23.1678000", "-47.7436000", "35", "30"},
+            {"Doadores do Tietê", "Mobilização de doadores com saída matutina e lanche especial.", "Tietê", "-23.1022000", "-47.7144000", "38", "38"},
+            {"Caravana Piedade", "Condução saindo da rodoviária de Piedade rumo ao hemocentro.", "Piedade", "-23.7125000", "-47.4264000", "41", "30"},
+            {"Doadores de Capão Bonito", "Caravana regional intermunicipal para atendimento em Sorocaba.", "Capão Bonito", "-24.0064000", "-48.3497000", "44", "42"},
+            {"Caravana Angatuba", "Transporte exclusivo para os doadores cadastrados de Angatuba.", "Angatuba", "-23.4917000", "-48.4128000", "47", "30"},
+            {"Jovens Solidários de Sorocaba", "Transporte metropolitano com voluntários universitários.", "Sorocaba", "-23.4871000", "-47.4586000", "50", "40"},
+            {"Caravana de Primavera", "Coleta comemorativa regional de sangue para reforço de estoques.", "Tatuí", "-23.3556000", "-47.8569000", "53", "35"},
+            {"Corrente do Bem Sorocaba", "Caravana especial de encerramento do ciclo regional de coletas.", "Sorocaba", "-23.4871000", "-47.4586000", "56", "45"}
+        };
+
+        for (String[] d : dadosExemplo) {
+            if (campanhaRepository.count() >= 20) {
+                break;
+            }
+
+            Location partida = new Location();
+            partida.setName("Ponto Central - " + d[2]);
+            partida.setCity(d[2]);
+            partida.setState("SP");
+            partida.setLatitude(new BigDecimal(d[3]));
+            partida.setLongitude(new BigDecimal(d[4]));
+            localizacaoRepository.save(partida);
+
+            Campaign c = new Campaign();
+            c.setTitle(d[0]);
+            c.setDescription(d[1]);
+            c.setEventDate(LocalDate.now().plusDays(Long.parseLong(d[5])));
+            c.setDepartureLocation(partida);
+            c.setDepartureTime(LocalTime.of(7, 30));
+            c.setDonationTime(LocalTime.of(10, 0));
+            c.setSlots(Integer.parseInt(d[6]));
+            c.setStatus(CampaignStatus.OPEN);
+            c.setTransportMode(TransportMode.BUS);
+            c.setDonationLocation(hemocentro);
+            c.setOrganizer(organizador);
+            campanhaRepository.save(c);
+        }
     }
 
     // Remove eventuais campanhas antigas cadastradas no modo sem transporte

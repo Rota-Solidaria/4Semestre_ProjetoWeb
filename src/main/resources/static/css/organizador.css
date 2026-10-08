@@ -253,25 +253,6 @@ input,select,textarea{font:inherit;color:inherit}
 .wizard-passos li{position:relative}
 .wizard-passos li:not(:last-child)::after{content:"";position:absolute;top:15px;left:44px;right:12px;height:3px;border-radius:2px;background:var(--border);transition:background .3s}
 .wizard-passos li:has(.is-feito)::after{background:#0E7A4F}
-/* Antes do passo 5: um batimento cardíaco no lugar da linha reta */
-.wizard-passos li:nth-child(4)::after{display:none}
-.wizard-passos__ecg{position:absolute;top:4px;left:44px;right:12px;width:calc(100% - 56px);height:24px;overflow:visible;pointer-events:none}
-.wizard-passos__ecg path{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;shape-rendering:geometricPrecision}
-.wizard-passos__ecg-base{stroke:var(--border)}
-/* Varredura de monitor cardíaco: o traço é desenhado em velocidade constante, brilha e esmaece.
-   --ecg-len é o comprimento real do traçado, em pixels, calculado pelo campanha-wizard.js */
-.wizard-passos__ecg-pulso{--ecg-forca:.55;--ecg-len:1000;stroke:var(--brand);stroke-dasharray:var(--ecg-len) var(--ecg-len);stroke-dashoffset:var(--ecg-len);opacity:0;filter:drop-shadow(0 0 2px rgba(180,35,42,.55));animation:wz-ecg 2.6s linear infinite}
-.wizard-passos li:has(.is-feito) .wizard-passos__ecg-base{stroke:#0E7A4F}
-.wizard[data-passo="5"] .wizard-passos__ecg-pulso{--ecg-forca:1;stroke-width:3}
-@keyframes wz-ecg{
-  0%{stroke-dashoffset:var(--ecg-len);opacity:0}
-  6%{opacity:var(--ecg-forca)}
-  55%{stroke-dashoffset:0;opacity:var(--ecg-forca)}
-  68%{stroke-dashoffset:0;opacity:var(--ecg-forca)}
-  90%,100%{stroke-dashoffset:0;opacity:0}
-}
-:root[data-motion="reduce"] .wizard-passos__ecg-pulso{animation:none;opacity:0}
-@media(prefers-reduced-motion:reduce){.wizard-passos__ecg-pulso{animation:none;opacity:0}}
 .wizard-passos__item{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:0;border:0;background:none;cursor:pointer;text-align:left;font:600 13px/1.3 'IBM Plex Sans',sans-serif;color:var(--text2);min-height:44px}
 .wizard-passos__item:disabled{cursor:default;opacity:.75}
 .wizard-passos__item:focus-visible{outline:3px solid #B4232A59;outline-offset:4px;border-radius:8px}
@@ -290,25 +271,6 @@ input,select,textarea{font:inherit;color:inherit}
 
 .wizard-corpo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px;align-items:start}
 .wizard[data-passo="1"] .wizard-corpo{grid-template-columns:minmax(0,1fr)}
-/* Passo 1 (ainda sem mapa): formulário e, ao lado, a prévia do que o doador vai ver */
-.passo1{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
-.passo1 .imagens__grade{grid-template-columns:repeat(4,minmax(0,1fr))}
-.previa-doador{position:sticky;top:92px;display:grid;gap:10px}
-.previa-doador__rotulo{font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text2)}
-.previa-doador__cartao{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 10px 28px rgba(26,24,23,.08)}
-.previa-doador__foto{width:100%;height:170px;object-fit:cover;display:block;background:var(--surface2);transition:opacity .2s}
-.previa-doador__corpo{padding:16px;display:grid;gap:10px}
-.previa-doador__corpo .badge{justify-self:start}
-.previa-doador__titulo{font:700 20px/1.2 Archivo,sans-serif;overflow-wrap:anywhere}
-.previa-doador__meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;color:var(--text2)}
-.previa-doador__meta .icon{font-size:18px;color:var(--brand)}
-.previa-doador__descricao{margin:0;font-size:14px;line-height:1.5;color:var(--text2)}
-.previa-doador__descricao[hidden]{display:none}
-.previa-doador__rota{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px dashed var(--border2)}
-.previa-doador__ponto{width:10px;height:10px;border-radius:50%;background:var(--border2);flex:none}
-.previa-doador__linha{flex:1;border-top:2px dashed var(--border2)}
-.previa-doador__gota{width:11px;height:11px;border-radius:50% 50% 50% 2px;transform:rotate(-45deg);background:var(--border2);flex:none}
-.previa-doador__dica{font-size:12px;color:var(--text3)}
 .wizard[data-passo="1"] .rota-editor__mapa{display:none}
 .wizard-folha{display:grid;gap:16px;min-width:0}
 .wizard-progresso{display:none}
@@ -347,47 +309,135 @@ input,select,textarea{font:inherit;color:inherit}
 .revisao__marca{width:16px;height:16px;box-sizing:border-box;border-radius:50%;border:3px solid var(--text);font-size:0}
 .revisao__ponto--inicio .revisao__marca{border:0;background:#0E7A4F}
 .revisao__ponto--fim .revisao__marca{border:0;border-radius:50% 50% 50% 3px;transform:rotate(-45deg);background:var(--brand-fill,var(--brand))}
-.revisao__conferencia{margin:0;padding:12px 16px;list-style:none;display:grid;gap:4px;border-radius:14px;background:var(--ok-soft);border:1px solid var(--ok-border);color:var(--ok-text);font-size:14px}
-.revisao__conferencia--aviso{background:var(--warn-soft);border-color:var(--warn-border)}
+.revisao__conferencia{margin:0;padding:12px 16px;list-style:none;display:grid;gap:4px;border-radius:14px;background:var(--warn-soft);border:1px solid var(--warn-border);color:var(--warn-text);font-size:14px}
 .revisao__conferencia li{display:flex;align-items:center;gap:8px;min-height:32px}
 .revisao__conferencia li.is-aviso{color:var(--warn-text)}
 .revisao__conferencia .icon{font-size:20px}
 .revisao__conferencia .revisao__editar{margin-left:auto}
 
 @media(max-width:960px){
-  .wizard-passos,.wizard-topo__titulo{display:none}
-  .passo1{grid-template-columns:1fr}
-  .previa-doador{display:none}
+  .wizard-topo__titulo{display:none}
+  .wizard-passos{
+    display:block;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    margin:0 -16px 16px;
+    padding:4px 16px 8px;
+    scrollbar-width:none;
+  }
+  .wizard-passos::-webkit-scrollbar{display:none}
+  .wizard-passos ol{
+    display:flex;
+    gap:8px;
+    width:max-content;
+    min-width:100%;
+    margin:0;
+  }
+  .wizard-passos li:not(:last-child)::after{display:none}
+  .wizard-passos__item{
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:999px;
+    font:600 13px/1 'IBM Plex Sans',sans-serif;
+    color:var(--text2);
+    white-space:nowrap;
+    min-height:38px;
+  }
+  .wizard-passos__item.is-atual{
+    background:var(--brand-soft);
+    border-color:var(--brand-soft-border);
+    color:var(--brand);
+    font-weight:700;
+  }
+  .wizard-passos__item.is-feito{
+    border-color:var(--ok-border);
+    color:var(--ok-text);
+  }
+  .wizard-passos__num{
+    width:22px;
+    height:22px;
+    font-size:11px;
+    border-width:1.5px;
+  }
+  .wizard-passos__item.is-feito .wizard-passos__num::before{
+    font-size:15px;
+  }
+
   .wizard-topo{margin:12px 0}
-  .wizard-corpo,.wizard[data-passo="1"] .wizard-corpo{display:flex;flex-direction:column;align-items:stretch;gap:0}
-  /* Mapa colado no topo; o painel do passo rola por cima dele */
-  .rota-editor__mapa{position:sticky;top:64px;order:-1;z-index:1;margin:0 -16px;gap:0}
-  .rota-editor__mapa .rota-mapa{height:42vh;min-height:260px;border-radius:0;border:0}
-  .rota-editor__mapa .rota-mapa-legenda,.rota-editor__dica{display:none}
-  .wizard-folha{position:relative;z-index:2;margin:-24px -16px 0;padding:10px 16px 24px;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:0 -10px 30px rgba(26,24,23,.14);min-height:55vh;align-content:start}
-  .wizard[data-passo="1"] .wizard-folha{margin-top:0}
-  .wizard-progresso{display:grid;gap:12px;margin-bottom:4px}
-  .wizard-progresso__alca{justify-self:center;width:40px;height:5px;border-radius:3px;background:var(--border2)}
-  .wizard-progresso__linha{display:flex;align-items:center;gap:10px}
-  .wizard-progresso__barra{flex:1;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
-  .wizard-progresso__barra span{display:block;height:100%;border-radius:3px;background:var(--brand-fill,var(--brand));transition:width .35s cubic-bezier(.2,.8,.3,1)}
-  .wizard-progresso__texto{font:500 12px/1 'IBM Plex Mono',monospace;color:var(--text2)}
-  .wizard-passo[data-passo="1"] .form-card,.wizard-passo[data-passo="2"] .ponto,.wizard-passo[data-passo="4"] .ponto{border:0;padding:0;background:transparent}
-  .wizard-rodape{background:var(--surface)}
-  .wizard-rodape{margin:0 -16px;padding:10px 16px}
+  .wizard-corpo,.wizard[data-passo="1"] .wizard-corpo{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:20px;
+  }
+  .rota-editor__mapa{
+    position:relative;
+    top:0;
+    order:2;
+    margin:0;
+    gap:8px;
+  }
+  .rota-editor__mapa .rota-mapa{
+    height:240px;
+    min-height:220px;
+    border-radius:16px;
+    border:1px solid var(--border);
+  }
+  .wizard-folha{
+    position:relative;
+    margin:0;
+    padding:0;
+    background:transparent;
+    box-shadow:none;
+    min-height:auto;
+  }
+  .wizard-progresso{display:none}
+  .wizard-passo[data-passo="1"] .form-card,
+  .wizard-passo[data-passo="2"] .ponto,
+  .wizard-passo[data-passo="4"] .ponto{
+    border:1px solid var(--border);
+    padding:18px;
+    background:var(--surface);
+    border-radius:16px;
+  }
+  .wizard-rodape{
+    background:var(--surface);
+    margin:0 -16px;
+    padding:12px 16px;
+  }
   .wizard-rodape__info{display:none}
 }
+
 @media(max-width:620px){
-  .campo--4{grid-column:span 6}
+  .campos{
+    grid-template-columns:repeat(6,1fr);
+    gap:10px;
+  }
+  .campo{grid-column:span 6}
+  .campo--2{grid-column:span 6}
+  .form-card .campos .campo--2{grid-column:span 3}
   .campo--3{grid-column:span 4}
-  .campo--2{grid-column:span 3}
   .campo--1{grid-column:span 2}
+  .campo--4{grid-column:span 6}
   .campo--m6{grid-column:span 6}
   .org-card{padding:18px}
   .imagens__grade{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .campanha-form__salvar{flex-wrap:nowrap;padding:10px 16px}
-  .campanha-form__salvar .btn{flex:1;padding:0 12px}
-  .campanha-form__salvar [data-wizard="voltar"]{flex:none}
+  .campanha-form__salvar{
+    display:flex;
+    gap:10px;
+    padding:10px 16px;
+  }
+  .campanha-form__salvar .btn{
+    height:48px;
+    font-size:15px;
+  }
+  .campanha-form__salvar [data-wizard="voltar"]{flex:0 0 auto}
+  .campanha-form__salvar [data-wizard="avancar"],
+  .campanha-form__salvar [data-wizard="publicar"]{flex:1}
 }
 @media(max-width:900px){
   .campanha-form__salvar{bottom:calc(68px + env(safe-area-inset-bottom))}
