@@ -5,7 +5,7 @@
   <#if ehOrganizador!false>
     <a <#if (currentNav!"") == "organizador">class="active" </#if>href="/organizador/campanhas">Organizar</a>
   </#if>
-  <#if usuarioLogado??>
+  <#if usuarioLogado?? && !ehOrganizador!false>
     <a <#if (currentNav!"") == "minhas">class="active" </#if>href="/perfil">Minhas inscrições</a>
   </#if>
 </nav>

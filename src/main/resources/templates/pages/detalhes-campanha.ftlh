@@ -36,6 +36,7 @@
           </div>
 
           <h1>${campanha.title}</h1>
+          <p class="detail-org">Organizado por <#if campanha.organizer??><#if campanha.organizer.institution?has_content && campanha.organizer.name?has_content>${campanha.organizer.institution} (${campanha.organizer.name})<#else>${campanha.organizer.institution!campanha.organizer.name!"Organizador"}</#if><#else>Organizador Regional</#if></p>
 
           <#if campanha.description??>
             <p class="detail-description">${campanha.description}</p>
@@ -143,20 +144,6 @@
             </section>
           </div>
 
-          <div class="notice-box">
-            <p><strong>Organizado por:</strong>
-              <#if campanha.organizer??>${campanha.organizer.institution!"Organizador"} (${campanha.organizer.name})<#else>Organizador Regional</#if>.
-            </p>
-          </div>
-
-          <div class="checklist-title">Antes de embarcar</div>
-          <ul class="checklist">
-            <li>Documento oficial com foto, original</li>
-            <li>Alimentação leve até 4 horas antes</li>
-            <li>Mínimo de 6 horas de sono</li>
-            <li>Entre 16 e 69 anos e acima de 50 kg</li>
-          </ul>
-
           <div class="detail-actions">
             <#if minhaInscricao??>
               <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}">Ver inscrição</a>
@@ -165,7 +152,6 @@
             <#else>
               <a class="btn btn-primary btn-lg" href="/campanhas/${campanha.id}/inscrever">Fazer inscrição</a>
             </#if>
-            <a class="btn btn-secondary btn-lg" href="/campanhas">Ver outras campanhas</a>
           </div>
         </div>
       </div>

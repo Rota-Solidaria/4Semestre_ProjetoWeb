@@ -130,8 +130,7 @@
 
   function rotuloAvancar(n) {
     if (n >= TOTAL) { return ''; }
-    if (n === 3) { return paradas().length ? ACOES[3] : 'Continuar sem paradas'; }
-    return ACOES[vizinho(n, 1) - 1];
+    return 'Continuar';
   }
 
   /** O mapa aparece do passo 2 em diante; ao entrar num passo de ponto, o pino dele salta. */
@@ -326,33 +325,29 @@
     rota.appendChild(lista);
     revisao.appendChild(rota);
 
-    // Conferência
+    // Avisos de validação na revisão, se houver pendência real
     var semMapa = pontos.filter(function (b) { return !valor(b, 'lat'); }).length;
     var horarios = pontos.map(function (b) { return valor(b, 'horario'); }).filter(Boolean);
     var emOrdem = horarios.every(function (h, i) { return i === 0 || h > horarios[i - 1]; });
     var destino = pontos[pontos.length - 1];
-    var itens = direto ? [
-      { ok: semMapa === 0, texto: semMapa === 0 ? 'O local está no mapa' : 'O local ainda não está no mapa', passo: 4 },
-      { ok: !!valor(destino, 'nome') && !!valor(destino, 'cidade'), texto: valor(destino, 'nome') ? 'Hemocentro definido' : 'Falta escolher o hemocentro', passo: 4 }
-    ] : [
-      { ok: emOrdem, texto: emOrdem ? 'Horários seguem a ordem da rota' : 'Há um horário fora da ordem da rota', passo: 3 },
-      { ok: semMapa === 0, texto: semMapa === 0 ? 'Todos os pontos estão no mapa'
-        : semMapa + (semMapa === 1 ? ' ponto ainda não está no mapa' : ' pontos ainda não estão no mapa'), passo: 2 },
-      { ok: !!valor(destino, 'nome') && !!valor(destino, 'cidade'), texto: valor(destino, 'nome') ? 'Hemocentro definido' : 'Falta escolher o hemocentro', passo: 4 }
-    ];
-    var todosOk = itens.every(function (i) { return i.ok; });
-    var conferencia = el('ul', 'revisao__conferencia' + (todosOk ? '' : ' revisao__conferencia--aviso'));
-    conferencia.setAttribute('aria-label', 'Conferência');
-    itens.forEach(function (item) {
-      var li = el('li', item.ok ? 'is-ok' : 'is-aviso');
-      var icone = el('span', 'icon', item.ok ? 'check_circle' : 'error');
-      icone.setAttribute('aria-hidden', 'true');
-      li.appendChild(icone);
-      li.appendChild(el('span', null, item.texto));
-      if (!item.ok) { li.appendChild(linkEditar(item.passo, 'Corrigir')); }
-      conferencia.appendChild(li);
-    });
-    revisao.appendChild(conferencia);
+    var pendencias = [];
+    if (!emOrdem) { pendencias.push({ texto: 'Há um horário fora da ordem da rota', passo: 3 }); }
+    if (semMapa > 0) { pendencias.push({ texto: semMapa + (semMapa === 1 ? ' ponto ainda não está no mapa' : ' pontos ainda não estão no mapa'), passo: 2 }); }
+    if (!valor(destino, 'nome') || !valor(destino, 'cidade')) { pendencias.push({ texto: 'Falta escolher o hemocentro', passo: 4 }); }
+    if (pendencias.length > 0) {
+      var conferencia = el('ul', 'revisao__conferencia revisao__conferencia--aviso');
+      conferencia.setAttribute('aria-label', 'Pendências');
+      pendencias.forEach(function (item) {
+        var li = el('li', 'is-aviso');
+        var icone = el('span', 'icon', 'error');
+        icone.setAttribute('aria-hidden', 'true');
+        li.appendChild(icone);
+        li.appendChild(el('span', null, item.texto));
+        li.appendChild(linkEditar(item.passo, 'Corrigir'));
+        conferencia.appendChild(li);
+      });
+      revisao.appendChild(conferencia);
+    }
   }
 
   /* ---------- Passo 1: prévia "como o doador vai ver" ---------- */
