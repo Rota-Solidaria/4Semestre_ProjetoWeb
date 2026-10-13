@@ -30,6 +30,19 @@
 :root[data-theme="dark"] .cta-primary {
   color: #FFFFFF;
 }
+/* Home e /doar: faixas de impacto e o botão cheio da primeira caravana */
+:root[data-theme="dark"] .home-impacto,
+:root[data-theme="dark"] .doar-impacto,
+:root[data-theme="dark"] .caravana:first-child:not(.is-lotada) .caravana__cta {
+  background: var(--brand-fill);
+  border-color: var(--brand-fill);
+  color: #FFFFFF;
+}
+/* /doar: a chamada final é escura no tema claro; no escuro, ganha borda para não sumir no fundo */
+:root[data-theme="dark"] .doar-final {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+}
 :root[data-theme="dark"] .profile-hero {
   background: linear-gradient(135deg, #8F1821 0%, #4A0F14 100%);
 }

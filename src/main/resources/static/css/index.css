@@ -83,92 +83,112 @@ input,select,textarea{font:inherit;color:inherit}
   .footer-inner{flex-direction:column;text-align:center}
 }
 
+
 /* =========== Estilos específicos desta página (index) =========== */
 
-.hero{background:var(--surface);border-bottom:1px solid var(--border)}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:64px 0}
-.hero h1{font:800 clamp(2.1rem,4.2vw,3.4rem)/1.08 Archivo,sans-serif;margin:14px 0 16px}
-.hero p{font-size:18px;color:var(--text2);max-width:480px;margin:0 0 26px}
-.search-field{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0 14px;height:52px;min-width:0}
-.search-field .icon{font-size:20px;color:var(--text3)}
-.search-field input{flex:1;border:0;background:transparent;font:400 15px/1 'IBM Plex Sans',sans-serif;min-width:0;outline:none}
-.stat-num{font:800 26px/1 Archivo,sans-serif;color:var(--brand)}
-.stat-label{font-size:14px;color:var(--text2)}
-.stat-divider{width:1px;background:var(--border)}
-.hero-image{position:relative}
-.hero-image img{border-radius:24px;height:400px;width:100%;object-fit:cover;box-shadow:0 20px 44px #1a181724}
-.callout-title{font:600 14px/1.3 'IBM Plex Sans',sans-serif}
-.callout-sub{font-size:13px;color:var(--text3)}
+/* home-mapa.js esconde/mostra com [hidden]; classes como .btn não podem desfazer isso */
+[hidden]{display:none!important}
 
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:24px;flex-wrap:wrap}
-.section-head h2{font:700 30px/1.15 Archivo,sans-serif;margin:8px 0 4px}
-.section-head p{font-size:15px;color:var(--text2);margin:0}
+/* Topo: o que é, em uma linha */
+.home-hero{padding:44px 0 24px}
+.home-hero__grid{display:flex;flex-wrap:wrap;gap:16px 40px;align-items:flex-end;justify-content:space-between}
+.home-hero__grid > div{flex:1 1 560px;min-width:0}
+.home-hero h1{font:800 clamp(2.1rem,4.4vw,3.35rem)/1.05 Archivo,sans-serif;letter-spacing:-.03em;margin:12px 0 0}
+.home-hero p{flex:0 1 380px;margin:0;font-size:18px;color:var(--text2)}
 
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 6px 20px #1a181710;transition:transform .18s ease,box-shadow .18s ease}
-.card:hover{transform:translateY(-3px);box-shadow:0 14px 30px #1a18171f}
-.card-img{height:150px;overflow:hidden}
-.card-img img{width:100%;height:100%;object-fit:cover}
-.card.is-closed .card-img img{filter:grayscale(1) opacity(.7)}
-.card-body{padding:20px}
-.card h3{font:700 20px/1.25 Archivo,sans-serif;margin:12px 0 12px}
-.card .meta{display:grid;gap:8px;font-size:14px;color:var(--text2);margin-bottom:18px}
-.card .meta span{display:flex;gap:8px;align-items:center}
-.card .meta .icon{font-size:18px;color:var(--brand)}
-.card-cta{display:flex;align-items:center;justify-content:center;height:46px;border-radius:12px;font:600 15px/1 'IBM Plex Sans',sans-serif}
-.cta-primary{background:var(--brand);color:#fff}
-.cta-disabled{background:var(--surface2);color:var(--text3)}
+/* Mapa + lista */
+.home-mapa{padding:0 0 48px}
+.home-mapa__painel{display:flex;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden}
+.home-mapa__area{flex:3 1 560px;min-width:0;display:flex;position:relative}
 
-.past-section{
-  background:var(--surface2);
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-}
+/* Legenda do número nos pinos: no alto, ao lado dos botões de zoom (embaixo ela cobria os créditos do mapa) */
+.home-legenda{position:absolute;left:64px;top:12px;z-index:2;display:flex;align-items:center;gap:10px;max-width:calc(100% - 76px);padding:8px 12px 8px 8px;border-radius:12px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--border);box-shadow:0 4px 14px #1a181714;font-size:13px;line-height:1.3;color:var(--text2);pointer-events:none}
+.home-legenda__pino{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2.5px solid #1A1817;color:#1A1817;font:700 13px/1 'IBM Plex Sans',sans-serif}
+:root[data-theme="dark"] .home-legenda__pino{background:#1A1918;border-color:#F6F4F2;color:#F6F4F2}
+.home-mapa__mapa.rota-mapa{flex:1;height:auto;min-height:560px;border:0;border-radius:0}
+.home-mapa__lado{flex:2 1 360px;min-width:0;padding:26px;display:flex;flex-direction:column;gap:16px;border-left:1px solid var(--border);max-height:640px;overflow:auto}
+.home-mapa__painel.is-sem-mapa .home-mapa__lado{border-left:0;max-height:none}
 
-.past-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-}
+.home-status{display:flex;flex-direction:column;gap:8px}
+.home-status h2{font:800 26px/1.15 Archivo,sans-serif}
+.home-status p{margin:0;font-size:15px}
+.home-status__local{align-self:flex-start;margin-top:4px}
 
-.past-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 6px 20px #1a181710;
-}
+.caravanas{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.caravana__link{display:flex;flex-direction:column;gap:6px;padding:18px;border:1px solid var(--border);border-radius:16px;background:var(--surface);transition:border-color .15s ease,box-shadow .15s ease}
+.caravana__link:hover,.caravana.is-destacada .caravana__link{border-color:var(--brand);box-shadow:0 8px 22px #1a181714}
+.caravana__topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.caravana__quando{font:500 15px/1.3 'IBM Plex Mono',monospace;color:var(--text)}
+.caravana__titulo{font:700 18px/1.3 Archivo,sans-serif}
+.caravana__trajeto{display:flex;gap:8px;font-size:15px;color:var(--text2)}
+.caravana__trajeto .icon{font-size:20px;color:var(--brand);margin-top:1px}
+.caravana__perto{font-size:14px;color:var(--text2)}
+.caravana__cta{margin-top:6px;display:flex;justify-content:center;align-items:center;gap:8px;height:46px;border-radius:12px;background:transparent;color:var(--brand);border:1.5px solid var(--brand);font:600 15px/1 'IBM Plex Sans',sans-serif}
+.caravana__cta .icon{font-size:20px}
+/* Só a primeira da lista (a mais perto, home-mapa.js reordena) leva o botão cheio: um primário por bloco */
+.caravana:first-child .caravana__cta{background:var(--brand);color:#fff;border-color:var(--brand)}
+.caravana.is-lotada .caravana__cta{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.caravana.is-lotada .caravana__titulo,.caravana.is-lotada .caravana__quando{color:var(--text2)}
 
-.past-card img{
-  width:100%;
-  height:210px;
-  object-fit:cover;
-}
+.home-cidades{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);padding-top:16px}
+.home-cidades__titulo{font-size:15px;font-weight:600}
+.home-cidades__lista{display:flex;flex-wrap:wrap;gap:8px}
+.home-cidades__lista button{min-height:44px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--border2);background:var(--surface);font-size:15px;color:var(--text)}
+.home-cidades__lista button:hover{border-color:var(--brand);color:var(--brand)}
+.home-cidades__lista button[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-soft-text);font-weight:600}
+.home-mapa__todas{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--brand)}
+.home-mapa__todas .icon{font-size:20px}
 
-.past-info{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  padding:16px 18px;
-}
+/* Sem caravana: hemocentros mais próximos */
+.hemocentros-perto{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.hemocentros-perto button{width:100%;text-align:left;display:flex;flex-direction:column;gap:2px;padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.hemocentros-perto button:hover{border-color:var(--brand)}
+.hemocentros-perto strong{font-size:16px}
+.hemocentros-perto span{font-size:14px;color:var(--text2)}
 
-.past-info strong{
-  font:700 17px/1.25 Archivo,sans-serif;
-}
+/* Pinos da home: o mapa da região é denso, então o destaque é discreto.
+   (Em rota-mapa.css o pino sobe 8px com efeito de mola e ganha um anel pulsando; aqui ele saía de baixo
+   do cursor e voltava, piscando, e passar o mouse por um grupo de pinos fazia vários pularem.) */
+.home-mapa .rp--destacado .rp__corpo{transform:scale(1.12);transition:transform .15s ease-out;filter:drop-shadow(0 4px 4px rgba(26,24,23,.2))}
+.home-mapa .rp--destacado .rp__onda{animation:none}
+.home-mapa .rp--saltando .rp__batida{animation:home-pino-pulso .3s ease-out}
+.home-mapa .rp--fim .rp__batida{animation:none}
+@keyframes home-pino-pulso{50%{transform:scale(1.15)}}
 
-.past-info span{
-  font-size:14px;
-  color:var(--text2);
-}
+/* Você está aqui */
+.home-voce{width:18px;height:18px;border-radius:50%;background:#1D5FBF;border:3px solid #fff;box-shadow:0 0 0 6px #1D5FBF33,0 2px 6px #1a181759}
+
+/* Primeira vez */
+.home-primeira{padding:0 0 48px}
+.home-primeira__faixa{display:flex;flex-wrap:wrap;gap:14px 32px;align-items:center;padding:24px 30px;background:var(--surface);border:1px solid var(--border);border-radius:20px}
+.home-primeira__faixa > strong{font:800 22px/1.2 Archivo,sans-serif}
+.home-primeira__passos{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px 28px;color:var(--text2)}
+.home-primeira__passos span{font:500 14px/1 'IBM Plex Mono',monospace;color:var(--brand);margin-right:8px}
+.home-primeira__link{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--brand)}
+.home-primeira__link .icon{font-size:20px}
+
+/* Impacto + posso doar */
+.home-fim{padding:0 0 64px}
+.home-fim__grid{display:flex;flex-wrap:wrap;gap:16px}
+.home-impacto{flex:1 1 380px;display:flex;flex-direction:column;gap:6px;padding:32px;border-radius:20px;background:var(--brand);color:#fff;font-size:18px}
+.home-impacto__num{font:800 clamp(2.6rem,5vw,3.2rem)/1 Archivo,sans-serif}
+.home-impacto__fonte{font:500 13px/1.4 'IBM Plex Mono',monospace;opacity:.9}
+.home-posso{flex:1 1 380px;display:flex;flex-direction:column;gap:8px;padding:32px;border-radius:20px;background:var(--surface);border:1px solid var(--border)}
+.home-posso strong{font:800 24px/1.2 Archivo,sans-serif}
+.home-posso:hover{border-color:var(--brand)}
+.home-posso__link{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--brand)}
+.home-posso__link .icon{font-size:20px}
 
 @media(max-width:900px){
-  .past-grid{
-    grid-template-columns:1fr;
-  }
-
-  .past-card img{
-    height:240px;
-  }
+  .home-mapa__lado{border-left:0;border-top:1px solid var(--border);max-height:none}
+  .home-mapa__mapa.rota-mapa{min-height:380px}
+  .home-primeira__link{margin-left:0}
 }
-
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr;padding:44px 0}.grid{grid-template-columns:1fr}.hero-image img{height:280px}}
+@media(max-width:620px){
+  .home-hero{padding:24px 0 16px}
+  .home-hero p{font-size:16px}
+  .home-mapa__mapa.rota-mapa{min-height:280px}
+  .home-mapa__lado{padding:20px}
+  .home-legenda{font-size:12px}
+  .home-impacto,.home-posso{padding:24px}
+}
