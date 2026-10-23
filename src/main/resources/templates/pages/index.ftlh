@@ -2,23 +2,25 @@
 
 <@main.layout title="Rota Solidária" css="/css/index.css" currentNav="inicio">
   <main>
-    <section class="hero">
+    <section class="hero vh-section">
       <div class="container hero-grid">
-        <div>
+        <div class="hero-content">
           <span class="kicker">Doação de sangue · Angatuba e região</span>
           <h1>Doe sangue, salve vidas perto de você.</h1>
-          <p>Encontre a próxima coleta na sua região e garanta sua vaga em poucos minutos.</p>
+          <p>Encontre a próxima coleta na sua região e garanta sua vaga com transporte gratuito em poucos minutos.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/campanhas">Ver campanhas <span class="icon">arrow_forward</span></a>
+            <a class="btn btn-secondary" href="/educativo">Como doar sangue</a>
+          </div>
         </div>
 
         <div class="hero-image">
           <img src="/images/doacaodesangue.jpeg" alt="Pessoa realizando doação de sangue">
-
-          </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section class="section section-campaigns vh-section" id="campanhas-agenda">
       <div class="container">
         <div class="section-head">
           <div>
@@ -82,7 +84,8 @@
         </div>
       </div>
     </section>
-    <section class="section past-section">
+
+    <section class="section past-section vh-section" id="nossa-historia">
       <div class="container">
         <div class="section-head">
           <div>

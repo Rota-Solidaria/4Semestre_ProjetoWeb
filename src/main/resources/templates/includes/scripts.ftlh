@@ -33,15 +33,21 @@
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       || document.documentElement.getAttribute('data-motion') === 'reduce';
 
-    // Altura do header em --header-h: posiciona toasts e o painel de acessibilidade logo abaixo dele
+    // Altura do header e tabbar em variáveis CSS: posiciona toasts, painel e calcula 100vh das seções
     const header = document.querySelector('.site-header');
-    if (header) {
-      const measureHeader = function () {
+    const tabbar = document.querySelector('.tabbar');
+    const measureHeights = function () {
+      if (header) {
         document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
-      };
-      measureHeader();
-      window.addEventListener('resize', measureHeader);
-    }
+      }
+      if (tabbar && window.getComputedStyle(tabbar).display !== 'none') {
+        document.documentElement.style.setProperty('--tabbar-h', tabbar.offsetHeight + 'px');
+      } else {
+        document.documentElement.style.setProperty('--tabbar-h', '0px');
+      }
+    };
+    measureHeights();
+    window.addEventListener('resize', measureHeights);
 
     document.querySelectorAll('[data-toast]').forEach(function (toast) {
       const dismiss = function () {
