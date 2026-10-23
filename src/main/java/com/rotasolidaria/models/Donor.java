@@ -87,7 +87,8 @@ public class Donor {
 
     /** Data de nascimento no padrão brasileiro, para as telas. */
     public String getBirthDateBr() {
-        return Datas.br(birthDate);
+        String formatada = Datas.br(birthDate);
+        return formatada != null ? formatada : "";
     }
 
     public Double getWeight() {

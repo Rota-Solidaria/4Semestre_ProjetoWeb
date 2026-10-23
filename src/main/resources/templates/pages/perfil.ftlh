@@ -24,8 +24,8 @@
             </#if>
             <#if ehOrganizador!false && (organizer.institution)?has_content>
               <span><span class="icon">domain</span>${organizer.institution}</span>
-            <#elseif !ehOrganizador!false && isDonor && donor?? && donor.birthDate??>
-              <span><span class="icon">cake</span>${donor.birthDateBr}</span>
+            <#elseif !ehOrganizador!false && isDonor && (donor.birthDateBr)?has_content>
+              <span><span class="icon">cake</span>${(donor.birthDateBr)!}</span>
             </#if>
           </div>
         </div>
@@ -263,13 +263,13 @@
 
               <div class="form-field">
                 <label for="prof-weight">Peso (kg)</label>
-                <input id="prof-weight" name="weight" type="number" step="0.5" min="45" max="250" placeholder="ex: 70" value="<#if donor?? && donor.weight??>${donor.weight}</#if>">
+                <input id="prof-weight" name="weight" type="number" step="0.5" min="45" max="250" placeholder="ex: 70" value="<#if (donor.weight)??>${donor.weight}</#if>">
               </div>
             </div>
 
             <div class="form-field">
               <label for="prof-birth">Data de Nascimento</label>
-              <input id="prof-birth" name="birthDate" type="date" value="<#if donor?? && donor.birthDate??>${donor.birthDate}</#if>">
+              <input id="prof-birth" name="birthDate" type="date" value="<#if (donor.birthDate)??>${donor.birthDate}</#if>">
             </div>
           </#if>
 
