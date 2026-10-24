@@ -416,3 +416,24 @@ button.icon-btn {
    (medidor + rótulo + requisitos), para "Confirmar senha" e o botão não descerem de repente */
 .field:has(> input[data-password-strength]){padding-bottom:108px}
 .field:has(.pw-meter){padding-bottom:0}
+
+/* Mantém o avatar/dropdown acessível no topo em celulares para permitir sair da conta */
+@media (max-width: 620px) {
+  .header-actions .user-dropdown-wrapper {
+    display: block !important;
+  }
+  .header-actions .user-dropdown-wrapper .profile-chip {
+    display: inline-flex !important;
+    padding: 3px !important;
+    border-radius: 999px !important;
+    gap: 0 !important;
+  }
+  .header-actions .user-dropdown-wrapper .profile-chip > span:not(.avatar),
+  .header-actions .user-dropdown-wrapper .profile-chip .dropdown-caret {
+    display: none !important;
+  }
+  .header-actions .user-dropdown-menu {
+    right: 0;
+    max-width: calc(100vw - 24px);
+  }
+}

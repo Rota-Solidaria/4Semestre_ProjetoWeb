@@ -42,6 +42,13 @@
           <span class="icon">edit</span>
           <span>Editar Perfil</span>
         </button>
+        <form class="logout-form" method="post" action="/logout" style="display:inline">
+          <#include "../includes/csrf.ftlh">
+          <button type="submit" class="btn-hero-logout" title="Sair da sua conta">
+            <span class="icon">logout</span>
+            <span>Sair da conta</span>
+          </button>
+        </form>
       </div>
     </div>
   </section>
