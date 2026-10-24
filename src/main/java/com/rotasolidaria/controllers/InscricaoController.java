@@ -5,6 +5,7 @@ import com.rotasolidaria.exception.BusinessException;
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Location;
 import com.rotasolidaria.models.Registration;
+import com.rotasolidaria.repositories.OrganizerRepository;
 import com.rotasolidaria.repositories.UserRepository;
 import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.services.CampaignService;
@@ -42,15 +43,18 @@ public class InscricaoController {
     private final CampaignService campaignService;
     private final InscricaoService inscricaoService;
     private final UserRepository userRepository;
+    private final OrganizerRepository organizerRepository;
     private final String baseUrl;
 
     public InscricaoController(CampaignService campaignService,
                                InscricaoService inscricaoService,
                                UserRepository userRepository,
+                               OrganizerRepository organizerRepository,
                                @Value("${app.base-url}") String baseUrl) {
         this.campaignService = campaignService;
         this.inscricaoService = inscricaoService;
         this.userRepository = userRepository;
+        this.organizerRepository = organizerRepository;
         this.baseUrl = baseUrl;
     }
 
@@ -64,6 +68,20 @@ public class InscricaoController {
             return "redirect:/campanhas";
         }
         Campaign campanha = campanhaOpt.get();
+
+        // Regra de negócio: Organizações não podem se inscrever em nenhuma campanha
+        if (principal.isOrganizer() || organizerRepository.existsById(principal.getId())) {
+            redirectAttributes.addFlashAttribute("toast",
+                    Toast.warning("Acesso restrito", "Contas de organização não podem realizar inscrições em campanhas."));
+            return "redirect:/campanhas/" + id;
+        }
+
+        // Regra de negócio: Inscrições encerradas ou sem vagas
+        if (!campanha.isInscricoesAbertas() || inscricaoService.slotsLeft(campanha) <= 0) {
+            redirectAttributes.addFlashAttribute("toast",
+                    Toast.warning("Inscrições indisponíveis", "As inscrições para esta campanha estão encerradas."));
+            return "redirect:/campanhas/" + id;
+        }
 
         // Já inscrito: mostra o bilhete em vez de outro formulário
         Optional<Registration> existente = inscricaoService.findForDonor(campanha, principal.getId());
@@ -92,8 +110,17 @@ public class InscricaoController {
         if (campanhaOpt.isEmpty()) {
             return "redirect:/campanhas";
         }
+        Campaign campanha = campanhaOpt.get();
+
+        // Validação no backend: organizações não podem se inscrever
+        if (principal.isOrganizer() || organizerRepository.existsById(principal.getId())) {
+            redirectAttributes.addFlashAttribute("toast",
+                    Toast.warning("Acesso restrito", "Contas de organização não podem realizar inscrições em campanhas."));
+            return "redirect:/campanhas/" + id;
+        }
+
         try {
-            Registration inscricao = inscricaoService.register(campanhaOpt.get(), principal.getId(), embarque, observacoes, lgpd != null);
+            Registration inscricao = inscricaoService.register(campanha, principal.getId(), embarque, observacoes, lgpd != null);
             String garantida = "Sua vaga no transporte está garantida.";
             redirectAttributes.addFlashAttribute("toast",
                     Toast.success("Inscrição confirmada", garantida).withIcon("check_circle"));
@@ -184,22 +211,44 @@ public class InscricaoController {
                 .body(ics.toString());
     }
 
-    /** Cidade de embarque para o bilhete: a do ponto escolhido (ou da partida), ou "Sua cidade" quando não há. */
-    private static String origem(Registration inscricao) {
-        if (!InscricaoService.goesByBus(inscricao)) {
-            return "Por conta própria";
+    private static String origem(Registration r) {
+        if (r.getBoardingLocation() != null) {
+            Location l = r.getBoardingLocation();
+            return l.getCity() != null && !l.getCity().isBlank() ? l.getName() + " (" + l.getCity() + ")" : l.getName();
         }
-        Location saida = inscricao.getBoardingLocation() != null
-                ? inscricao.getBoardingLocation()
-                : inscricao.getCampaign().getDepartureLocation();
-        return saida != null && saida.getCity() != null ? saida.getCity() : "Sua cidade";
+        if (r.getBoardingPoint() != null && !r.getBoardingPoint().isBlank()) {
+            return r.getBoardingPoint();
+        }
+        Campaign c = r.getCampaign();
+        if (c.getDepartureLocation() != null) {
+            Location d = c.getDepartureLocation();
+            return d.getCity() != null && !d.getCity().isBlank() ? d.getName() + " (" + d.getCity() + ")" : d.getName();
+        }
+        return "Ponto de encontro da campanha";
     }
 
     private static String local(Location l) {
-        return l.getCity() == null ? l.getName() : l.getName() + ", " + l.getCity();
+        StringBuilder s = new StringBuilder(l.getName());
+        if (l.getStreet() != null) {
+            s.append(", ").append(l.getStreet());
+            if (l.getNumber() != null) {
+                s.append(", ").append(l.getNumber());
+            }
+        }
+        if (l.getCity() != null) {
+            s.append(" - ").append(l.getCity());
+        }
+        return s.toString();
     }
 
-    private static String escapeIcs(String text) {
-        return text.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n");
+    private static String escapeIcs(String texto) {
+        if (texto == null) {
+            return "";
+        }
+        return texto.replace("\\", "\\\\")
+                .replace(";", "\\;")
+                .replace(",", "\\,")
+                .replace("\r\n", "\\n")
+                .replace("\n", "\\n");
     }
 }

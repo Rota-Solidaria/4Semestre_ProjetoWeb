@@ -40,6 +40,14 @@ public class AuthenticatedUser implements UserDetails, CredentialsContainer {
         this.authorities = List.copyOf(roles);
     }
 
+    public boolean isOrganizer() {
+        return authorities.stream().anyMatch(a -> "ROLE_ORGANIZER".equals(a.getAuthority()));
+    }
+
+    public boolean isDonor() {
+        return authorities.stream().anyMatch(a -> "ROLE_DONOR".equals(a.getAuthority()));
+    }
+
     public Long getId() {
         return id;
     }

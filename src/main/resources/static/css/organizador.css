@@ -51,6 +51,14 @@ input,select,textarea{font:inherit;color:inherit}
 .btn-block{width:100%}
 .btn-lg{height:52px}
 .btn[disabled],.btn-disabled{background:var(--surface2);color:var(--text3);border-color:var(--border);cursor:default}
+.btn-danger{background:#FFF1F2;color:#B4232A;border-color:#FECDD3}
+.btn-danger:hover{background:#B4232A;color:#fff;border-color:#B4232A}
+.btn-outline-danger{background:var(--surface);color:#B4232A;border-color:#FECDD3}
+.btn-outline-danger:hover{background:#FFF1F2;border-color:#B4232A}
+:root[data-theme="dark"] .btn-danger{background:#3B1215;color:#FFAEB3;border-color:#6B1D23}
+:root[data-theme="dark"] .btn-danger:hover{background:#B4232A;color:#fff}
+:root[data-theme="dark"] .btn-outline-danger{background:var(--surface);color:#FFAEB3;border-color:#6B1D23}
+:root[data-theme="dark"] .btn-outline-danger:hover{background:#3B1215;border-color:#FFAEB3}
 
 /* Badges de status */
 .badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 12px;font:600 12px/1 'IBM Plex Sans',sans-serif}
@@ -100,7 +108,8 @@ input,select,textarea{font:inherit;color:inherit}
 .org-card__meta{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--text2)}
 .org-card__meta span{display:inline-flex;align-items:center;gap:6px}
 .org-card__meta .icon{font-size:18px}
-.org-card__actions{display:flex;gap:10px;flex-wrap:wrap}
+.org-card__actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.org-card__actions form{display:inline-flex;margin:0}
 .org-card__top{display:flex;gap:8px}
 .org-empty{padding:40px;text-align:center;color:var(--text2);display:grid;justify-items:center;gap:14px}
 .org-empty p{margin:0}

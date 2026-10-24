@@ -118,6 +118,12 @@
     <div class="wizard-topo">
       <a class="back-link" href="/organizador/campanhas"><span class="icon" aria-hidden="true">arrow_back</span>Minhas campanhas</a>
       <span class="wizard-topo__titulo"><#if novo>Nova campanha<#else>${campanha.title}</#if></span>
+      <#if !novo>
+        <form method="post" action="/organizador/campanhas/${campanha.id?c}/excluir" style="margin-left:auto" onsubmit="return confirm('Tem certeza que deseja excluir esta campanha definitivamente? Esta ação não pode ser desfeita.');">
+          <#include "../includes/csrf.ftlh">
+          <button type="submit" class="btn btn-outline-danger btn-sm"><span class="icon" aria-hidden="true">delete</span>Excluir campanha</button>
+        </form>
+      </#if>
     </div>
 
     <#-- Passos numerados -->
