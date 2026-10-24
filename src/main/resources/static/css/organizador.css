@@ -108,8 +108,19 @@ input,select,textarea{font:inherit;color:inherit}
 .org-card__meta{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--text2)}
 .org-card__meta span{display:inline-flex;align-items:center;gap:6px}
 .org-card__meta .icon{font-size:18px}
-.org-card__actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.org-card__actions form{display:inline-flex;margin:0}
+.org-card__actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.org-card__actions>a,.org-card__actions>form{display:inline-flex;margin:0}
+.org-card__actions .btn{height:40px;padding:0 14px;font-size:14px;border-radius:10px}
+.org-card__actions .btn .icon{font-size:18px}
+@media(max-width:768px){
+  .org-card{flex-direction:column;align-items:stretch;padding:18px 16px;gap:16px}
+  .org-card__actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+  .org-card__actions>a,.org-card__actions>form{width:100%;display:flex}
+  .org-card__actions .btn{width:100%;height:42px;padding:0 8px;font-size:13px;font-weight:600;justify-content:center;border-radius:10px;box-sizing:border-box}
+  .org-card__actions .btn .icon{font-size:17px}
+  .org-card__actions .org-act-edit{grid-column:1/-1;height:44px;font-size:14px}
+  .org-card__actions .org-act-delete:last-child:nth-child(odd){grid-column:1/-1}
+}
 .org-card__top{display:flex;gap:8px}
 .org-empty{padding:40px;text-align:center;color:var(--text2);display:grid;justify-items:center;gap:14px}
 .org-empty p{margin:0}

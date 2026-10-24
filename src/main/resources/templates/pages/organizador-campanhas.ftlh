@@ -38,12 +38,18 @@
               </div>
             </div>
             <div class="org-card__actions">
-              <a class="btn btn-secondary" href="/campanhas/${c.id?c}" title="Visualizar página pública da campanha">Ver página</a>
-              <a class="btn btn-secondary" href="/organizador/campanhas/${c.id?c}/divulgar" title="Divulgar nas redes e WhatsApp"><span class="icon" aria-hidden="true">share</span>Divulgar</a>
-              <a class="btn btn-primary" href="/organizador/campanhas/${c.id?c}/editar" title="Editar dados e paradas da rota"><span class="icon" aria-hidden="true">edit</span>Editar</a>
+              <a class="btn btn-primary org-act-edit" href="/organizador/campanhas/${c.id?c}/editar" title="Editar dados e paradas da rota">
+                <span class="icon" aria-hidden="true">edit</span>Editar
+              </a>
+              <a class="btn btn-secondary org-act-view" href="/campanhas/${c.id?c}" title="Visualizar página pública da campanha">
+                <span class="icon" aria-hidden="true">visibility</span>Ver página
+              </a>
+              <a class="btn btn-secondary org-act-share" href="/organizador/campanhas/${c.id?c}/divulgar" title="Divulgar nas redes e WhatsApp">
+                <span class="icon" aria-hidden="true">share</span>Divulgar
+              </a>
 
               <#if c.status == "OPEN">
-                <form method="post" action="/organizador/campanhas/${c.id?c}/status">
+                <form method="post" action="/organizador/campanhas/${c.id?c}/status" class="org-act-status">
                   <#include "../includes/csrf.ftlh">
                   <input type="hidden" name="status" value="CLOSED">
                   <button type="submit" class="btn btn-secondary" title="Encerrar inscrições para novos doadores">
@@ -52,7 +58,7 @@
                 </form>
               <#elseif c.status == "CLOSED">
                 <#if !c.dataPassada>
-                  <form method="post" action="/organizador/campanhas/${c.id?c}/status">
+                  <form method="post" action="/organizador/campanhas/${c.id?c}/status" class="org-act-status">
                     <#include "../includes/csrf.ftlh">
                     <input type="hidden" name="status" value="OPEN">
                     <button type="submit" class="btn btn-secondary" title="Reabrir inscrições da campanha">
@@ -63,7 +69,7 @@
               </#if>
 
               <#if c.status != "CANCELLED">
-                <form method="post" action="/organizador/campanhas/${c.id?c}/status" onsubmit="return confirm('Tem certeza que deseja cancelar esta campanha? Os doadores inscritos serão notificados por e-mail.');">
+                <form method="post" action="/organizador/campanhas/${c.id?c}/status" class="org-act-cancel" onsubmit="return confirm('Tem certeza que deseja cancelar esta campanha? Os doadores inscritos serão notificados por e-mail.');">
                   <#include "../includes/csrf.ftlh">
                   <input type="hidden" name="status" value="CANCELLED">
                   <button type="submit" class="btn btn-outline-danger" title="Cancelar caravana">
@@ -71,7 +77,7 @@
                   </button>
                 </form>
               <#elseif !c.dataPassada>
-                <form method="post" action="/organizador/campanhas/${c.id?c}/status">
+                <form method="post" action="/organizador/campanhas/${c.id?c}/status" class="org-act-cancel">
                   <#include "../includes/csrf.ftlh">
                   <input type="hidden" name="status" value="OPEN">
                   <button type="submit" class="btn btn-secondary" title="Reativar campanha cancelada">
@@ -80,7 +86,7 @@
                 </form>
               </#if>
 
-              <form method="post" action="/organizador/campanhas/${c.id?c}/excluir" onsubmit="return confirm('Tem certeza que deseja excluir esta campanha definitivamente? Esta ação não pode ser desfeita.');">
+              <form method="post" action="/organizador/campanhas/${c.id?c}/excluir" class="org-act-delete" onsubmit="return confirm('Tem certeza que deseja excluir esta campanha definitivamente? Esta ação não pode ser desfeita.');">
                 <#include "../includes/csrf.ftlh">
                 <button type="submit" class="btn btn-danger" title="Excluir campanha permanentemente">
                   <span class="icon" aria-hidden="true">delete</span>Excluir
