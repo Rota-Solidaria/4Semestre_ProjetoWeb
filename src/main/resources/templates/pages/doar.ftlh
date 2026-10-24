@@ -8,25 +8,22 @@
 <@main.layout title="Doe sangue sem se preocupar com o transporte · Rota Solidária" css="/css/doar.css" currentNav="inicio" scripts=["/js/gotas.js", "/js/doar-motion.js"]>
   <main class="doar">
 
-    <section class="doar-hero">
+    <section class="doar-hero vh-section">
       <div class="container doar-hero__grid">
         <div class="doar-hero__texto">
-          <span class="kicker doar-pal" style="--i:0">Doação de sangue · Angatuba, Itapetininga e região</span>
-          <h1><span class="doar-pal" style="--i:1">O</span> <span class="doar-pal" style="--i:2">hemocentro</span> <span class="doar-pal" style="--i:3">fica</span> <span class="doar-pal doar-longe" style="--i:4">longe</span><span class="doar-pal" style="--i:4">?</span> <span class="doar-pal" style="--i:6">O</span> <span class="doar-pal" style="--i:7">ônibus</span> <span class="doar-leva"><span class="doar-pal" style="--i:8">leva</span> <span class="doar-pal" style="--i:9">você.</span></span></h1>
+          <h1><span class="doar-pal" style="--i:0">O</span> <span class="doar-pal" style="--i:1">hemocentro</span> <span class="doar-pal" style="--i:2">fica</span> <span class="doar-pal doar-longe" style="--i:3">longe</span><span class="doar-pal" style="--i:3">?</span> <span class="doar-pal" style="--i:5">O</span> <span class="doar-pal" style="--i:6">ônibus</span> <span class="doar-leva"><span class="doar-pal" style="--i:7">leva</span> <span class="doar-pal" style="--i:8">você.</span></span></h1>
           <p class="doar-hero__sub">Escolha uma caravana gratuita que sai da sua cidade, reserve a vaga em poucos cliques e receba o bilhete de embarque no celular.</p>
           <div class="doar-hero__acoes">
-            <a class="btn btn-primary btn-lg" href="/mapa">Ver caravanas perto de mim<span class="icon doar-seta" aria-hidden="true">arrow_forward</span></a>
+            <a class="btn btn-primary btn-lg" href="/campanhas">Ver caravanas perto de mim<span class="icon doar-seta" aria-hidden="true">arrow_forward</span></a>
             <a class="btn btn-ghost btn-lg" href="#como">Como funciona</a>
           </div>
-          <span class="doar-gatilho"><span class="icon" aria-hidden="true">verified</span>Transporte gratuito · reserva em poucos cliques · lembrete por e-mail</span>
           <#if caravanasAbertas gt 0>
             <span class="doar-prova"><span class="doar-prova__ponto" aria-hidden="true"></span><strong>${caravanasAbertas}</strong> <#if caravanasAbertas == 1>caravana com inscrições abertas agora<#else>caravanas com inscrições abertas agora</#if></span>
           </#if>
         </div>
 
-        <#-- iPhone com a tela "Como chegar" em HTML: a rota se desenha, o ônibus desce a linha, o bilhete é carimbado
-             e chega o e-mail de lembrete (o app manda quando falta menos de um dia) -->
-        <div class="doar-hero__visual">
+        <#-- iPhone com a tela "Como chegar" em HTML (no desktop fica lado a lado no hero; no mobile ganha sua própria seção abaixo) -->
+        <div class="doar-hero__visual doar-hero__visual--desktop">
           <div class="iphone" role="img" aria-label="Celular com a tela Como chegar do Rota Solidária: o ônibus sai da Praça da Matriz de Angatuba às 06:30, para na Rodoviária de Itapetininga e chega ao Colsan Sorocaba para a doação às 08:30">
             <span class="iphone__btn iphone__btn--acao"></span><span class="iphone__btn iphone__btn--vol1"></span><span class="iphone__btn iphone__btn--vol2"></span><span class="iphone__btn iphone__btn--lado"></span>
             <div class="iphone__bezel">
@@ -35,7 +32,6 @@
                 <div class="iphone__status">
                   <span>9:41</span>
                   <span class="iphone__icones">
-                    <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"></rect><rect x="5" y="5.5" width="3" height="6.5" rx="1"></rect><rect x="10" y="3" width="3" height="9" rx="1"></rect><rect x="15" y="0" width="3" height="12" rx="1"></rect></svg>
                     <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .8 10.3 10.3 0 0 0 .8 3.7L2 5c1.6-1.5 3.7-2.4 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4.4 6.7 6.7 0 0 0 3.4 6.2l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.5c-.4 0-.8.2-1.1.5L8 11.4l1.1-1.2c-.3-.3-.7-.5-1.1-.5Z"></path></svg>
                     <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"></rect><rect x="2" y="2" width="18" height="9" rx="2.4"></rect><path d="M25 4.5v4a2 2 0 0 0 0-4Z" opacity=".45"></path></svg>
                   </span>
@@ -49,9 +45,9 @@
                   <span class="app-kicker">Como chegar</span>
                   <div class="app-titulo">O ônibus leva você até o hemocentro</div>
                   <div class="rota">
-                    <svg class="rota__linha" viewBox="0 0 4 260" preserveAspectRatio="none">
-                      <path class="rota__fundo" d="M2 0V260" pathLength="1"></path>
-                      <path class="rota__traco" d="M2 0V260" pathLength="1"></path>
+                    <svg class="rota__linha" viewBox="0 0 4 240" preserveAspectRatio="none">
+                      <path class="rota__fundo" d="M2 0V240" pathLength="1"></path>
+                      <path class="rota__traco" d="M2 0V240" pathLength="1"></path>
                     </svg>
                     <div class="rota__parada">
                       <span class="rota__pino rota__pino--saida"><span class="icon">directions_bus</span></span>
@@ -77,22 +73,79 @@
       </div>
     </section>
 
-    <section class="doar-dor" data-anima>
+    <#-- No mobile: o celular vira uma seção de 100vh própria e focada na animação da rota -->
+    <section class="doar-cel-sec vh-section" data-anima data-anima-limiar="0.3">
+      <div class="container doar-cel-sec__container">
+        <div class="doar-hero__visual doar-hero__visual--mobile">
+          <div class="iphone" role="img" aria-label="Celular com a tela Como chegar do Rota Solidária: o ônibus sai da Praça da Matriz de Angatuba às 06:30, para na Rodoviária de Itapetininga e chega ao Colsan Sorocaba para a doação às 08:30">
+            <span class="iphone__btn iphone__btn--acao"></span><span class="iphone__btn iphone__btn--vol1"></span><span class="iphone__btn iphone__btn--vol2"></span><span class="iphone__btn iphone__btn--lado"></span>
+            <div class="iphone__bezel">
+              <div class="iphone__tela" aria-hidden="true">
+                <span class="iphone__ilha"></span>
+                <div class="iphone__status">
+                  <span>9:41</span>
+                  <span class="iphone__icones">
+                    <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"></rect><rect x="5" y="5.5" width="3" height="6.5" rx="1"></rect><rect x="10" y="3" width="3" height="9" rx="1"></rect><rect x="15" y="0" width="3" height="12" rx="1"></rect></svg>
+                    <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.6c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .8 10.3 10.3 0 0 0 .8 3.7L2 5c1.6-1.5 3.7-2.4 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4.4 6.7 6.7 0 0 0 3.4 6.2l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.5c-.4 0-.8.2-1.1.5L8 11.4l1.1-1.2c-.3-.3-.7-.5-1.1-.5Z"></path></svg>
+                    <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"></rect><rect x="2" y="2" width="18" height="9" rx="2.4"></rect><path d="M25 4.5v4a2 2 0 0 0 0-4Z" opacity=".45"></path></svg>
+                  </span>
+                </div>
+                <div class="iphone__notif">
+                  <span class="iphone__notif-app"><span class="icon">mail</span></span>
+                  <span class="iphone__notif-txt"><span class="iphone__notif-linha"><span>E-mail · Rota Solidária</span><span>agora</span></span><b>Lembrete: falta menos de um dia</b><span>Embarque ≈ 07:15 · Rodoviária de Itapetininga</span></span>
+                </div>
+                <div class="app-topo"><i></i><span><b>Rota</b> Solidária</span></div>
+                <div class="app-corpo">
+                  <span class="app-kicker">Como chegar</span>
+                  <div class="app-titulo">O ônibus leva você até o hemocentro</div>
+                  <div class="rota">
+                    <svg class="rota__linha" viewBox="0 0 4 240" preserveAspectRatio="none">
+                      <path class="rota__fundo" d="M2 0V240" pathLength="1"></path>
+                      <path class="rota__traco" d="M2 0V240" pathLength="1"></path>
+                    </svg>
+                    <div class="rota__parada">
+                      <span class="rota__pino rota__pino--saida"><span class="icon">directions_bus</span></span>
+                      <span class="rota__txt"><span class="rota__hora">Saída 06:30</span><strong>Partida</strong><span>Praça da Matriz, Angatuba</span></span>
+                    </div>
+                    <div class="rota__parada">
+                      <span class="rota__pino rota__pino--parada">1</span>
+                      <span class="rota__txt"><span class="rota__hora">≈ 07:15</span><strong>Parada 1</strong><span>Rodoviária de Itapetininga</span></span>
+                    </div>
+                    <div class="rota__parada">
+                      <span class="rota__pino rota__pino--hemo"><span class="icon">bloodtype</span></span>
+                      <span class="rota__txt"><span class="rota__hora">Doação 08:30</span><strong>Hemocentro</strong><span>Colsan Sorocaba</span></span>
+                    </div>
+                    <span class="rota__bus"><span class="icon">directions_bus</span></span>
+                  </div>
+                </div>
+                <div class="app-carimbo"><strong><span class="icon">check</span>VAGA GARANTIDA</strong><span>CÓDIGO RS-00002</span></div>
+                <span class="iphone__indicador"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="doar-dor vh-section" data-anima>
       <div class="container">
-        <div class="doar-cabeca">
+        <div class="doar-cabeca doar-cabeca--centro">
           <span class="kicker doar-entra">Por que tanta gente não doa</span>
           <h2 class="doar-entra" style="--i:1">Vontade não falta. Falta chegar até lá.</h2>
         </div>
         <div class="doar-dor__grid">
           <div class="doar-dor__card" style="--i:0">
+            <span class="doar-dor__icone" aria-hidden="true"><span class="icon">location_on</span></span>
             <s class="doar-objecao">"O hemocentro é em outra cidade."</s>
             <span class="doar-resposta"><strong>A caravana sai da sua cidade.</strong><span>Pontos de embarque conhecidos, como a praça ou a rodoviária, com horário marcado.</span></span>
           </div>
           <div class="doar-dor__card" style="--i:1">
+            <span class="doar-dor__icone" aria-hidden="true"><span class="icon">directions_bus</span></span>
             <s class="doar-objecao">"Não tenho carro nem carona."</s>
             <span class="doar-resposta"><strong>O ônibus é gratuito.</strong><span>Você não paga passagem nem nada para doar. Só reserva a vaga.</span></span>
           </div>
           <div class="doar-dor__card" style="--i:2">
+            <span class="doar-dor__icone" aria-hidden="true"><span class="icon">fact_check</span></span>
             <s class="doar-objecao">"Nem sei se eu posso doar."</s>
             <span class="doar-resposta"><strong>Confira em 30 segundos.</strong><span>Os requisitos básicos estão logo abaixo. A palavra final é da triagem no hemocentro.</span></span>
           </div>
@@ -100,57 +153,48 @@
       </div>
     </section>
 
-    <section class="doar-como" id="como" data-anima>
+    <section class="doar-como vh-section" id="como" data-anima>
       <div class="container">
-        <div class="doar-cabeca">
+        <div class="doar-cabeca doar-cabeca--centro">
           <span class="kicker doar-entra">Como funciona</span>
           <h2 class="doar-entra" style="--i:1">Três passos até a sua vaga no ônibus</h2>
         </div>
         <ol class="doar-passos">
           <li class="doar-entra" style="--i:0">
             <div class="doar-passos__tela"><img src="/images/doar/passo-1-caravanas.jpg" width="585" height="1266" loading="lazy" alt="Lista de caravanas abertas no app, com data e vagas"></div>
-            <span class="doar-passos__num">01</span>
-            <strong>Escolha a caravana</strong>
-            <span>Veja data, horário de saída e quantas vagas ainda restam.</span>
+            <div class="doar-passos__info">
+              <span class="doar-passos__num">01</span>
+              <strong>Escolha a caravana</strong>
+              <span>Veja data, horário de saída e quantas vagas ainda restam.</span>
+            </div>
           </li>
           <li class="doar-entra" style="--i:1">
             <div class="doar-passos__tela"><img src="/images/doar/passo-2-embarque.jpg" width="585" height="1266" loading="lazy" alt="Escolha do ponto de embarque no app"></div>
-            <span class="doar-passos__num">02</span>
-            <strong>Escolha onde embarcar</strong>
-            <span>O ônibus passa por mais de um ponto. Você pega o mais perto de casa.</span>
+            <div class="doar-passos__info">
+              <span class="doar-passos__num">02</span>
+              <strong>Escolha onde embarcar</strong>
+              <span>O ônibus passa por mais de um ponto. Você pega o mais perto de casa.</span>
+            </div>
           </li>
           <li class="doar-entra" style="--i:2">
             <div class="doar-passos__tela">
               <img src="/images/doar/passo-3-bilhete.jpg" width="585" height="1266" loading="lazy" alt="Bilhete de embarque com o código da vaga">
               <span class="doar-mini-carimbo" aria-hidden="true">VAGA GARANTIDA<small>RS-00002</small></span>
             </div>
-            <span class="doar-passos__num">03</span>
-            <strong>Receba o bilhete</strong>
-            <span>Mande para o WhatsApp, salve na agenda e receba lembrete por e-mail.</span>
+            <div class="doar-passos__info">
+              <span class="doar-passos__num">03</span>
+              <strong>Receba o bilhete</strong>
+              <span>Mande para o WhatsApp, salve na agenda e receba lembrete por e-mail.</span>
+            </div>
           </li>
         </ol>
-        <a class="btn btn-primary btn-lg doar-entra" style="--i:3" href="/mapa">Quero reservar minha vaga<span class="icon doar-seta" aria-hidden="true">arrow_forward</span></a>
-      </div>
-    </section>
-
-    <section class="doar-impacto-sec" data-anima data-anima-vidas>
-      <div class="container">
-        <div class="doar-impacto">
-          <#-- Uma gota que vira quatro: o sangue doado é separado em componentes que atendem pacientes diferentes -->
-          <div class="doar-gotas4" aria-hidden="true">
-            <span class="doar-g4" style="--i:0;--x:-165px;--o0:1"><svg viewBox="0 0 24 24"><path d="M12 2.5c-3.8 4.8-6.5 8.3-6.5 11.7a6.5 6.5 0 0 0 13 0c0-3.4-2.7-6.9-6.5-11.7z"></path></svg><small>hemácias</small></span>
-            <span class="doar-g4" style="--i:1;--x:-55px;--o0:0"><svg viewBox="0 0 24 24"><path d="M12 2.5c-3.8 4.8-6.5 8.3-6.5 11.7a6.5 6.5 0 0 0 13 0c0-3.4-2.7-6.9-6.5-11.7z"></path></svg><small>plaquetas</small></span>
-            <span class="doar-g4" style="--i:2;--x:55px;--o0:0"><svg viewBox="0 0 24 24"><path d="M12 2.5c-3.8 4.8-6.5 8.3-6.5 11.7a6.5 6.5 0 0 0 13 0c0-3.4-2.7-6.9-6.5-11.7z"></path></svg><small>plasma</small></span>
-            <span class="doar-g4" style="--i:3;--x:165px;--o0:0"><svg viewBox="0 0 24 24"><path d="M12 2.5c-3.8 4.8-6.5 8.3-6.5 11.7a6.5 6.5 0 0 0 13 0c0-3.4-2.7-6.9-6.5-11.7z"></path></svg><small>crioprecipitado</small></span>
-          </div>
-          <span class="doar-impacto__num">até <span data-contador>4</span> vidas</span>
-          <span class="doar-impacto__texto">podem ser ajudadas por uma única doação de sangue.</span>
-          <span class="doar-impacto__fonte">Fonte: Ministério da Saúde, 25/11/2023</span>
+        <div class="doar-como__acao">
+          <a class="btn btn-primary btn-lg doar-entra" style="--i:3" href="/campanhas">Quero reservar minha vaga<span class="icon doar-seta" aria-hidden="true">arrow_forward</span></a>
         </div>
       </div>
     </section>
 
-    <section class="doar-posso" id="posso" data-anima>
+    <section class="doar-posso vh-section" id="posso" data-anima>
       <div class="container doar-posso__grid">
         <div class="doar-posso__texto doar-entra">
           <span class="kicker">Posso doar?</span>
@@ -167,7 +211,7 @@
       </div>
     </section>
 
-    <section class="doar-todos" data-anima>
+    <section class="doar-todos vh-section-sm" data-anima>
       <div class="container doar-todos__grid">
         <img class="doar-entra" src="/images/doar/acessibilidade.jpg" width="1200" height="750" loading="lazy" alt="Painel de acessibilidade do Rota Solidária com o texto ampliado">
         <div class="doar-todos__texto doar-entra" style="--i:1">
@@ -179,9 +223,12 @@
       </div>
     </section>
 
-    <section class="doar-duvidas" id="duvidas">
+    <section class="doar-duvidas vh-section" id="duvidas">
       <div class="container doar-duvidas__caixa">
-        <h2>Dúvidas de quem vai pela primeira vez</h2>
+        <div class="doar-cabeca doar-cabeca--centro">
+          <span class="kicker">Tire suas dúvidas</span>
+          <h2>Dúvidas de quem vai pela primeira vez</h2>
+        </div>
         <div class="doar-faq">
           <details open>
             <summary>É gratuito mesmo?<span class="icon" aria-hidden="true">expand_more</span></summary>
@@ -207,7 +254,7 @@
       </div>
     </section>
 
-    <section class="doar-final-sec" data-anima data-anima-gotas>
+    <section class="doar-final-sec vh-section-sm" data-anima data-anima-gotas>
       <div class="container">
         <div class="doar-final">
           <div>
@@ -215,7 +262,7 @@
             <p class="doar-entra" style="--i:1">Veja a data, escolha o ponto de embarque e garanta a vaga.</p>
           </div>
           <div class="doar-final__acao doar-entra" style="--i:2">
-            <a class="btn btn-primary btn-lg" href="/mapa" data-gotas-do>Ver caravanas perto de mim<span class="icon doar-seta" aria-hidden="true">arrow_forward</span></a>
+            <a class="btn btn-primary btn-lg" href="/campanhas" data-gotas-do>Ver caravanas perto de mim<span class="icon doar-seta" aria-hidden="true">arrow_forward</span></a>
             <span>Gratuito · reserva em poucos cliques</span>
           </div>
         </div>

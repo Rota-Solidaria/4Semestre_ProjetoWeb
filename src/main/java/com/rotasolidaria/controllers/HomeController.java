@@ -4,48 +4,31 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.rotasolidaria.dto.CaravanaNoMapa;
 import com.rotasolidaria.models.Campaign;
-import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.services.CampaignService;
-import com.rotasolidaria.services.InscricaoService;
 
 @Controller
 public class HomeController {
 
-    /** Quantas caravanas abertas a home carrega para o mapa (as próximas, por data). */
     private static final int CARAVANAS_NO_MAPA = 60;
 
     private final CampaignService campaignService;
-    private final InscricaoService inscricaoService;
 
-    public HomeController(CampaignService campaignService, InscricaoService inscricaoService) {
+    public HomeController(CampaignService campaignService) {
         this.campaignService = campaignService;
-        this.inscricaoService = inscricaoService;
     }
 
-    /** Início: quem não entrou vê a landing (explica a caravana); quem entrou vai direto ao mapa. */
+    /** Início: landing page que explica a caravana e leva para as campanhas. */
     @GetMapping("/")
-    public String index(@AuthenticationPrincipal AuthenticatedUser principal, Model model) {
-        return principal == null ? doar(model) : mapa(model);
+    public String index(Model model) {
+        return doar(model);
     }
 
-    /** Mapa da região com as caravanas abertas (destino dos botões da landing). */
-    @GetMapping("/mapa")
-    public String mapa(Model model) {
-        List<CaravanaNoMapa> caravanas = abertas().stream()
-                .map(c -> new CaravanaNoMapa(c, inscricaoService.slotsLeft(c), inscricaoService.boardingOptions(c)))
-                .toList();
-        model.addAttribute("caravanas", caravanas);
-        return "pages/index"; // -> templates/pages/index.ftlh
-    }
-
-    /** Landing para quem nunca doou: explica a caravana e leva para o mapa. */
+    /** Landing para quem nunca doou: explica a caravana e leva para as campanhas. */
     @GetMapping("/doar")
     public String doar(Model model) {
         model.addAttribute("caravanasAbertas", abertas().size());

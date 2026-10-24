@@ -6,20 +6,18 @@
     <div class="container profile-hero-inner">
       <div class="profile-avatar-large">
         <span>${(usuario.initials)!"US"}</span>
-        <#if !ehOrganizador!false && isDonor && donor?? && donor.bloodType??>
-          <#if donor.bloodType.name() != "UNKNOWN">
-            <span class="blood-type-pill" title="Tipo sanguíneo: ${donor.bloodType.displayName}">${donor.bloodType.displayName}</span>
-          <#else>
-            <span class="blood-type-pill" title="Tipo sanguíneo a definir na triagem">?</span>
-          </#if>
+        <#if !(ehOrganizador!false) && (isDonor!false) && (donor.bloodType)?? && (donor.bloodType.name())! != "UNKNOWN">
+          <span class="blood-type-pill" title="Tipo sanguíneo: ${(donor.bloodType.displayName)!}">${(donor.bloodType.displayName)!}</span>
+        <#elseif !(ehOrganizador!false) && (isDonor!false)>
+          <span class="blood-type-pill" title="Tipo sanguíneo a definir na triagem">?</span>
         </#if>
       </div>
 
       <div class="profile-name-row">
         <h1>${usuario.name}</h1>
-        <#if !ehOrganizador!false && isDonor && donor?? && donor.bloodType?? && donor.bloodType.name() != "UNKNOWN">
-          <span class="profile-tag-blood">${donor.bloodType.displayName}</span>
-        <#elseif !ehOrganizador!false && isDonor>
+        <#if !(ehOrganizador!false) && (isDonor!false) && (donor.bloodType)?? && (donor.bloodType.name())! != "UNKNOWN">
+          <span class="profile-tag-blood">${(donor.bloodType.displayName)!}</span>
+        <#elseif !(ehOrganizador!false) && (isDonor!false)>
           <span class="profile-tag-blood unconfirmed">Tipo a definir</span>
         </#if>
       </div>
@@ -29,9 +27,9 @@
         <#if usuario.phone?? && usuario.phone?has_content>
           <span><span class="icon">call</span>${usuario.phone}</span>
         </#if>
-        <#if ehOrganizador!false && (organizer.institution)?has_content>
+        <#if (ehOrganizador!false) && (organizer.institution)?has_content>
           <span><span class="icon">domain</span>${organizer.institution}</span>
-        <#elseif !ehOrganizador!false && isDonor>
+        <#elseif !(ehOrganizador!false) && (isDonor!false)>
           <span><span class="icon">volunteer_activism</span>${totalDoacoes!0} <#if (totalDoacoes!0) == 1>doação<#else>doações</#if></span>
           <#if (donor.birthDateBr)?has_content && donor.birthDateBr != "">
             <span><span class="icon">cake</span>${donor.birthDateBr}</span>
@@ -143,14 +141,14 @@
           <input id="prof-phone" name="phone" type="text" placeholder="(15) 99999-9999" value="${usuario.phone!""}">
         </div>
 
-        <#if isDonor>
+        <#if isDonor!false>
           <div class="form-row-2">
             <div class="form-field">
               <label for="prof-blood">Tipo Sanguíneo</label>
               <select id="prof-blood" name="bloodType">
                 <option value="">Selecione...</option>
                 <#list bloodTypes as bt>
-                  <option value="${bt.name()}" <#if donor?? && donor.bloodType?? && donor.bloodType == bt>selected</#if>>${bt.displayName}</option>
+                  <option value="${bt.name()}" <#if (donor.bloodType)?? && donor.bloodType == bt>selected</#if>>${bt.displayName}</option>
                 </#list>
               </select>
             </div>

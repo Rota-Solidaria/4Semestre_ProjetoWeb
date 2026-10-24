@@ -33,18 +33,27 @@
     }, 950);
   }
 
-  var observador = new IntersectionObserver(function (entradas) {
+  function aoAparecer(entradas, obs) {
     entradas.forEach(function (e) {
       if (!e.isIntersecting) { return; }
       var bloco = e.target;
-      observador.unobserve(bloco);
+      obs.unobserve(bloco);
       bloco.classList.add('visivel');
       if (bloco.hasAttribute('data-anima-vidas')) { contarVidas(bloco); }
       if (bloco.hasAttribute('data-anima-gotas')) { estourarGotas(bloco); }
     });
-  }, { threshold: 0.25 });
+  }
 
-  document.querySelectorAll('[data-anima]').forEach(function (bloco) { observador.observe(bloco); });
+  // Cada bloco pode pedir quanto dele precisa estar na tela para começar (data-anima-limiar; padrão 25%).
+  // O celular do mobile usa 60%: a animação só roda quando ele está de fato à vista.
+  var observadores = {};
+  document.querySelectorAll('[data-anima]').forEach(function (bloco) {
+    var limiar = parseFloat(bloco.getAttribute('data-anima-limiar')) || 0.25;
+    if (!observadores[limiar]) {
+      observadores[limiar] = new IntersectionObserver(aoAparecer, { threshold: limiar });
+    }
+    observadores[limiar].observe(bloco);
+  });
 
   // A seta do botão principal é o único movimento contínuo: para quando a pessoa começa a rolar
   function aoRolar() {
