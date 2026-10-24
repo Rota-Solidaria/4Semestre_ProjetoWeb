@@ -8,7 +8,6 @@
     <section class="hero vh-section">
       <div class="container hero-grid">
         <div class="hero-content">
-          <span class="kicker">Doação de sangue · Angatuba e região</span>
           <h1>Doe sangue, salve vidas perto de você.</h1>
           <p>Encontre a próxima coleta na sua região e garanta sua vaga com transporte gratuito em poucos minutos.</p>
           <div class="hero-actions">
@@ -168,7 +167,7 @@
       </div>
     </section>
 
-    <section class="home-primeira">
+    <section class="home-primeira vh-section-sm">
       <div class="container">
         <div class="home-primeira__faixa">
           <strong>Primeira vez?</strong>
@@ -182,7 +181,7 @@
       </div>
     </section>
 
-    <section class="home-fim">
+    <section class="home-fim vh-section-sm">
       <div class="container home-fim__grid">
         <div class="home-impacto">
           <span class="home-impacto__num">até 4 vidas</span>

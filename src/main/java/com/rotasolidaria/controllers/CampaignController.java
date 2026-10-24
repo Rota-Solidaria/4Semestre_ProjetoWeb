@@ -1,33 +1,34 @@
-// CampanhaController.java
 package com.rotasolidaria.controllers;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.rotasolidaria.dto.CaravanaNoMapa;
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Location;
 import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.services.CampaignService;
 import com.rotasolidaria.services.InscricaoService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class CampaignController {
 
     public static final int LIMITE_PADRAO = 6;
+    private static final int CARAVANAS_NO_MAPA = 60;
 
     private final CampaignService campanhaService;
     private final InscricaoService inscricaoService;
@@ -35,6 +36,14 @@ public class CampaignController {
     public CampaignController(CampaignService campanhaService, InscricaoService inscricaoService) {
         this.campanhaService = campanhaService;
         this.inscricaoService = inscricaoService;
+    }
+
+    private List<Campaign> abertasParaMapa() {
+        LocalDate hoje = LocalDate.now();
+        return campanhaService.listarAbertasPaginadas(PageRequest.of(0, CARAVANAS_NO_MAPA))
+                .getContent().stream()
+                .filter(c -> c.getEventDate() == null || !c.getEventDate().isBefore(hoje))
+                .toList();
     }
 
     @GetMapping("/campanhas")
@@ -78,6 +87,12 @@ public class CampaignController {
         model.addAttribute("temProxima", paginaCampanhas.hasNext());
         model.addAttribute("busca", busca != null ? busca.trim() : "");
         model.addAttribute("limite", tamanho);
+
+        // Caravanas no mapa regional (mesmo painel visualizador com geolocalização e filtros)
+        List<CaravanaNoMapa> caravanas = abertasParaMapa().stream()
+                .map(c -> new CaravanaNoMapa(c, inscricaoService.slotsLeft(c), inscricaoService.boardingOptions(c)))
+                .toList();
+        model.addAttribute("caravanas", caravanas);
 
         // Campanhas em que o usuário já se inscreveu mostram o selo e o atalho para o bilhete
         if (principal != null) {
