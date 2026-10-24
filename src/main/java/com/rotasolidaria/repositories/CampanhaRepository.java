@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.enums.CampaignStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,11 +22,18 @@ public interface CampanhaRepository extends JpaRepository<Campaign, Long> {
     Page<Campaign> findByStatusOrderByEventDateAsc(CampaignStatus status, Pageable pageable);
 
     @Query("SELECT c FROM Campaign c " +
+           "WHERE c.status = :status " +
+           "AND (c.eventDate IS NULL OR c.eventDate >= :hoje) " +
+           "ORDER BY c.eventDate ASC, c.id ASC")
+    Page<Campaign> findAbertasValidas(@Param("status") CampaignStatus status, @Param("hoje") LocalDate hoje, Pageable pageable);
+
+    @Query("SELECT c FROM Campaign c " +
            "LEFT JOIN c.donationLocation dl " +
            "LEFT JOIN c.departureLocation dpl " +
            "LEFT JOIN c.organizer o " +
            "LEFT JOIN o.user u " +
            "WHERE c.status = :status " +
+           "AND (c.eventDate IS NULL OR c.eventDate >= :hoje) " +
            "AND (:busca IS NULL OR :busca = '' OR " +
            "LOWER(c.title) LIKE LOWER(CONCAT('%', :busca, '%')) OR " +
            "LOWER(dl.city) LIKE LOWER(CONCAT('%', :busca, '%')) OR " +
@@ -34,5 +42,5 @@ public interface CampanhaRepository extends JpaRepository<Campaign, Long> {
            "LOWER(u.name) LIKE LOWER(CONCAT('%', :busca, '%')) OR " +
            "LOWER(o.institution) LIKE LOWER(CONCAT('%', :busca, '%'))) " +
            "ORDER BY c.eventDate ASC, c.id ASC")
-    Page<Campaign> buscarAbertasComFiltro(@Param("status") CampaignStatus status, @Param("busca") String busca, Pageable pageable);
+    Page<Campaign> buscarAbertasComFiltro(@Param("status") CampaignStatus status, @Param("busca") String busca, @Param("hoje") LocalDate hoje, Pageable pageable);
 }

@@ -147,7 +147,9 @@
           <div class="detail-actions">
             <#if minhaInscricao??>
               <a class="btn btn-primary btn-lg" href="/inscricoes/${minhaInscricao.id?c}">Ver inscrição</a>
-            <#elseif campanha.status != "OPEN" || vagasRestantes lte 0>
+            <#elseif ehOrganizador!false>
+              <span class="btn btn-primary btn-lg btn-disabled" aria-disabled="true" title="Contas de organização não podem se inscrever em campanhas">Inscrição exclusiva para doadores</span>
+            <#elseif !campanha.inscricoesAbertas || vagasRestantes lte 0>
               <span class="btn btn-primary btn-lg btn-disabled" aria-disabled="true"><#if vagasRestantes lte 0>Vagas esgotadas<#else>Inscrições encerradas</#if></span>
             <#else>
               <a class="btn btn-primary btn-lg" href="/campanhas/${campanha.id}/inscrever">Fazer inscrição</a>

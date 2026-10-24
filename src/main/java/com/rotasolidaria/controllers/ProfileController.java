@@ -6,11 +6,11 @@ import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.User;
 import com.rotasolidaria.models.enums.BloodType;
 import com.rotasolidaria.models.enums.RegistrationStatus;
+import com.rotasolidaria.repositories.CampanhaRepository;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
 import com.rotasolidaria.repositories.OrganizerRepository;
 import com.rotasolidaria.repositories.UserRepository;
-import com.rotasolidaria.exception.BusinessException;
 import com.rotasolidaria.security.AuthenticatedUser;
 import com.rotasolidaria.services.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -34,11 +34,11 @@ import java.util.Optional;
 @Controller
 public class ProfileController {
 
-
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
     private final OrganizerRepository organizerRepository;
     private final InscricaoRepository inscricaoRepository;
+    private final CampanhaRepository campanhaRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
@@ -46,12 +46,14 @@ public class ProfileController {
                              DonorRepository donorRepository,
                              OrganizerRepository organizerRepository,
                              InscricaoRepository inscricaoRepository,
+                             CampanhaRepository campanhaRepository,
                              PasswordEncoder passwordEncoder,
                              AuthService authService) {
         this.userRepository = userRepository;
         this.donorRepository = donorRepository;
         this.organizerRepository = organizerRepository;
         this.inscricaoRepository = inscricaoRepository;
+        this.campanhaRepository = campanhaRepository;
         this.passwordEncoder = passwordEncoder;
         this.authService = authService;
     }
@@ -69,23 +71,28 @@ public class ProfileController {
 
         User user = userOpt.get();
 
+        Optional<Organizer> organizerOpt = organizerRepository.findById(user.getId());
+        Organizer organizer = organizerOpt.orElse(null);
+        boolean ehOrg = organizer != null || principal.isOrganizer();
+
         boolean isDonor = false;
         Donor donor = null;
         List<Registration> inscricoes = Collections.emptyList();
 
-        Optional<Donor> donorOpt = donorRepository.findById(user.getId());
-        if (donorOpt.isPresent()) {
-            isDonor = true;
-            donor = donorOpt.get();
-            inscricoes = inscricaoRepository.findByDonor(donor);
+        if (ehOrg) {
+            // Regra de negócio: Organização / hemocentro não tem inscrições, gerencia campanhas
+            model.addAttribute("campanhasOrganizador", campanhaRepository.findByOrganizerIdOrderByEventDateDesc(user.getId()));
+        } else {
+            Optional<Donor> donorOpt = donorRepository.findById(user.getId());
+            if (donorOpt.isPresent()) {
+                isDonor = true;
+                donor = donorOpt.get();
+                inscricoes = inscricaoRepository.findByDonor(donor);
+            }
+            if (isDonor) {
+                addDonorCard(inscricoes, model);
+            }
         }
-
-        if (isDonor) {
-            addDonorCard(inscricoes, model);
-        }
-
-        Optional<Organizer> organizerOpt = organizerRepository.findById(user.getId());
-        Organizer organizer = organizerOpt.orElse(null);
 
         model.addAttribute("usuario", user);
         // Contas criadas pelo Google começam sem senha: o perfil oferece "Definir senha"
@@ -114,26 +121,33 @@ public class ProfileController {
                 .toList();
 
         model.addAttribute("totalDoacoes", doacoes.size());
-        if (!doacoes.isEmpty()) {
-            LocalDate ultima = doacoes.get(doacoes.size() - 1);
-            LocalDate proximaHomens = ultima.plusDays(60);
-            LocalDate proximaMulheres = ultima.plusDays(90);
-            long diasDesde = ChronoUnit.DAYS.between(ultima, hoje);
-            model.addAttribute("ultimaDoacaoBr", ultima.format(Datas.DATA_BR));
-            model.addAttribute("proximaHomensBr", proximaHomens.format(Datas.DATA_BR));
-            model.addAttribute("proximaMulheresBr", proximaMulheres.format(Datas.DATA_BR));
-            model.addAttribute("diasRestantes", Math.max(0, ChronoUnit.DAYS.between(hoje, proximaHomens)));
-            model.addAttribute("progressoIntervalo", Math.min(100, diasDesde * 100 / 60));
+
+        if (doacoes.isEmpty()) {
+            model.addAttribute("podeDoarAgora", true);
+            return;
         }
 
-        inscricoes.stream()
-                .filter(r -> r.getStatus() == RegistrationStatus.CONFIRMED)
-                .filter(r -> r.getCampaign().getEventDate() != null && !r.getCampaign().getEventDate().isBefore(hoje))
-                .min(Comparator.comparing(r -> r.getCampaign().getEventDate()))
-                .ifPresent(r -> {
-                    model.addAttribute("proximaInscricao", r);
-                    model.addAttribute("proximaInscricaoDataBr", r.getCampaign().getEventDate().format(Datas.DATA_BR));
-                });
+        LocalDate ultima = doacoes.get(doacoes.size() - 1);
+        model.addAttribute("ultimaDoacao", Datas.br(ultima));
+
+        LocalDate proxHomem = ultima.plusDays(60);
+        LocalDate proxMulher = ultima.plusDays(90);
+
+        boolean homemPode = !hoje.isBefore(proxHomem);
+        boolean mulherPode = !hoje.isBefore(proxMulher);
+
+        model.addAttribute("homemPodeDoar", homemPode);
+        model.addAttribute("mulherPodeDoar", mulherPode);
+        model.addAttribute("podeDoarAgora", homemPode && mulherPode);
+
+        if (!homemPode) {
+            model.addAttribute("diasParaHomem", ChronoUnit.DAYS.between(hoje, proxHomem));
+            model.addAttribute("proximaDataHomem", Datas.br(proxHomem));
+        }
+        if (!mulherPode) {
+            model.addAttribute("diasParaMulher", ChronoUnit.DAYS.between(hoje, proxMulher));
+            model.addAttribute("proximaDataMulher", Datas.br(proxMulher));
+        }
     }
 
     @PostMapping("/perfil/editar")
@@ -162,34 +176,36 @@ public class ProfileController {
 
         // Se for organizador, atualiza os dados específicos da instituição
         Optional<Organizer> organizerOpt = organizerRepository.findById(user.getId());
-        if (organizerOpt.isPresent() && institution != null) {
-            Organizer organizer = organizerOpt.get();
-            organizer.setInstitution(institution.trim());
-            organizerRepository.save(organizer);
-        }
-
-        // Se a conta tiver perfil de doador, atualiza os campos específicos
-        Optional<Donor> donorOpt = donorRepository.findById(user.getId());
-        if (donorOpt.isPresent()) {
-            Donor donor = donorOpt.get();
-            if (bloodType != null && !bloodType.isBlank()) {
-                try {
-                    donor.setBloodType(BloodType.valueOf(bloodType));
-                } catch (IllegalArgumentException ignored) {
+        if (organizerOpt.isPresent() || principal.isOrganizer()) {
+            if (organizerOpt.isPresent() && institution != null) {
+                Organizer organizer = organizerOpt.get();
+                organizer.setInstitution(institution.trim());
+                organizerRepository.save(organizer);
+            }
+        } else {
+            // Se a conta tiver perfil de doador, atualiza os campos específicos
+            Optional<Donor> donorOpt = donorRepository.findById(user.getId());
+            if (donorOpt.isPresent()) {
+                Donor donor = donorOpt.get();
+                if (bloodType != null && !bloodType.isBlank()) {
+                    try {
+                        donor.setBloodType(BloodType.valueOf(bloodType));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                } else {
+                    donor.setBloodType(null);
                 }
-            } else {
-                donor.setBloodType(null);
-            }
-            if (weight != null) {
-                donor.setWeight(weight);
-            }
-            if (birthDate != null && !birthDate.isBlank()) {
-                try {
-                    donor.setBirthDate(LocalDate.parse(birthDate));
-                } catch (Exception ignored) {
+                if (weight != null) {
+                    donor.setWeight(weight);
                 }
+                if (birthDate != null && !birthDate.isBlank()) {
+                    try {
+                        donor.setBirthDate(LocalDate.parse(birthDate));
+                    } catch (Exception ignored) {
+                    }
+                }
+                donorRepository.save(donor);
             }
-            donorRepository.save(donor);
         }
 
         // Alteração de senha, se solicitada
@@ -198,21 +214,19 @@ public class ProfileController {
             // Quem entrou pelo Google e ainda não tem senha pode defini-la sem informar a atual
             if (user.hasPassword() && (senhaAtual == null || !passwordEncoder.matches(senhaAtual, user.getPasswordHash()))) {
                 redirectAttributes.addFlashAttribute("toast",
-                        Toast.error("Senha não alterada", "Seus dados foram salvos, mas a senha atual está incorreta."));
+                        Toast.error("Senha atual incorreta", "Os dados foram salvos, mas a senha não foi alterada."));
                 return "redirect:/perfil";
             }
-            try {
-                authService.validatePasswordLength(novaSenha);
-            } catch (BusinessException e) {
+            if (novaSenha.length() < 8) {
                 redirectAttributes.addFlashAttribute("toast",
-                        Toast.error("Senha não alterada", "Seus dados foram salvos. " + e.getMessage()));
+                        Toast.error("Senha muito curta", "A nova senha precisa ter pelo menos 8 caracteres."));
                 return "redirect:/perfil";
             }
             user.setPasswordHash(passwordEncoder.encode(novaSenha));
             userRepository.save(user);
         }
 
-        redirectAttributes.addFlashAttribute("toast", Toast.success("Perfil atualizado", "Suas alterações foram salvas."));
+        redirectAttributes.addFlashAttribute("toast", Toast.success("Perfil atualizado", "Suas informações foram salvas."));
         return "redirect:/perfil";
     }
 }

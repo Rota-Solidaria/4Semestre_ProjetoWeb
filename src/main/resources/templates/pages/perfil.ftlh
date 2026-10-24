@@ -42,63 +42,120 @@
           <span class="icon">edit</span>
           <span>Editar Perfil</span>
         </button>
+        <form class="logout-form" method="post" action="/logout" style="display:inline">
+          <#include "../includes/csrf.ftlh">
+          <button type="submit" class="btn-hero-logout" title="Sair da sua conta">
+            <span class="icon">logout</span>
+            <span>Sair da conta</span>
+          </button>
+        </form>
       </div>
     </div>
   </section>
 
   <main class="container section profile-main-section">
     <div class="profile-content-wrap">
-      <div class="section-title-wrap">
-        <h2>Minhas Inscrições</h2>
-        <a class="btn btn-secondary btn-sm" href="/campanhas">Ver todas as coletas</a>
-      </div>
+      <#if ehOrganizador!false>
+        <#-- Seção para Organizadores / Hemocentros: exibe suas campanhas e opções de gestão -->
+        <div class="section-title-wrap">
+          <h2>Minhas Campanhas</h2>
+          <a class="btn btn-primary btn-sm" href="/organizador/campanhas/nova"><span class="icon" aria-hidden="true">add</span>Nova campanha</a>
+        </div>
 
-      <#if inscricoes?? && inscricoes?size gt 0>
-        <#list inscricoes as reg>
-          <div class="reg-card">
-            <div class="reg-card-main">
-              <span class="badge <#if reg.status == 'CONFIRMED'>badge-open<#else>badge-few</#if>">
-                <span class="dot"></span>
-                <#if reg.status == 'CONFIRMED'>Inscrição Confirmada<#elseif reg.status == 'PENDING'>Aguardando Triagem<#else>${reg.status}</#if>
-              </span>
-              <h3>${reg.campaign.title}</h3>
-              <div class="reg-meta">
-                <#if reg.campaign.eventDate??>
-                  <span><span class="icon">schedule</span><#if reg.campaign.eventDate??>${reg.campaign.eventDateBr}</#if> <#if reg.campaign.departureTime??>· Saída ${reg.campaign.departureTime}h</#if></span>
-                </#if>
-                <#if reg.campaign.donationLocation??>
-                  <span><span class="icon">place</span>${reg.campaign.donationLocation.name} (${reg.campaign.donationLocation.city})</span>
-                </#if>
-                <#if reg.boardingLocation??>
-                  <span><span class="icon">directions_bus</span>Embarque: ${reg.boardingLocation.name}</span>
-                <#elseif reg.boardingPoint?has_content>
-                  <span><span class="icon">directions_bus</span>Embarque: ${reg.boardingPoint}</span>
-                </#if>
+        <#if campanhasOrganizador?? && campanhasOrganizador?size gt 0>
+          <#list campanhasOrganizador as c>
+            <div class="reg-card">
+              <div class="reg-card-main">
+                <span class="badge <#if c.statusEfetivo == 'OPEN'>badge-open<#else>badge-few</#if>">
+                  <span class="dot"></span>
+                  ${c.statusRotulo}
+                </span>
+                <h3>${c.title}</h3>
+                <div class="reg-meta">
+                  <#if c.eventDate??>
+                    <span><span class="icon">schedule</span>${c.eventDateBr}<#if c.departureTime??> · Saída ${c.departureTime}h<#elseif c.donationTime??> · ${c.donationTimeTexto}h</#if></span>
+                  </#if>
+                  <#if c.departureLocation??>
+                    <span><span class="icon">route</span>${c.departureLocation.city!c.departureLocation.name} → ${(c.donationLocation.city)!"Hemocentro"}</span>
+                  </#if>
+                  <span><span class="icon">group</span>${c.slots!0} vagas no transporte</span>
+                </div>
+              </div>
+              <div class="reg-card-actions">
+                <a class="btn btn-primary" href="/organizador/campanhas/${c.id?c}/editar"><span class="icon" aria-hidden="true">edit</span>Gerenciar</a>
+                <a class="btn btn-secondary" href="/campanhas/${c.id?c}">Ver página</a>
               </div>
             </div>
-            <div class="reg-card-actions">
-              <#if reg.status != "CANCELLED">
-                <a class="btn btn-primary" href="/inscricoes/${reg.id?c}"><span class="icon" aria-hidden="true">assignment</span>Ver inscrição</a>
-              </#if>
-              <a class="btn btn-secondary" href="/campanhas/${reg.campaign.id}">Detalhes</a>
+          </#list>
+        <#else>
+          <div class="reg-empty">
+            <div class="reg-empty-art" aria-hidden="true">
+              <span class="icon">campaign</span>
+            </div>
+            <div class="reg-empty-text">
+              <h3>Você ainda não cadastrou nenhuma campanha</h3>
+              <p>Crie caravanas de transporte gratuito para levar voluntários até seu hemocentro.</p>
+              <div class="reg-empty-actions">
+                <a class="btn btn-primary" href="/organizador/campanhas/nova"><span class="icon" aria-hidden="true">add</span>Criar primeira campanha</a>
+                <a class="btn btn-ghost" href="/organizador/campanhas">Ir para painel de campanhas</a>
+              </div>
             </div>
           </div>
-        </#list>
+        </#if>
       <#else>
-        <div class="reg-empty">
-          <div class="reg-empty-art" aria-hidden="true">
-            <span class="reg-empty-drop"></span>
-            <span class="icon">directions_bus</span>
-          </div>
-          <div class="reg-empty-text">
-            <h3>Você ainda não tem inscrições</h3>
-            <p>Escolha uma campanha perto de você e garanta sua vaga no transporte.</p>
-            <div class="reg-empty-actions">
-              <a class="btn btn-primary" href="/campanhas">Ver campanhas<span class="icon" aria-hidden="true">arrow_forward</span></a>
-              <a class="btn btn-ghost" href="/educativo">Como funciona a doação</a>
+        <#-- Seção exclusiva para Doadores: histórico de inscrições em caravanas -->
+        <div class="section-title-wrap">
+          <h2>Minhas Inscrições</h2>
+          <a class="btn btn-secondary btn-sm" href="/campanhas">Ver todas as coletas</a>
+        </div>
+
+        <#if inscricoes?? && inscricoes?size gt 0>
+          <#list inscricoes as reg>
+            <div class="reg-card">
+              <div class="reg-card-main">
+                <span class="badge <#if reg.status == 'CONFIRMED'>badge-open<#else>badge-few</#if>">
+                  <span class="dot"></span>
+                  <#if reg.status == 'CONFIRMED'>Inscrição Confirmada<#elseif reg.status == 'PENDING'>Aguardando Triagem<#else>${reg.status}</#if>
+                </span>
+                <h3>${reg.campaign.title}</h3>
+                <div class="reg-meta">
+                  <#if reg.campaign.eventDate??>
+                    <span><span class="icon">schedule</span><#if reg.campaign.eventDate??>${reg.campaign.eventDateBr}</#if> <#if reg.campaign.departureTime??>· Saída ${reg.campaign.departureTime}h</#if></span>
+                  </#if>
+                  <#if reg.campaign.donationLocation??>
+                    <span><span class="icon">place</span>${reg.campaign.donationLocation.name} (${reg.campaign.donationLocation.city})</span>
+                  </#if>
+                  <#if reg.boardingLocation??>
+                    <span><span class="icon">directions_bus</span>Embarque: ${reg.boardingLocation.name}</span>
+                  <#elseif reg.boardingPoint?has_content>
+                    <span><span class="icon">directions_bus</span>Embarque: ${reg.boardingPoint}</span>
+                  </#if>
+                </div>
+              </div>
+              <div class="reg-card-actions">
+                <#if reg.status != "CANCELLED">
+                  <a class="btn btn-primary" href="/inscricoes/${reg.id?c}"><span class="icon" aria-hidden="true">assignment</span>Ver inscrição</a>
+                </#if>
+                <a class="btn btn-secondary" href="/campanhas/${reg.campaign.id}">Detalhes</a>
+              </div>
+            </div>
+          </#list>
+        <#else>
+          <div class="reg-empty">
+            <div class="reg-empty-art" aria-hidden="true">
+              <span class="reg-empty-drop"></span>
+              <span class="icon">directions_bus</span>
+            </div>
+            <div class="reg-empty-text">
+              <h3>Você ainda não tem inscrições</h3>
+              <p>Escolha uma campanha perto de você e garanta sua vaga no transporte.</p>
+              <div class="reg-empty-actions">
+                <a class="btn btn-primary" href="/campanhas">Ver campanhas<span class="icon" aria-hidden="true">arrow_forward</span></a>
+                <a class="btn btn-ghost" href="/educativo">Como funciona a doação</a>
+              </div>
             </div>
           </div>
-        </div>
+        </#if>
       </#if>
     </div>
   </main>
@@ -141,7 +198,7 @@
           <input id="prof-phone" name="phone" type="text" placeholder="(15) 99999-9999" value="${usuario.phone!""}">
         </div>
 
-        <#if isDonor!false>
+        <#if !(ehOrganizador!false) && (isDonor!false)>
           <div class="form-row-2">
             <div class="form-field">
               <label for="prof-blood">Tipo Sanguíneo</label>

@@ -11,6 +11,7 @@ import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.repositories.DonorRepository;
 import com.rotasolidaria.repositories.InscricaoRepository;
+import com.rotasolidaria.repositories.OrganizerRepository;
 import com.rotasolidaria.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,12 +37,14 @@ public class InscricaoService {
     private final InscricaoRepository inscricaoRepository;
     private final DonorRepository donorRepository;
     private final UserRepository userRepository;
+    private final OrganizerRepository organizerRepository;
 
     public InscricaoService(InscricaoRepository inscricaoRepository, DonorRepository donorRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository, OrganizerRepository organizerRepository) {
         this.inscricaoRepository = inscricaoRepository;
         this.donorRepository = donorRepository;
         this.userRepository = userRepository;
+        this.organizerRepository = organizerRepository;
     }
 
     /**
@@ -145,18 +148,13 @@ public class InscricaoService {
 
     @Transactional
     public Registration register(Campaign campaign, Long userId, String boardingKey, String notes, boolean lgpdAccepted) {
-        if (campaign.getOrganizer() != null && campaign.getOrganizer().getId().equals(userId)) {
-            throw new BusinessException("Você organiza esta campanha. Para doar, escolha a campanha de outro organizador.");
+        // Regra de negócio: Organizações/hemocentros não podem realizar inscrições em nenhuma campanha
+        if (organizerRepository.existsById(userId)) {
+            throw new BusinessException("Organizações não podem realizar inscrições em campanhas.");
         }
-        // Quem ainda não tem perfil de doador (ex.: um organizador) ganha um na primeira inscrição
-        Donor donor = donorRepository.findById(userId).orElseGet(() -> donorRepository.save(new Donor(
-                userRepository.findById(userId).orElseThrow(() -> new BusinessException("Faça login para se inscrever.")))));
 
-        if (inscricaoRepository.existsByCampaignAndDonor(campaign, donor)) {
-            throw new BusinessException("Você já está inscrito nesta campanha.");
-        }
-        if (campaign.getStatus() != CampaignStatus.OPEN
-                || (campaign.getEventDate() != null && campaign.getEventDate().isBefore(LocalDate.now()))) {
+        // Regra de negócio: Inscrições encerram na data do evento ou quando status != OPEN
+        if (!campaign.isInscricoesAbertas()) {
             throw new BusinessException("As inscrições desta campanha estão encerradas.");
         }
         if (slotsLeft(campaign) <= 0) {
@@ -165,6 +163,14 @@ public class InscricaoService {
         if (!lgpdAccepted) {
             throw new BusinessException("É preciso autorizar o envio dos seus dados ao organizador.");
         }
+
+        Donor donor = donorRepository.findById(userId).orElseGet(() -> donorRepository.save(new Donor(
+                userRepository.findById(userId).orElseThrow(() -> new BusinessException("Faça login para se inscrever.")))));
+
+        if (inscricaoRepository.existsByCampaignAndDonor(campaign, donor)) {
+            throw new BusinessException("Você já está inscrito nesta campanha.");
+        }
+
         BoardingOption boarding = boardingOptions(campaign).stream()
                 .filter(o -> o.getKey().equals(boardingKey))
                 .findFirst()

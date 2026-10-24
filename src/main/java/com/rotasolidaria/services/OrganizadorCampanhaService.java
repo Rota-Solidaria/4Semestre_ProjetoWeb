@@ -4,6 +4,7 @@ import com.rotasolidaria.dto.CampanhaForm;
 import com.rotasolidaria.exception.BusinessException;
 import com.rotasolidaria.models.Campaign;
 import com.rotasolidaria.models.Organizer;
+import com.rotasolidaria.models.Registration;
 import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.models.enums.RegistrationStatus;
 import com.rotasolidaria.models.enums.TransportMode;
@@ -125,6 +126,34 @@ public class OrganizadorCampanhaService {
         if (statusAnterior != CampaignStatus.CANCELLED && campaign.getStatus() == CampaignStatus.CANCELLED) {
             events.publishEvent(new CampaignCancelledEvent(campaign.getId()));
         }
+    }
+
+    @Transactional
+    public void atualizarStatus(Long campaignId, Long organizerId, CampaignStatus novoStatus) {
+        Campaign campaign = buscarDoOrganizador(campaignId, organizerId)
+                .orElseThrow(() -> new BusinessException("Campanha não encontrada."));
+        CampaignStatus statusAnterior = campaign.getStatus();
+        if (novoStatus == CampaignStatus.OPEN) {
+            if (campaign.getEventDate() != null && campaign.getEventDate().isBefore(LocalDate.now())) {
+                throw new BusinessException("Não é possível reabrir inscrições de uma campanha cuja data de realização já passou.");
+            }
+        }
+        campaign.setStatus(novoStatus);
+        campanhaRepository.save(campaign);
+        if (statusAnterior != CampaignStatus.CANCELLED && novoStatus == CampaignStatus.CANCELLED) {
+            events.publishEvent(new CampaignCancelledEvent(campaign.getId()));
+        }
+    }
+
+    @Transactional
+    public void excluir(Long campaignId, Long organizerId) {
+        Campaign campaign = buscarDoOrganizador(campaignId, organizerId)
+                .orElseThrow(() -> new BusinessException("Campanha não encontrada."));
+        List<Registration> inscricoes = inscricaoRepository.findByCampaign(campaign);
+        if (!inscricoes.isEmpty()) {
+            inscricaoRepository.deleteAll(inscricoes);
+        }
+        campanhaRepository.delete(campaign);
     }
 
     private void aplicarDados(Campaign campaign, CampanhaForm form, long inscritos) {

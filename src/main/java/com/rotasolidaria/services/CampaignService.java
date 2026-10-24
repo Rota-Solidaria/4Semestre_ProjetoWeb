@@ -1,12 +1,14 @@
 package com.rotasolidaria.services;
 
 import com.rotasolidaria.models.Campaign;
+import com.rotasolidaria.models.enums.CampaignStatus;
 import com.rotasolidaria.repositories.CampanhaRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,20 +26,22 @@ public class CampaignService {
     }
 
     public List<Campaign> listarAbertas() {
-        return campanhaRepository.findTop6ByStatus(com.rotasolidaria.models.enums.CampaignStatus.OPEN);
+        return campanhaRepository.findTop6ByStatus(CampaignStatus.OPEN);
     }
 
     public Page<Campaign> listarAbertasPaginadas(Pageable pageable) {
-        return campanhaRepository.findByStatusOrderByEventDateAsc(com.rotasolidaria.models.enums.CampaignStatus.OPEN, pageable);
+        return campanhaRepository.findAbertasValidas(CampaignStatus.OPEN, LocalDate.now(), pageable);
     }
 
     public Page<Campaign> buscarAbertas(String busca, Pageable pageable) {
+        LocalDate hoje = LocalDate.now();
         if (busca == null || busca.isBlank()) {
-            return listarAbertasPaginadas(pageable);
+            return campanhaRepository.findAbertasValidas(CampaignStatus.OPEN, hoje, pageable);
         }
         return campanhaRepository.buscarAbertasComFiltro(
-                com.rotasolidaria.models.enums.CampaignStatus.OPEN,
+                CampaignStatus.OPEN,
                 busca.trim(),
+                hoje,
                 pageable
         );
     }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
@@ -100,6 +101,40 @@ public class OrganizadorController {
             model.addAttribute("toast", Toast.error("Não foi possível salvar a campanha", e.getMessage()));
             return formulario(model, form, campanha.orElse(null));
         }
+    }
+
+    /** Atualiza o status da campanha (encerrar inscrições, reabrir ou cancelar). */
+    @PostMapping("/organizador/campanhas/{id}/status")
+    public String alterarStatus(@PathVariable Long id,
+                                @RequestParam("status") CampaignStatus status,
+                                @AuthenticationPrincipal AuthenticatedUser principal,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            campanhaService.atualizarStatus(id, principal.getId(), status);
+            String msg = switch (status) {
+                case CLOSED -> "Inscrições encerradas com sucesso.";
+                case OPEN -> "Inscrições reabertas com sucesso.";
+                case CANCELLED -> "Campanha cancelada com sucesso. Os inscritos foram notificados.";
+            };
+            redirectAttributes.addFlashAttribute("toast", Toast.success("Status atualizado", msg));
+        } catch (BusinessException e) {
+            redirectAttributes.addFlashAttribute("toast", Toast.error("Não foi possível alterar o status", e.getMessage()));
+        }
+        return "redirect:/organizador/campanhas";
+    }
+
+    /** Exclui uma campanha do organizador e suas inscrições. */
+    @PostMapping("/organizador/campanhas/{id}/excluir")
+    public String excluirCampanha(@PathVariable Long id,
+                                  @AuthenticationPrincipal AuthenticatedUser principal,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            campanhaService.excluir(id, principal.getId());
+            redirectAttributes.addFlashAttribute("toast", Toast.success("Campanha excluída", "A campanha foi removida com sucesso."));
+        } catch (BusinessException e) {
+            redirectAttributes.addFlashAttribute("toast", Toast.error("Não foi possível excluir a campanha", e.getMessage()));
+        }
+        return "redirect:/organizador/campanhas";
     }
 
     /** Bilhete da campanha para divulgar: imagem para as redes, WhatsApp, link e QR code. */

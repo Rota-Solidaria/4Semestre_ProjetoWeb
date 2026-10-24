@@ -168,6 +168,37 @@ public class Campaign {
         this.status = status;
     }
 
+    public boolean isInscricoesAbertas() {
+        if (status != CampaignStatus.OPEN) {
+            return false;
+        }
+        return eventDate == null || !eventDate.isBefore(LocalDate.now());
+    }
+
+    public boolean isDataPassada() {
+        return eventDate != null && eventDate.isBefore(LocalDate.now());
+    }
+
+    public CampaignStatus getStatusEfetivo() {
+        if (status == CampaignStatus.CANCELLED) {
+            return CampaignStatus.CANCELLED;
+        }
+        if (status == CampaignStatus.CLOSED || (eventDate != null && eventDate.isBefore(LocalDate.now()))) {
+            return CampaignStatus.CLOSED;
+        }
+        return CampaignStatus.OPEN;
+    }
+
+    public String getStatusRotulo() {
+        if (status == CampaignStatus.CANCELLED) {
+            return "Cancelada";
+        }
+        if (isInscricoesAbertas()) {
+            return "Inscrições abertas";
+        }
+        return "Inscrições encerradas";
+    }
+
     public TransportMode getTransportMode() {
         return TransportMode.BUS;
     }
