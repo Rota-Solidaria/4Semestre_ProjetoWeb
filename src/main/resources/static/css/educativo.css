@@ -83,30 +83,403 @@ input,select,textarea{font:inherit;color:inherit}
   .footer-inner{flex-direction:column;text-align:center}
 }
 
-/* =========== Estilos específicos desta página (educativo) =========== */
+/* =========== Variáveis de Viewport para Alinhamento 100vh =========== */
+:root {
+  --header-h: 72px;
+  --tabbar-h: 0px;
+  --section-min-h: calc(100vh - var(--header-h, 72px) - var(--tabbar-h, 0px));
+  --section-min-h-dvh: calc(100dvh - var(--header-h, 72px) - var(--tabbar-h, 0px));
+}
 
-.page-hero{background:var(--brand);color:#fff;padding:44px 0 40px;text-align:center}
-.page-hero .kicker{color:#FBE3E4}
-.page-hero h1{font:800 clamp(1.9rem,3.6vw,2.6rem)/1.1 Archivo,sans-serif;margin:10px 0 8px}
-.page-hero p{font-size:16px;color:#FDE3E4;margin:10px auto 0;max-width:600px}
+@media (max-width: 900px) {
+  :root {
+    --header-h: 72px;
+    --tabbar-h: calc(68px + env(safe-area-inset-bottom, 0px));
+    --section-min-h: calc(100vh - var(--header-h, 72px) - var(--tabbar-h, 68px));
+    --section-min-h-dvh: calc(100dvh - var(--header-h, 72px) - var(--tabbar-h, 68px));
+  }
+}
 
-.section h2{font:700 26px/1.2 Archivo,sans-serif;margin-bottom:22px}
-.req-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.req-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px}
-.req-card .icon-box{width:44px;height:44px;border-radius:12px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;margin-bottom:14px}
-.req-card .icon-box .icon{font-size:24px}
-.req-card h3{font:700 17px/1.3 Archivo,sans-serif;margin:0 0 8px}
-.req-card p{font-size:14px;color:var(--text2);margin:0}
+@media (max-width: 620px) {
+  :root {
+    --header-h: 64px;
+    --section-min-h: calc(100vh - var(--header-h, 64px) - var(--tabbar-h, 68px));
+    --section-min-h-dvh: calc(100dvh - var(--header-h, 64px) - var(--tabbar-h, 68px));
+  }
+}
 
-.steps{display:grid;gap:20px}
-.step{display:grid;grid-template-columns:40px 1fr;gap:16px}
-.step-num{width:38px;height:38px;background:var(--brand);color:#fff;border-radius:50%;display:grid;place-items:center;font:700 15px/1 'IBM Plex Mono',monospace}
-.step h3{font:700 18px/1.3 Archivo,sans-serif;margin:0 0 6px}
-.step p{font-size:15px;color:var(--text2);margin:0}
+/* Seções com 100vh uniforme em todos os dispositivos */
+.vh-section {
+  min-height: var(--section-min-h);
+  min-height: var(--section-min-h-dvh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: clamp(24px, 4vh, 48px) 0;
+  scroll-margin-top: var(--header-h, 72px);
+  position: relative;
+  width: 100%;
+}
 
-.cta-panel{background:var(--brand);color:#fff;text-align:center;border-radius:20px;padding:40px 28px}
-.cta-panel h2{font:800 26px/1.2 Archivo,sans-serif;margin:0 0 10px}
-.cta-panel p{font-size:16px;color:#FDE3E4;margin:0 0 22px}
+.vh-section > .container {
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+}
 
-@media(max-width:900px){.req-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:620px){.req-grid{grid-template-columns:1fr}}
+/* Utilitários */
+.text-center {
+  text-align: center;
+}
+
+.section-head.text-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto clamp(18px, 3vh, 28px);
+}
+
+.section-head h2 {
+  font: 700 clamp(22px, 2.8vh, 30px)/1.15 Archivo, sans-serif;
+  margin: 6px 0 4px;
+}
+
+.section-head p {
+  font-size: clamp(13.5px, 1.6vh, 15px);
+  color: var(--text2);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.section-foot {
+  margin-top: clamp(16px, 2.5vh, 24px);
+}
+
+.foot-scroll-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand);
+  font: 600 clamp(12.5px, 1.5vh, 14px)/1 'IBM Plex Sans', sans-serif;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  transition: background .15s ease, transform .15s ease;
+}
+
+.foot-scroll-link:hover {
+  background: var(--border);
+  transform: translateY(2px);
+}
+
+.foot-scroll-link .icon {
+  font-size: 17px;
+}
+
+/* =========== Seção 1: Hero =========== */
+.page-hero {
+  background: var(--brand);
+  color: #fff;
+  text-align: center;
+  border-bottom: 1px solid var(--border2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  position: relative;
+  z-index: 2;
+}
+
+.hero-content-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.page-hero .kicker {
+  color: #FBE3E4;
+  margin-bottom: 8px;
+}
+
+.page-hero h1 {
+  font: 800 clamp(2.2rem, 4vw, 3.2rem)/1.1 Archivo, sans-serif;
+  margin: 8px 0 14px;
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+
+.page-hero p {
+  font-size: clamp(15px, 1.8vh, 18px);
+  color: #FDE3E4;
+  margin: 0 auto clamp(20px, 3.2vh, 30px);
+  max-width: 620px;
+  line-height: 1.55;
+}
+
+.hero-features {
+  display: flex;
+  gap: clamp(10px, 1.8vw, 18px);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: clamp(20px, 3vh, 32px);
+}
+
+.hero-feature-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 7px 16px;
+  border-radius: 999px;
+  font: 500 clamp(12.5px, 1.5vh, 14px)/1 'IBM Plex Sans', sans-serif;
+  color: #FFFFFF;
+}
+
+.hero-feature-item .icon {
+  font-size: 18px;
+  color: #FBE3E4;
+}
+
+.hero-scroll-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: clamp(44px, 5.2vh, 50px);
+  padding: 0 24px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.hero-scroll-btn:hover {
+  transform: translateY(2px);
+}
+
+/* =========== Seção 2: Requisitos Básicos (Fundo surface2 para contraste nítido) =========== */
+.req-section {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border2);
+  position: relative;
+  z-index: 1;
+}
+
+.req-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 1.8vw, 20px);
+}
+
+.req-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(16px, 2.4vh, 24px);
+  box-shadow: 0 4px 14px #1a18170e;
+  display: flex;
+  flex-direction: column;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.req-card:hover {
+  border-color: var(--brand-soft-border);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px #1a181716;
+}
+
+.req-card .icon-box {
+  width: clamp(40px, 5vh, 46px);
+  height: clamp(40px, 5vh, 46px);
+  border-radius: 12px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  display: grid;
+  place-items: center;
+  margin-bottom: clamp(10px, 1.6vh, 14px);
+  flex-shrink: 0;
+}
+
+.req-card .icon-box .icon {
+  font-size: 22px;
+}
+
+.req-card h3 {
+  font: 700 clamp(16px, 1.9vh, 18px)/1.3 Archivo, sans-serif;
+  margin: 0 0 6px;
+}
+
+.req-card p {
+  font-size: clamp(13px, 1.5vh, 14px);
+  color: var(--text2);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* =========== Seção 3: Passos do Processo (Fundo base com transição elegante) =========== */
+.steps-section {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border2);
+  position: relative;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 1.8vh, 18px);
+}
+
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(14px, 2vh, 20px) clamp(16px, 2.2vw, 22px);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: 0 4px 14px #1a18170e;
+  transition: transform .15s ease, border-color .15s ease;
+}
+
+.step-card:hover {
+  border-color: var(--brand-soft-border);
+  transform: translateY(-2px);
+}
+
+.step-num {
+  width: clamp(34px, 4.4vh, 40px);
+  height: clamp(34px, 4.4vh, 40px);
+  background: var(--brand);
+  color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 700 clamp(14px, 1.8vh, 16px)/1 'IBM Plex Mono', monospace;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h3 {
+  font: 700 clamp(15.5px, 1.9vh, 17.5px)/1.3 Archivo, sans-serif;
+  margin: 0 0 4px;
+}
+
+.step-content p {
+  font-size: clamp(13px, 1.5vh, 14px);
+  color: var(--text2);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* =========== Seção 4: Painel CTA (Fundo surface2 para acolher o painel destacado) =========== */
+.cta-section {
+  background: var(--surface2);
+}
+
+.cta-panel {
+  background: var(--brand);
+  color: #fff;
+  text-align: center;
+  border-radius: 24px;
+  padding: clamp(32px, 6vh, 52px) clamp(20px, 4vw, 44px);
+  max-width: 840px;
+  margin: 0 auto;
+  box-shadow: 0 16px 40px rgba(180, 35, 42, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modo escuro: alternância entre camadas */
+:root[data-theme="dark"] .req-section {
+  background: var(--bg);
+  border-bottom-color: var(--border2);
+}
+
+:root[data-theme="dark"] .steps-section {
+  background: var(--surface2);
+  border-bottom-color: var(--border2);
+}
+
+:root[data-theme="dark"] .cta-section {
+  background: var(--bg);
+}
+
+.kicker-soft {
+  color: #FBE3E4;
+  margin-bottom: 8px;
+}
+
+.cta-panel h2 {
+  font: 800 clamp(22px, 3.2vh, 32px)/1.18 Archivo, sans-serif;
+  margin: 6px 0 12px;
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+
+.cta-panel p {
+  font-size: clamp(15px, 1.8vh, 17.5px);
+  color: #FDE3E4;
+  margin: 0 auto clamp(20px, 3vh, 30px);
+  max-width: 580px;
+  line-height: 1.5;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-ghost-white {
+  background: transparent;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-md);
+  padding: 0 20px;
+  height: 52px;
+  font: 600 15px/1 'IBM Plex Sans', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.btn-ghost-white:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFFFFF;
+  color: #FFFFFF;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+  .req-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .req-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cta-actions .btn {
+    width: 100%;
+  }
+}
