@@ -78,7 +78,7 @@ input,select,textarea{font:inherit;color:inherit}
 
 @media(max-width:900px){
   .nav{display:none}
-  .header-actions .profile-chip{display:none}
+  .header-actions .profile-chip{display:none}.header-actions{margin-left:auto}
 }
 @media(max-width:620px){
   .header-inner{min-height:64px;gap:10px}

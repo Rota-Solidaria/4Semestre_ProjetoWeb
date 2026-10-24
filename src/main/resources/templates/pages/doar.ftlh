@@ -5,7 +5,12 @@
      Fatos de saúde só de fonte oficial e datada (ver docs/video/prompt-video.md).
      Movimento (direção M1, "Rota viva"): o hero anima só com CSS; os blocos com data-anima entram ao aparecer
      na tela (static/js/doar-motion.js). Sem JS ou com "Reduzir movimento", tudo aparece direto no estado final. -->
-<@main.layout title="Doe sangue sem se preocupar com o transporte · Rota Solidária" css="/css/doar.css" currentNav="inicio" scripts=["/js/gotas.js", "/js/doar-motion.js"]>
+<@main.layout 
+  title="Doe sangue sem se preocupar com o transporte · Rota Solidária" 
+  description="O hemocentro fica longe? O ônibus leva você. Encontre uma caravana gratuita que sai da sua cidade, reserve sua vaga em poucos cliques e ajude a salvar vidas."
+  css="/css/doar.css" 
+  currentNav="inicio" 
+  scripts=["/js/gotas.js", "/js/doar-motion.js"]>
   <main class="doar">
 
     <section class="doar-hero vh-section">

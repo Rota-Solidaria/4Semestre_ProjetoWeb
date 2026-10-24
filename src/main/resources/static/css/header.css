@@ -199,6 +199,7 @@ body > main {
 
 /* No celular o atalho fica na barra de baixo ("Organizar") */
 @media (max-width: 900px) {
+  .site-header .header-actions { margin-left: auto; }
   .header-cta {
     display: none;
   }
