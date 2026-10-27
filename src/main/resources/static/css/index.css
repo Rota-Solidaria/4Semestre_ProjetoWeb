@@ -89,8 +89,8 @@ input,select,textarea{font:inherit;color:inherit}
   --tabbar-h: 0px;
   --section-min-h: calc(100vh - var(--header-h, 72px) - var(--tabbar-h, 0px));
   --section-min-h-dvh: calc(100dvh - var(--header-h, 72px) - var(--tabbar-h, 0px));
-  --section-sm-min-h: clamp(320px, 48vh, 480px);
-  --section-sm-min-h-dvh: clamp(320px, 48dvh, 480px);
+  --section-sm-min-h: calc(100vh - var(--header-h, 72px) - var(--tabbar-h, 0px));
+  --section-sm-min-h-dvh: calc(100dvh - var(--header-h, 72px) - var(--tabbar-h, 0px));
 }
 
 @media (max-width: 900px) {
@@ -99,6 +99,8 @@ input,select,textarea{font:inherit;color:inherit}
     --tabbar-h: calc(68px + env(safe-area-inset-bottom, 0px));
     --section-min-h: calc(100vh - var(--header-h, 72px) - var(--tabbar-h, 68px));
     --section-min-h-dvh: calc(100dvh - var(--header-h, 72px) - var(--tabbar-h, 68px));
+    --section-sm-min-h: calc(100vh - var(--header-h, 72px) - var(--tabbar-h, 68px));
+    --section-sm-min-h-dvh: calc(100dvh - var(--header-h, 72px) - var(--tabbar-h, 68px));
   }
 }
 
@@ -107,42 +109,27 @@ input,select,textarea{font:inherit;color:inherit}
     --header-h: 64px;
     --section-min-h: calc(100vh - var(--header-h, 64px) - var(--tabbar-h, 68px));
     --section-min-h-dvh: calc(100dvh - var(--header-h, 64px) - var(--tabbar-h, 68px));
+    --section-sm-min-h: calc(100vh - var(--header-h, 64px) - var(--tabbar-h, 68px));
+    --section-sm-min-h-dvh: calc(100dvh - var(--header-h, 64px) - var(--tabbar-h, 68px));
   }
 }
 
 /* Seções com 100vh uniforme em todos os dispositivos */
-.vh-section {
+.vh-section,
+.vh-section-sm {
   min-height: var(--section-min-h);
   min-height: var(--section-min-h-dvh);
   display: flex;
   flex-direction: column;
   justify-content: center;
   box-sizing: border-box;
-  padding: clamp(28px, 4vh, 56px) 0;
+  padding: clamp(20px, 3.5vh, 48px) 0;
   scroll-margin-top: var(--header-h, 72px);
   position: relative;
   width: 100%;
 }
 
-.vh-section > .container {
-  width: min(var(--max), calc(100% - 32px));
-  margin: 0 auto;
-}
-
-/* Seções menores */
-.vh-section-sm {
-  min-height: var(--section-sm-min-h);
-  min-height: var(--section-sm-min-h-dvh);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: clamp(24px, 4vh, 48px) 0;
-  scroll-margin-top: var(--header-h, 72px);
-  position: relative;
-  width: 100%;
-}
-
+.vh-section > .container,
 .vh-section-sm > .container {
   width: min(var(--max), calc(100% - 32px));
   margin: 0 auto;

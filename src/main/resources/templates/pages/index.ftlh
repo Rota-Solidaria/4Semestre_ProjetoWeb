@@ -167,7 +167,7 @@
       </div>
     </section>
 
-    <section class="home-primeira vh-section-sm">
+    <section class="home-primeira vh-section">
       <div class="container">
         <div class="home-primeira__faixa">
           <strong>Primeira vez?</strong>
@@ -181,7 +181,7 @@
       </div>
     </section>
 
-    <section class="home-fim vh-section-sm">
+    <section class="home-fim vh-section">
       <div class="container home-fim__grid">
         <div class="home-impacto">
           <span class="home-impacto__num">até 4 vidas</span>
